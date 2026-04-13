@@ -244,3 +244,4 @@ sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
 
 Happy coding team!
 Nếu gặp lỗi, vui lòng gửi result của lệnh `npm run tauri info` để mọi người dễ debug.
+![Tauri dev chạy ngon lành](https://i.pinimg.com/736x/b1/6a/df/b16adfc458b81a696588fcb090ceba47.jpg)
