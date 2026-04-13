@@ -1,0 +1,42 @@
+<aside class="sidebar">
+  <style>
+    .sidebar{width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+    .sidebar-brand .logo-mark{width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .sidebar-section{padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase}
+    .sidebar-link{display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);border:none;background:none;font-family:var(--sans);width:100%;text-align:left;transition:all .15s;text-decoration:none;cursor:pointer}
+    .sidebar-link:hover{background:var(--bg2);color:var(--text)}
+    .sidebar-link.active{background:var(--green-light);color:var(--green-dark);font-weight:500}
+    .sidebar-bottom{margin-top:auto;padding:1rem;border-top:1px solid var(--border)}
+    .sidebar-user{display:flex;align-items:center;gap:10px}
+    .sidebar-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center}
+    /* Layout helpers for pages that load this sidebar */
+    .dash-main{flex:1;min-width:0;display:flex;flex-direction:column}
+    .dash-topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .dash-title{font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text)}
+    .dash-content{padding:1.25rem 1.5rem}
+  </style>
+  <div class="sidebar-brand">
+    <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+    Fresh Market
+  </div>
+  <div class="sidebar-section">Overview</div>
+  <a class="sidebar-link" href="/components/customer/dashboard-customer.html"><span class="mi">dashboard</span> Dashboard</a>
+  <div class="sidebar-section">Shop</div>
+  <a class="sidebar-link" href="/components/customer/products-customer.html"><span class="mi">inventory_2</span> Menu</a>
+  <a class="sidebar-link" href="/components/customer/voucher-customer.html"><span class="mi">local_offer</span> Vouchers</a>
+  <a class="sidebar-link" href="/components/customer/orders-customer.html"><span class="mi">receipt_long</span> Orders</a>
+  <div class="sidebar-section">Account</div>
+  <a class="sidebar-link" href="/components/customer/user-customer.html"><span class="mi">person</span> My Profile</a>
+  <a class="sidebar-link" href="/components/customer/setting-customer.html"><span class="mi">settings</span> Settings</a>
+  <a class="sidebar-link" href="/" style="margin-top:8px"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><span class="mi" style="font-size:18px;color:var(--green)">person</span></div>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text)" id="sb-name">—</div>
+        <div style="font-size:11px;color:var(--text-light)" id="sb-role">customer</div>
+      </div>
+    </div>
+  </div>
+</aside>

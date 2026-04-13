@@ -1,76 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>My Vouchers - Fresh Market</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Vouchers — Fresh Market</title>
 	<link rel="stylesheet" href="/style/style.css" />
 	<style>
-		body { background:var(--bg); }
-		.wrap { display:flex; min-height:100vh; }
-		.sidebar { width:220px; background:#fff; border-right:1px solid var(--border); padding:1rem; }
-		.brand { display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; margin-bottom:1rem; }
-		.logo { width:30px; height:30px; border-radius:8px; background:var(--green); display:grid; place-items:center; }
-		.slink { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; text-decoration:none; color:var(--text-mid); font-size:13px; }
-		.slink:hover { background:var(--bg2); }
-		.slink.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
-		.main { flex:1; padding:1.5rem; }
-		.title { font-family:var(--serif); font-size:1.5rem; margin-bottom:.4rem; }
-		.sub { color:var(--text-mid); font-size:13px; margin-bottom:1rem; }
-		.list { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
-		.voucher { background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px; }
-		.code { font-size:18px; font-weight:700; color:var(--green-dark); letter-spacing:.05em; }
-		.desc { margin-top:5px; font-size:12px; color:var(--text-mid); }
-		.row { margin-top:10px; display:flex; justify-content:space-between; align-items:center; }
-		.btn { border:none; border-radius:8px; padding:7px 10px; background:var(--green); color:#fff; font-size:12px; cursor:pointer; }
-		.exp { font-size:11px; color:var(--text-light); }
-		@media(max-width:768px){ .sidebar{display:none;} .main{padding:1rem;} }
+		.container{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
+		.voucher-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+		.voucher{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+		.voucher-code{font-family:var(--serif);font-weight:700;color:var(--text);font-size:18px}
+		.voucher-desc{color:var(--text-mid);font-size:13px;margin-top:6px}
 	</style>
 </head>
 <body>
-	<div class="wrap">
-		<aside class="sidebar">
-			<div class="brand"><div class="logo"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>Fresh Market</div>
-			<a class="slink" href="/components/customer/dashboard-customer.html"><span class="mi">dashboard</span> Overview</a>
-			<a class="slink active" href="/components/customer/voucher-customer.html"><span class="mi">local_offer</span> My Vouchers</a>
-			<a class="slink" href="/components/customer/orders-customer.html"><span class="mi">receipt_long</span> My Orders</a>
-			<a class="slink" href="/components/customer/setting-customer.html"><span class="mi">settings</span> Settings</a>
-			<a class="slink" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
-		</aside>
-		<main class="main">
-			<div class="title">My Vouchers</div>
-			<div class="sub">Use these codes at checkout in the store page.</div>
-			<div class="list" id="list"></div>
-		</main>
-	</div>
+<div style="display:flex;min-height:100vh">
+	<div id="sidebar-slot"></div>
+	<div class="dash-main">
+		<div class="dash-topbar"><div class="dash-title">Vouchers</div></div>
+		<div class="dash-content">
 
-	<script>
-		const FM_VOUCHERS_KEY = 'fm_vouchers';
-		const seeds = [
-			{ code:'FRESH15', desc:'15% off first order', exp:'2026-12-31' },
-			{ code:'GREENSHIP', desc:'Free delivery on any order', exp:'2026-12-31' },
-			{ code:'DETOX10', desc:'10% off detox category', exp:'2026-10-31' },
-		];
-		function getVouchers(){ return JSON.parse(localStorage.getItem(FM_VOUCHERS_KEY) || '[]'); }
-		function saveVouchers(v){ localStorage.setItem(FM_VOUCHERS_KEY, JSON.stringify(v)); }
-		function init(){ if(!getVouchers().length) saveVouchers(seeds); }
-		async function copyCode(code){
-			try { await navigator.clipboard.writeText(code); alert('Copied: ' + code); }
-			catch { alert('Code: ' + code); }
+			<div class="container">
+	<div class="section-label">Vouchers</div>
+	<div class="sec-title">Available Offers</div>
+	<div class="sec-sub">Apply vouchers at checkout to get discounts.</div>
+
+	<div id="vouchers" class="voucher-grid" style="margin-top:18px"></div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div id="footer-slot"></div>
+
+<script>
+async function loadComponent(slot, url){ try{ const r=await fetch(url); if(!r.ok) throw 0; document.getElementById(slot).innerHTML=await r.text(); }catch(e){console.warn('load failed',url);} }
+loadComponent('footer-slot','/components/layout/footer.html');
+
+// load the customer sidebar with fallback for Tauri
+window.addEventListener('DOMContentLoaded', async ()=>{
+	const sidebarSlot = document.getElementById('sidebar-slot');
+	let sidebarLoaded = false;
+	try{
+		const res = await fetch('/components/layout/sidebar-customer.html');
+		if(res.ok){
+			const content = await res.text();
+			if(content.trim()){
+				sidebarSlot.innerHTML = content;
+				sidebarLoaded = true;
+			}
 		}
-		function render(){
-			const list = getVouchers();
-			document.getElementById('list').innerHTML = list.map(v => `
-				<div class="voucher">
-					<div class="code">${v.code}</div>
-					<div class="desc">${v.desc}</div>
-					<div class="row">
-						<div class="exp">Expires ${v.exp}</div>
-						<button class="btn" onclick="copyCode('${v.code}')">Copy</button>
-					</div>
-				</div>`).join('');
-		}
-		window.addEventListener('DOMContentLoaded', ()=>{ init(); render(); });
-	</script>
+	}catch(e){
+		console.warn('Sidebar fetch failed, using fallback');
+	}
+
+	// If fetch failed or returned nothing, use fallback
+	if(!sidebarLoaded || !sidebarSlot.innerHTML.trim()){
+		sidebarSlot.innerHTML = `<aside class="sidebar" style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;padding:0">
+		  <div style="padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">
+		    <span class="mi" style="font-size:16px;color:#1d9e75;margin-right:8px">local_drink</span>Fresh Market
+		  </div>
+		  <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">Overview</div>
+		  <a href="/components/customer/dashboard-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">dashboard</span> Dashboard</a>
+		  <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Shop</div>
+		  <a href="/components/customer/products-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">inventory_2</span> Menu</a>
+		  <a href="/components/customer/voucher-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:#1d9e75;text-decoration:none;cursor:pointer;font-weight:500"><span class="mi">local_offer</span> Vouchers</a>
+		  <a href="/components/customer/orders-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">receipt_long</span> Orders</a>
+		  <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Account</div>
+		  <a href="/components/customer/user-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">person</span> My Profile</a>
+		  <a href="/components/customer/setting-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">settings</span> Settings</a>
+		  <div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">
+		    <div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:#1d9e75;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600">—</div>
+		    <div style="flex:1;min-width:0">
+		      <div id="sb-name" style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+		      <div id="sb-role" style="font-size:10px;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">customer</div>
+		    </div>
+		  </div>
+		</aside>`;
+	}
+
+	const s = JSON.parse(localStorage.getItem('fm_session')||'null');
+	if(s){
+		const nameEl = document.getElementById('sb-name');
+		const roleEl = document.getElementById('sb-role');
+		const avatar = document.getElementById('sb-avatar');
+		if(nameEl) nameEl.textContent = s.name;
+		if(roleEl) roleEl.textContent = s.role||'customer';
+		if(avatar) avatar.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+	}
+
+	try{ render(); }catch(e){ console.warn('render error',e); }
+})();
+
+function getVouchers(){ return JSON.parse(localStorage.getItem('fm_vouchers')||'[]'); }
+function render(){ const v=getVouchers(); const wrap=document.getElementById('vouchers'); if(!v.length){ wrap.innerHTML='<div style="padding:2rem;color:var(--text-light);text-align:center">No vouchers available.</div>'; return;} wrap.innerHTML = v.map(x=>`<div class="voucher"><div class="voucher-code">${x.code}</div><div class="voucher-desc">${x.title||x.desc||''}</div><div style="margin-top:10px"><button class="btn-white" onclick="applyCode('${x.code}')">Apply</button></div></div>`).join(''); }
+
+function applyCode(code){ localStorage.setItem('fm_applied_voucher', code); alert('Voucher '+code+' applied'); }
+window.addEventListener('DOMContentLoaded', render);
+</script>
 </body>
 </html>

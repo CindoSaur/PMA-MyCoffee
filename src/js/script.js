@@ -220,7 +220,7 @@ let products = [
     feat: false,
   },
     {
-    id: 23,
+    id: 22,
     name: "Apple Juice",
     desc: "Fresh apple juice, rich in vitamin C and antioxidants. A refreshing and healthy choice for a quick energy boost.",
     price: 5.5,
@@ -275,19 +275,13 @@ let cart = {},
 const ITEMS_PER_PAGE = 10;
 
 function showPage(n) {
-  const targetPage = document.getElementById("page-" + n);
-  if (!targetPage) {
-    showToast("This page is coming soon.");
-    return;
-  }
-
   document
     .querySelectorAll(".page")
     .forEach((p) => p.classList.remove("active"));
   document
     .querySelectorAll(".nav-btn")
     .forEach((b) => b.classList.remove("active"));
-  targetPage.classList.add("active");
+  document.getElementById("page-" + n).classList.add("active");
   const nb = document.getElementById("nav-" + n);
   if (nb) nb.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -594,8 +588,6 @@ function openCheckout() {
   closeCart();
   checkoutStep = 1;
   selectedPay = "card";
-  document.getElementById("co-steps").style.display = "flex";
-  document.getElementById("co-nav").style.display = "flex";
   renderCoStep();
   document.getElementById("checkout-ov").classList.add("open");
 }

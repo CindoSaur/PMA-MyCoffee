@@ -5,34 +5,6 @@
 
 const AUTH_USERS_KEY = 'fm_users';      // stores all registered accounts
 const AUTH_SESSION_KEY = 'fm_session';  // stores the currently logged-in user
-const AUTH_RESET_KEY = 'fm_password_resets';
-
-const DEFAULT_ACCOUNTS = [
-  {
-    name: 'Admin User',
-    email: 'admin@polycoffee.vn',
-    password: 'admin1234',
-    role: 'admin',
-    blocked: false,
-    joined: '2025-01-01',
-  },
-  {
-    name: 'Linh Nguyen',
-    email: 'customer@polycoffee.vn',
-    password: 'customer1234',
-    role: 'customer',
-    blocked: false,
-    joined: '2025-03-15',
-  },
-  {
-    name: 'Minh Staff',
-    email: 'staff@polycoffee.vn',
-    password: 'staff1234',
-    role: 'staff',
-    blocked: false,
-    joined: '2025-02-10',
-  },
-];
 
 // ── Helpers ──────────────────────────────────
 
@@ -42,14 +14,6 @@ function getUsers() {
 
 function saveUsers(users) {
   localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
-}
-
-function getResetRequests() {
-  return JSON.parse(localStorage.getItem(AUTH_RESET_KEY) || '{}');
-}
-
-function saveResetRequests(requests) {
-  localStorage.setItem(AUTH_RESET_KEY, JSON.stringify(requests));
 }
 
 function getSession() {
@@ -62,54 +26,6 @@ function saveSession(user) {
 
 function clearSession() {
   localStorage.removeItem(AUTH_SESSION_KEY);
-}
-
-function createPasswordResetRequest(email) {
-  const normalizedEmail = String(email || '').trim().toLowerCase();
-  const users = getUsers();
-  const exists = users.some(u => u.email === normalizedEmail);
-  if (!exists) return { ok: false, message: 'Email not found' };
-
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  const requests = getResetRequests();
-  requests[normalizedEmail] = {
-    code,
-    expiresAt: Date.now() + 10 * 60 * 1000,
-  };
-  saveResetRequests(requests);
-  return { ok: true, code };
-}
-
-function completePasswordReset(email, code, newPassword) {
-  const normalizedEmail = String(email || '').trim().toLowerCase();
-  const normalizedCode = String(code || '').trim();
-  const requests = getResetRequests();
-  const req = requests[normalizedEmail];
-  if (!req) return { ok: false, message: 'No reset request found. Please request a new code.' };
-  if (Date.now() > req.expiresAt) {
-    delete requests[normalizedEmail];
-    saveResetRequests(requests);
-    return { ok: false, message: 'Reset code expired. Please request a new one.' };
-  }
-  if (req.code !== normalizedCode) return { ok: false, message: 'Invalid reset code' };
-  if (!newPassword || newPassword.length < 8) return { ok: false, message: 'Password must be at least 8 characters' };
-
-  const users = getUsers();
-  const idx = users.findIndex(u => u.email === normalizedEmail);
-  if (idx === -1) return { ok: false, message: 'Account no longer exists' };
-
-  users[idx].password = newPassword;
-  saveUsers(users);
-  delete requests[normalizedEmail];
-  saveResetRequests(requests);
-  return { ok: true };
-}
-
-function seedAccounts() {
-  const users = getUsers();
-  if (!Array.isArray(users) || users.length === 0) {
-    saveUsers(DEFAULT_ACCOUNTS);
-  }
 }
 
 
@@ -145,11 +61,6 @@ function handleLogin() {
 
   if (!user) {
     showToast('Incorrect email or password');
-    return;
-  }
-
-  if (user.blocked) {
-    showToast('Your account is blocked. Please contact support.');
     return;
   }
 
@@ -213,7 +124,6 @@ function showToast(msg) {
 // ── On page load: seed accounts + redirect if already logged in ──
 
 window.addEventListener('DOMContentLoaded', () => {
-  seedAccounts();
   const session = getSession();
   if (session) {
     window.location.href = '/';
