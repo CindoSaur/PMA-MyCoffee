@@ -1,4 +1,4 @@
-const products = [
+let products = [
   {
     id: 1,
     name: "Sunrise Blend",
@@ -232,6 +232,18 @@ const products = [
 
 ];
 
+// ── Sync products with admin localStorage ──────────────────────────────────
+// If the admin has saved changes via products.html, use those.
+// Otherwise seed localStorage with the default list so admin can manage them.
+(function syncProducts() {
+  const stored = localStorage.getItem('fm_products');
+  if (stored) {
+    try { products = JSON.parse(stored); } catch(e) {}
+  } else {
+    localStorage.setItem('fm_products', JSON.stringify(products));
+  }
+})();
+
 const featData = {
   organic: {
     title: "Organic sourcing",
@@ -307,13 +319,18 @@ function pCard(p) {
 
 function renderHomeProducts() {
   const el = document.getElementById("home-products");
-  if (el) el.innerHTML = products.slice(0, 4).map(pCard).join("");
+  if (el) {
+    // Show featured first, then others; only in-stock items
+    const available = products.filter(p => p.inStock !== false);
+    const sorted = [...available.filter(p=>p.feat), ...available.filter(p=>!p.feat)];
+    el.innerHTML = sorted.slice(0, 4).map(pCard).join("");
+  }
 }
 
 function getFilteredProducts() {
   const q = (document.getElementById("search-input") || {}).value || "";
   let list = products.filter(
-    (p) => currentCat === "all" || p.cat === currentCat,
+    (p) => p.inStock !== false && (currentCat === "all" || p.cat === currentCat),
   );
   if (q)
     list = list.filter(
@@ -688,21 +705,46 @@ function logout() {
 // Update the Login button → show name + logout once header is loaded
 function applySessionToNav() {
   const session = getSession();
-  const btn = document.querySelector('.nav-login-btn');
-  if (!btn) return;
 
-  if (session) {
-    // Show first name + logout on click
-    btn.innerHTML = `<span class="mi" style="font-size:15px">person</span> ${session.name.split(' ')[0]}`;
-    btn.onclick = logout;
-    btn.title = 'Click to logout';
-
-    // Show Dashboard link for admin and staff
-    const dash = document.getElementById('nav-dashboard');
-    if (dash && (session.role === 'admin' || session.role === 'staff')) {
-      dash.style.display = 'flex';
+  // ── Login / user pill ──
+  const loginBtn = document.getElementById('nav-login-btn');
+  const loginLbl = document.getElementById('nav-login-label');
+  if (loginBtn && loginLbl) {
+    if (session) {
+      loginLbl.textContent = session.name.split(' ')[0];
+      loginBtn.title = 'Click to sign out';
+      loginBtn.onclick = () => {
+        if (confirm('Sign out of Fresh Market?')) logout();
+      };
+    } else {
+      loginLbl.textContent = 'Login';
+      loginBtn.onclick = () => { window.location.href = '/components/auth/login.html'; };
     }
-  } else {
-    btn.onclick = () => { window.location.href = '/components/auth/login.html'; };
   }
+
+  // ── Dashboard dropdown — show for admin / staff ──
+  const dashWrap = document.getElementById('nav-dashboard-wrap');
+  if (dashWrap && session && (session.role === 'admin' || session.role === 'staff')) {
+    dashWrap.style.display = 'block';
+  }
+
+  // ── Dropdown toggle (defined here so it works after innerHTML inject) ──
+  window.toggleDashMenu = function () {
+    const menu    = document.getElementById('dash-menu');
+    const chevron = document.getElementById('dash-chevron');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('open');
+    if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  };
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    const wrap = document.getElementById('nav-dashboard-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const menu    = document.getElementById('dash-menu');
+      const chevron = document.getElementById('dash-chevron');
+      if (menu)    menu.classList.remove('open');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  }, { capture: true });
 }

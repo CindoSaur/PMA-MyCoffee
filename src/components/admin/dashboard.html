@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Fresh Market Admin</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    .dash-shell { display:flex; min-height:100vh; background:var(--bg); }
+
+    /* Sidebar */
+    .sidebar { width:220px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:1.4rem 1.25rem 1rem; font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); }
+    .sidebar-brand .logo-mark { width:32px; height:32px; background:var(--green); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sidebar-section { padding:.75rem 1rem .25rem; font-size:10px; letter-spacing:.1em; color:var(--text-light); text-transform:uppercase; }
+    .sidebar-link { display:flex; align-items:center; gap:9px; padding:9px 1.25rem; font-size:13px; color:var(--text-mid); border:none; background:none; font-family:var(--sans); width:100%; text-align:left; transition:all .15s; text-decoration:none; cursor:pointer; }
+    .sidebar-link:hover { background:var(--bg2); color:var(--text); }
+    .sidebar-link.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+    .sidebar-link .mi { font-size:17px; }
+    .sidebar-bottom { margin-top:auto; padding:1rem; border-top:1px solid var(--border); }
+    .sidebar-user { display:flex; align-items:center; gap:10px; }
+    .sidebar-avatar { width:34px; height:34px; border-radius:50%; background:var(--green-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    /* Main */
+    .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
+    .dash-content { padding:1.75rem 2rem; flex:1; }
+
+    /* KPI */
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:1.75rem; }
+    .kpi-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; display:flex; flex-direction:column; gap:6px; transition:box-shadow .2s; }
+    .kpi-card:hover { box-shadow:0 4px 20px rgba(0,0,0,.07); }
+    .kpi-label { font-size:12px; color:var(--text-light); display:flex; align-items:center; gap:6px; }
+    .kpi-label .mi { font-size:15px; }
+    .kpi-value { font-family:var(--serif); font-size:1.9rem; font-weight:600; color:var(--text); }
+    .kpi-sub { font-size:12px; color:var(--text-light); }
+
+    /* Charts */
+    .charts-row { display:grid; grid-template-columns:1fr 340px; gap:16px; margin-bottom:16px; }
+    .chart-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; display:flex; flex-direction:column; }
+    .chart-card-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+    .chart-card-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .chart-pill { display:flex; gap:4px; }
+    .pill-btn { font-size:11px; padding:4px 10px; border-radius:99px; border:1px solid var(--border); background:#fff; cursor:pointer; font-family:var(--sans); color:var(--text-mid); transition:.15s; }
+    .pill-btn.active { background:var(--green); color:#fff; border-color:var(--green); }
+
+    /* Pie legend */
+    .pie-legend { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
+    .pie-legend-item { display:flex; align-items:center; gap:10px; font-size:13px; }
+    .pie-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .pie-name { flex:1; color:var(--text-mid); }
+    .pie-pct { font-weight:600; color:var(--text); }
+
+    /* Table */
+    .table-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .table-card-hd { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:11px 1.5rem; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-light); background:var(--bg2); font-weight:500; text-align:left; border-bottom:1px solid var(--border); }
+    tbody tr { transition:background .12s; }
+    tbody tr:hover { background:var(--bg2); }
+    tbody td { padding:13px 1.5rem; font-size:13px; color:var(--text-mid); border-bottom:1px solid rgba(0,0,0,.04); }
+    .order-id { font-weight:600; color:var(--text); font-family:var(--serif); }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
+    .badge-delivered { background:#dcfce7; color:#15803d; }
+    .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-cancelled { background:#fee2e2; color:#b91c1c; }
+
+    /* Empty */
+    .empty-dash { text-align:center; padding:3rem; color:var(--text-light); }
+    .empty-dash .mi { font-size:48px; display:block; margin-bottom:1rem; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+
+    /* Seed btn */
+    .btn-seed { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border:1.5px dashed var(--border); border-radius:var(--radius-sm); font-size:12px; color:var(--text-light); background:#fff; cursor:pointer; font-family:var(--sans); transition:.15s; }
+    .btn-seed:hover { border-color:var(--green); color:var(--green); }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<div class="dash-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+      Fresh Market
+    </div>
+    <div class="sidebar-section">Overview</div>
+    <a class="sidebar-link active" href="dashboard.html"><span class="mi">dashboard</span> Dashboard</a>
+    <div class="sidebar-section">Manage</div>
+    <a class="sidebar-link" href="user.html"><span class="mi">group</span> Users</a>
+    <a class="sidebar-link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
+    <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
+    <div class="sidebar-section">Settings</div>
+    <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><span class="mi" style="font-size:18px;color:var(--green)">person</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text)" id="sb-name">—</div>
+          <div style="font-size:11px;color:var(--text-light)" id="sb-role">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title">Dashboard</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--text-light)" id="dash-date"></span>
+      </div>
+    </div>
+
+    <div class="dash-content" id="dash-content">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  localStorage keys
+// ════════════════════════════════════════
+const FM_ORDERS_KEY  = 'fm_orders';
+const FM_USERS_KEY   = 'fm_users';
+const FM_SESSION_KEY = 'fm_session';
+
+function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS_KEY) || '[]'); }
+function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS_KEY)  || '[]'); }
+function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+
+// ════════════════════════════════════════
+//  Toast
+// ════════════════════════════════════════
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ════════════════════════════════════════
+//  Seed demo data (so dashboard isn't empty on first visit)
+// ════════════════════════════════════════
+function seedDemoOrders(){
+  const cats = ['juice','smoothie','tea','detox','juice'];
+  const names = [
+    ['Sunrise Blend','juice'], ['Green Detox','detox'], ['Berry Boost','smoothie'],
+    ['Calm Tea','tea'], ['Mango Turmeric','juice'], ['Pineapple Mint','juice'],
+    ['Watermelon Cooler','juice'], ['Matcha Latte','tea']
+  ];
+  const customers = [
+    {name:'Linh Nguyen', email:'linh@example.com'},
+    {name:'Minh Tran',   email:'minh@example.com'},
+    {name:'Ha Pham',     email:'ha@example.com'},
+    {name:'Duc Le',      email:'duc@example.com'},
+    {name:'Thu Vo',      email:'thu@example.com'},
+    {name:'Quan Bui',    email:'quan@example.com'},
+  ];
+  const statuses = ['delivered','delivered','delivered','processing','cancelled'];
+
+  const existing = getOrders();
+  const now = new Date();
+  const demo = [];
+
+  // Generate 30 orders spread over last 30 days
+  for(let d=29; d>=0; d--){
+    const count = Math.floor(Math.random()*4)+1; // 1-4 orders/day
+    for(let o=0;o<count;o++){
+      const dt = new Date(now);
+      dt.setDate(dt.getDate()-d);
+      dt.setHours(8+Math.floor(Math.random()*10), Math.floor(Math.random()*60));
+      const cust = customers[Math.floor(Math.random()*customers.length)];
+      const itemCount = Math.floor(Math.random()*3)+1;
+      const items = [];
+      let total = 0;
+      for(let i=0;i<itemCount;i++){
+        const p = names[Math.floor(Math.random()*names.length)];
+        const qty = Math.floor(Math.random()*2)+1;
+        const price = [5,6,6.5,7,7.5][Math.floor(Math.random()*5)];
+        items.push({ name:p[0], cat:p[1], qty, price });
+        total += qty*price;
+      }
+      demo.push({
+        id: 'FM-'+(10000+Math.floor(Math.random()*89999)),
+        customer: cust.name,
+        email: cust.email,
+        items,
+        total: parseFloat(total.toFixed(2)),
+        payment: Math.random()>.5 ? 'cash' : 'momo',
+        status: statuses[Math.floor(Math.random()*statuses.length)],
+        date: dt.toISOString()
+      });
+    }
+  }
+
+  localStorage.setItem(FM_ORDERS_KEY, JSON.stringify([...existing, ...demo]));
+  showToast(`${demo.length} demo orders added!`);
+  buildDashboard();
+}
+
+function clearOrders(){
+  if(!confirm('Clear ALL orders from localStorage?')) return;
+  localStorage.removeItem(FM_ORDERS_KEY);
+  showToast('Orders cleared');
+  buildDashboard();
+}
+
+// ════════════════════════════════════════
+//  Data helpers
+// ════════════════════════════════════════
+function fmtMoney(v){
+  if(v>=1000000) return '₫'+(v/1000000).toFixed(1)+'M';
+  if(v>=1000)    return '₫'+(v/1000).toFixed(0)+'K';
+  return '₫'+v.toFixed(0);
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+function buildKPIs(orders){
+  const total    = orders.reduce((s,o)=>s+o.total,0);
+  const count    = orders.length;
+  const users    = getUsers().filter(u=>u.role==='customer').length;
+  const avg      = count ? total/count : 0;
+
+  const today    = orders.filter(o=>o.date.slice(0,10)===todayStr());
+  const todayRev = today.reduce((s,o)=>s+o.total,0);
+
+  return { total, count, users, avg, todayRev, todayCount: today.length };
+}
+
+// Group orders by day/week/month label for bar chart
+function groupByRange(orders, range){
+  const buckets = {};
+
+  orders.forEach(o=>{
+    const d = new Date(o.date);
+    let key;
+    if(range==='week'){
+      // last 7 days
+      const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      key = days[d.getDay()];
+    } else if(range==='month'){
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      key = months[d.getMonth()];
+    } else {
+      key = String(d.getFullYear());
+    }
+    if(!buckets[key]) buckets[key]={ revenue:0, orders:0 };
+    buckets[key].revenue += o.total;
+    buckets[key].orders  += 1;
+  });
+
+  // Build ordered labels
+  let labels;
+  if(range==='week'){
+    labels=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  } else if(range==='month'){
+    labels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  } else {
+    const yrs = [...new Set(orders.map(o=>new Date(o.date).getFullYear()))].sort();
+    labels = yrs.map(String);
+    if(!labels.length) labels=[String(new Date().getFullYear())];
+  }
+
+  return {
+    labels,
+    revenue: labels.map(l=>parseFloat(((buckets[l]?.revenue||0)/1).toFixed(2))),
+    orders:  labels.map(l=>buckets[l]?.orders||0)
+  };
+}
+
+// Sales by category for pie
+function buildCatData(orders){
+  const map = {};
+  orders.forEach(o=>{
+    o.items.forEach(i=>{
+      const c = i.cat||'other';
+      map[c] = (map[c]||0) + i.qty * i.price;
+    });
+  });
+  const labels = Object.keys(map);
+  const values = labels.map(l=>map[l]);
+  const total  = values.reduce((a,b)=>a+b,0)||1;
+  const colors = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6'];
+  return { labels, values, pcts: values.map(v=>Math.round(v/total*100)), colors: labels.map((_,i)=>colors[i%colors.length]) };
+}
+
+// ════════════════════════════════════════
+//  Chart instances
+// ════════════════════════════════════════
+let barInst = null, pieInst = null;
+let currentRange = 'month';
+
+function renderBarChart(orders, range){
+  currentRange = range;
+  const ctx = document.getElementById('barChart');
+  if(!ctx) return;
+  const d = groupByRange(orders, range);
+  if(barInst) barInst.destroy();
+  barInst = new Chart(ctx.getContext('2d'), {
+    type:'bar',
+    data:{
+      labels: d.labels,
+      datasets:[
+        {
+          label:'Revenue (₫)',
+          data: d.revenue,
+          backgroundColor:'rgba(29,158,117,.18)',
+          borderColor:'#1d9e75',
+          borderWidth:2,
+          borderRadius:6,
+          borderSkipped:false,
+          yAxisID:'y'
+        },
+        {
+          label:'Orders',
+          data: d.orders,
+          type:'line',
+          borderColor:'#ef9f27',
+          backgroundColor:'rgba(239,159,39,.08)',
+          borderWidth:2.5,
+          tension:.4,
+          pointRadius:4,
+          pointBackgroundColor:'#ef9f27',
+          fill:true,
+          yAxisID:'y1'
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{ font:{family:'DM Sans',size:12}, boxWidth:12, padding:16 } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11}} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:'DM Sans',size:11}, callback:v=>fmtMoney(v)}, position:'left' },
+        y1:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11}}, position:'right' }
+      }
+    }
+  });
+}
+
+function renderPieChart(orders){
+  const ctx = document.getElementById('pieChart');
+  if(!ctx) return;
+  const cat = buildCatData(orders);
+  if(pieInst) pieInst.destroy();
+
+  if(!cat.labels.length){
+    ctx.parentElement.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-light);font-size:13px">No category data yet</div>';
+    return;
+  }
+
+  pieInst = new Chart(ctx.getContext('2d'), {
+    type:'doughnut',
+    data:{
+      labels: cat.labels.map(l=>l.charAt(0).toUpperCase()+l.slice(1)),
+      datasets:[{ data:cat.values, backgroundColor:cat.colors, borderWidth:0, hoverOffset:8 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:true,
+      cutout:'68%',
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${ctx.label}: ₫${ctx.parsed.toFixed(2)}` } } }
+    }
+  });
+
+  const leg = document.getElementById('pieLegend');
+  if(leg) leg.innerHTML = cat.labels.map((lbl,i)=>`
+    <div class="pie-legend-item">
+      <div class="pie-dot" style="background:${cat.colors[i]}"></div>
+      <span class="pie-name">${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</span>
+      <span class="pie-pct">${cat.pcts[i]}%</span>
+    </div>`).join('');
+}
+
+// Switch range pill
+function switchRange(range, btn){
+  document.querySelectorAll('.pill-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBarChart(getOrders(), range);
+}
+
+// ════════════════════════════════════════
+//  Recent orders table
+// ════════════════════════════════════════
+function renderOrdersTable(orders){
+  const tbody = document.getElementById('orders-tbody');
+  if(!tbody) return;
+  const recent = [...orders].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  if(!recent.length){
+    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-dash"><span class="mi">receipt_long</span>No orders yet. Place an order from the store or click "Seed demo data".</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(o=>{
+    const d = new Date(o.date);
+    const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const itemSummary = o.items.map(i=>`${i.name}${i.qty>1?' x'+i.qty:''}`).join(', ');
+    return `<tr>
+      <td class="order-id">#${o.id}</td>
+      <td>${o.customer}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${itemSummary}</td>
+      <td style="font-weight:500;color:var(--text)">${fmtMoney(o.total)}</td>
+      <td><span class="badge badge-${o.status||'delivered'}">${(o.status||'delivered').charAt(0).toUpperCase()+(o.status||'delivered').slice(1)}</span></td>
+      <td>${dateStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  Build full dashboard
+// ════════════════════════════════════════
+function buildDashboard(){
+  const orders = getOrders();
+  const kpi    = buildKPIs(orders);
+  const content = document.getElementById('dash-content');
+
+  content.innerHTML = `
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label"><span class="mi" style="color:var(--green)">payments</span> Total Revenue</div>
+        <div class="kpi-value">${fmtMoney(kpi.total)}</div>
+        <div class="kpi-sub">Today: ${fmtMoney(kpi.todayRev)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label"><span class="mi" style="color:var(--amber)">receipt_long</span> Total Orders</div>
+        <div class="kpi-value">${kpi.count}</div>
+        <div class="kpi-sub">Today: ${kpi.todayCount} order${kpi.todayCount!==1?'s':''}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label"><span class="mi" style="color:#3b82f6">group</span> Customers</div>
+        <div class="kpi-value">${kpi.users}</div>
+        <div class="kpi-sub">Registered accounts</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label"><span class="mi" style="color:#8b5cf6">star</span> Avg. Order</div>
+        <div class="kpi-value">${fmtMoney(kpi.avg)}</div>
+        <div class="kpi-sub">Per completed order</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-hd">
+          <div class="chart-card-title">Revenue & Orders</div>
+          <div class="chart-pill">
+            <button class="pill-btn" onclick="switchRange('week',this)">Week</button>
+            <button class="pill-btn active" onclick="switchRange('month',this)">Month</button>
+            <button class="pill-btn" onclick="switchRange('year',this)">Year</button>
+          </div>
+        </div>
+        <div style="position:relative;height:260px">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-hd">
+          <div class="chart-card-title">Sales by Category</div>
+        </div>
+        <div style="height:190px;display:flex;align-items:center;justify-content:center">
+          <canvas id="pieChart" style="max-height:190px"></canvas>
+        </div>
+        <div class="pie-legend" id="pieLegend"></div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="table-card">
+      <div class="table-card-hd">
+        <div class="chart-card-title">Recent Orders <span style="font-size:12px;color:var(--text-light);font-family:var(--sans);font-weight:400;margin-left:8px">(${orders.length} total)</span></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody"></tbody>
+      </table>
+    </div>
+  `;
+
+  // Render charts after DOM is ready
+  requestAnimationFrame(()=>{
+    renderBarChart(orders, currentRange);
+    renderPieChart(orders);
+    renderOrdersTable(orders);
+  });
+}
+
+// ════════════════════════════════════════
+//  Init
+// ════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', ()=>{
+  const s = getSession();
+  if(!s || (s.role!=='admin' && s.role!=='staff')){
+    alert('Access denied. Admins and staff only.');
+    window.location.href='/'; return;
+  }
+  document.getElementById('sb-name').textContent = s.name;
+  document.getElementById('sb-role').textContent = s.role;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+  buildDashboard();
+});
+</script>
+</body>
+</html>

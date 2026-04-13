@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery — Fresh Market</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    /* ── Page layout ── */
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1; }
+
+    /* ── Hero ── */
+    .page-hero-teal {
+      width: 100%;
+      padding: 5rem 3rem;
+      text-align: center;
+      background: var(--green);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero-teal::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.07);
+      top: -200px; right: -100px;
+      pointer-events: none;
+    }
+    .page-hero-teal::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.05);
+      bottom: -180px; left: -80px;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.15);
+      color: #fff; font-size: 12px; font-weight: 500;
+      padding: 5px 14px; border-radius: 99px;
+      margin-bottom: 1.25rem;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .page-hero-teal h1 {
+      font-family: var(--serif);
+      font-size: 48px;
+      color: #fff;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .page-hero-teal p {
+      font-size: 16px;
+      color: rgba(255,255,255,.82);
+      line-height: 1.7;
+      max-width: 540px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+    .hero-stats {
+      display: flex; align-items: center; justify-content: center; gap: 2.5rem;
+      position: relative;
+    }
+    .hero-stat {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .hero-stat-num {
+      font-family: var(--serif); font-size: 26px; font-weight: 600; color: #fff;
+    }
+    .hero-stat-lbl { font-size: 12px; color: rgba(255,255,255,.7); }
+    .hero-stat-div { width: 1px; height: 40px; background: rgba(255,255,255,.2); }
+
+    /* ── Container ── */
+    .container {
+      width: 100%; max-width: 1100px;
+      margin: 0 auto; padding: 0 2.5rem;
+    }
+
+    /* ── Zones section ── */
+    .section-label {
+      font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--green); font-weight: 600; margin-bottom: .5rem;
+    }
+    .section-title {
+      font-family: var(--serif); font-size: 28px; font-weight: 600;
+      color: var(--text); margin-bottom: .5rem;
+    }
+    .section-sub { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+    .zones-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 2rem 0 3.5rem;
+    }
+    .zone-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all .22s;
+      position: relative;
+    }
+    .zone-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--green);
+      box-shadow: 0 12px 32px rgba(29,158,117,.12);
+    }
+    .zone-card.available { border-color: var(--green-mid); }
+    .zone-ico {
+      width: 58px; height: 58px; border-radius: 50%;
+      margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .zone-ico.g { background: var(--green-light); color: var(--green-dark); }
+    .zone-ico.a { background: #fef3c7; color: #92400e; }
+    .zone-name {
+      font-family: var(--serif); font-size: 19px;
+      font-weight: 600; margin-bottom: 5px; color: var(--text);
+    }
+    .zone-time { font-size: 12px; color: var(--text-mid); margin-bottom: 14px; }
+    .zone-tag {
+      font-size: 11px; padding: 5px 14px;
+      border-radius: 99px; display: inline-block; font-weight: 500;
+    }
+    .zone-tag.avail { background: var(--green-light); color: var(--green-dark); }
+    .zone-tag.soon  { background: #fef3c7; color: #92400e; }
+    .zone-pop {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--green); color: #fff;
+      font-size: 10px; padding: 3px 8px; border-radius: 99px; font-weight: 600;
+    }
+
+    /* ── How it works ── */
+    .how-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .how-steps { display: flex; flex-direction: column; gap: 0; margin-top: 1.5rem; }
+    .del-row {
+      display: flex; align-items: flex-start; gap: 18px;
+      padding: 18px 0; border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .del-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .del-ico {
+      width: 46px; height: 46px; border-radius: var(--radius-sm);
+      background: var(--green-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green-dark); flex-shrink: 0;
+    }
+    .del-step-num {
+      position: absolute; left: 16px; top: 18px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transform: translate(-50%, -0px);
+    }
+    .del-row strong {
+      font-size: 14px; font-weight: 600; color: var(--text);
+      display: block; margin-bottom: 4px;
+    }
+    .del-row span { font-size: 13px; color: var(--text-mid); line-height: 1.65; }
+
+    /* ── Pricing strip ── */
+    .pricing-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin: 2.5rem 0;
+    }
+    .price-tile {
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.25rem;
+      text-align: center;
+    }
+    .price-tile .pt-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--green-light); color: var(--green-dark);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .pt-label { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
+    .pt-val { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--text); }
+    .pt-sub { font-size: 11px; color: var(--text-mid); margin-top: 4px; }
+
+    /* ── FAQ ── */
+    .faq-list { margin-bottom: 3.5rem; }
+    .faq-item {
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden;
+    }
+    .faq-q {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.4rem; border: none; background: none;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      color: var(--text); cursor: pointer; gap: 12px; text-align: left;
+      transition: background .15s;
+    }
+    .faq-q:hover { background: var(--bg2); }
+    .faq-q .mi { color: var(--green); flex-shrink: 0; transition: transform .2s; }
+    .faq-q.open .mi { transform: rotate(180deg); }
+    .faq-a {
+      display: none; padding: 0 1.4rem 1.1rem;
+      font-size: 13px; color: var(--text-mid); line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+    .faq-a.open { display: block; }
+
+    /* ── CTA band ── */
+    .cta-band {
+      background: var(--green-dark);
+      padding: 5rem 3rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+      border-radius: var(--radius);
+      margin-bottom: 5rem;
+    }
+    .cta-band::before {
+      content: ''; position: absolute;
+      width: 400px; height: 400px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.07);
+      top: -150px; right: -80px; pointer-events: none;
+    }
+    .cta-band::after {
+      content: ''; position: absolute;
+      width: 500px; height: 500px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.05);
+      bottom: -200px; left: -120px; pointer-events: none;
+    }
+    .cta-band h2 {
+      font-family: var(--serif); font-size: 38px;
+      color: #fff; margin-bottom: 12px; position: relative;
+    }
+    .cta-band p {
+      font-size: 16px; color: rgba(255,255,255,.72);
+      margin-bottom: 2.25rem; position: relative; line-height: 1.65;
+    }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: #fff; color: var(--green-dark);
+      border: none; padding: 15px 34px;
+      border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 500;
+      cursor: pointer; font-family: var(--sans);
+      transition: all .2s; position: relative;
+    }
+    .btn-white:hover { opacity:.92; transform: translateY(-1px); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1a1a18; color: #fff;
+      padding: 14px 22px; border-radius: var(--radius);
+      font-size: 13px; white-space: nowrap;
+      opacity: 0; pointer-events: none;
+      transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      z-index: 9999; display: flex; align-items: center; gap: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+
+    @media (max-width: 768px) {
+      .zones-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-strip { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+      .page-hero-teal h1 { font-size: 34px; }
+    }
+    @media (max-width: 480px) {
+      .zones-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- ══════════════ PROMO BAR ══════════════ -->
+<div id="promo-bar" class="promo-bar">
+  <span class="mi" style="font-size:16px">local_offer</span>
+  Free delivery on your first order — use code
+  <strong style="color:#fff;margin:0 6px">FRESHMARKET</strong> at checkout
+  <button class="promo-close" onclick="this.parentElement.style.display='none'">&times;</button>
+</div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav class="nav">
+  <a class="logo" href="/">
+    <div class="logo-mark">
+      <span class="mi" style="font-size:18px;color:#fff">local_drink</span>
+    </div>
+    Fresh Market
+  </a>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">
+      <span class="mi" style="font-size:15px">home</span> Home
+    </a>
+    <a class="nav-btn" href="/#menu">
+      <span class="mi" style="font-size:15px">restaurant_menu</span> Menu
+    </a>
+    <a class="nav-btn" href="/#about">
+      <span class="mi" style="font-size:15px">info</span> About
+    </a>
+    <a class="nav-btn active" href="/components/delivery.html">
+      <span class="mi" style="font-size:15px">delivery_dining</span> Delivery
+    </a>
+  </div>
+  <div class="nav-actions" style="display:flex;align-items:center;gap:8px">
+    <div class="nav-dropdown" id="nav-dashboard-wrap" style="display:none">
+      <button class="nav-btn nav-dashboard-btn" onclick="toggleDashMenu()">
+        <span class="mi" style="font-size:15px">dashboard</span>
+        Dashboard
+        <span class="mi nav-chevron" id="dash-chevron" style="font-size:14px;transition:transform .2s">expand_more</span>
+      </button>
+      <div class="nav-dropdown-menu" id="dash-menu">
+        <a class="nav-dropdown-item" href="/components/admin/dashboard.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">bar_chart</span>
+          <div><div class="nav-di-title">Analytics</div><div class="nav-di-sub">Charts & revenue overview</div></div>
+        </a>
+        <a class="nav-dropdown-item" href="/components/admin/user.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">group</span>
+          <div><div class="nav-di-title">Users</div><div class="nav-di-sub">Manage accounts & roles</div></div>
+        </a>
+        <div class="nav-dropdown-divider"></div>
+        <a class="nav-dropdown-item" href="/components/admin/orders.html">
+          <span class="mi" style="font-size:16px;color:var(--text-light)">receipt_long</span>
+          <div><div class="nav-di-title">Orders</div><div class="nav-di-sub">Track & manage orders</div></div>
+        </a>
+      </div>
+    </div>
+    <button class="nav-login-btn" id="nav-login-btn" onclick="window.location.href='/components/auth/login.html'">
+      <span class="mi" style="font-size:15px">person</span>
+      <span id="nav-login-label">Login</span>
+    </button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <div class="page-hero-teal">
+    <div class="hero-eyebrow">
+      <span class="mi" style="font-size:13px">delivery_dining</span>
+      Ho Chi Minh City
+    </div>
+    <h1>Delivery Zones</h1>
+    <p>We deliver across Ho Chi Minh City, Monday to Saturday, 7am–7pm. Cold-pressed fresh, delivered cold.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">4</div>
+        <div class="hero-stat-lbl">Active zones</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">2hr</div>
+        <div class="hero-stat-lbl">Average delivery</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">Free</div>
+        <div class="hero-stat-lbl">First order</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">7am–7pm</div>
+        <div class="hero-stat-lbl">Mon – Sat</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ ZONES ══════════════ -->
+  <div class="container" style="padding-top:3.5rem">
+
+    <div class="section-label">Coverage areas</div>
+    <div class="section-title">Where we deliver</div>
+    <div class="section-sub">Click any zone for more info. Available zones accept same-day orders placed before noon.</div>
+
+    <div class="zones-grid">
+      <!-- Available -->
+      <div class="zone-card available" onclick="showToast('District 1 — same-day delivery if ordered before noon!')">
+        <div class="zone-pop">Most Popular</div>
+        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
+        <div class="zone-name">District 1</div>
+        <div class="zone-time">Same-day · 2hr avg</div>
+        <div class="zone-tag avail">Available</div>
+      </div>
+      <div class="zone-card available" onclick="showToast('District 3 — same-day delivery available!')">
+        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
+        <div class="zone-name">District 3</div>
+        <div class="zone-time">Same-day · 2hr avg</div>
+        <div class="zone-tag avail">Available</div>
+      </div>
+      <div class="zone-card available" onclick="showToast('Bình Thạnh — same-day delivery available!')">
+        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
+        <div class="zone-name">Bình Thạnh</div>
+        <div class="zone-time">Same-day · 2.5hr avg</div>
+        <div class="zone-tag avail">Available</div>
+      </div>
+      <div class="zone-card available" onclick="showToast('Thủ Đức — same-day delivery available!')">
+        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
+        <div class="zone-name">Thủ Đức</div>
+        <div class="zone-time">Same-day · 3hr avg</div>
+        <div class="zone-tag avail">Available</div>
+      </div>
+      <!-- Coming soon -->
+      <div class="zone-card" onclick="showToast('District 7 — Launching Q3 2026. Stay tuned!')">
+        <div class="zone-ico a"><span class="mi" style="font-size:28px">schedule</span></div>
+        <div class="zone-name">District 7</div>
+        <div class="zone-time">Launching Q3 2026</div>
+        <div class="zone-tag soon">Coming soon</div>
+      </div>
+      <div class="zone-card" onclick="showToast('Nhà Bè — Launching Q4 2026. Stay tuned!')">
+        <div class="zone-ico a"><span class="mi" style="font-size:28px">schedule</span></div>
+        <div class="zone-name">Nhà Bè</div>
+        <div class="zone-time">Launching Q4 2026</div>
+        <div class="zone-tag soon">Coming soon</div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PRICING ══════════════ -->
+    <div class="section-label">Pricing</div>
+    <div class="section-title">Delivery fees</div>
+    <div class="section-sub">Simple, transparent pricing — no surprise charges at checkout.</div>
+    <div class="pricing-strip">
+      <div class="price-tile">
+        <div class="pt-icon"><span class="mi" style="font-size:22px">star</span></div>
+        <div class="pt-label">First order</div>
+        <div class="pt-val">Free</div>
+        <div class="pt-sub">Use code FRESHMARKET</div>
+      </div>
+      <div class="price-tile">
+        <div class="pt-icon"><span class="mi" style="font-size:22px">local_shipping</span></div>
+        <div class="pt-label">Standard delivery</div>
+        <div class="pt-val">₫25,000</div>
+        <div class="pt-sub">All active zones</div>
+      </div>
+      <div class="price-tile">
+        <div class="pt-icon"><span class="mi" style="font-size:22px">recycling</span></div>
+        <div class="pt-label">Bottle return discount</div>
+        <div class="pt-val">10% off</div>
+        <div class="pt-sub">Return empties to the rider</div>
+      </div>
+    </div>
+
+    <!-- ══════════════ HOW IT WORKS ══════════════ -->
+    <div class="how-card">
+      <div class="section-label">Process</div>
+      <div class="section-title" style="margin-bottom:0">How it works</div>
+      <div class="how-steps">
+        <div class="del-row">
+          <div class="del-ico"><span class="mi" style="font-size:20px">shopping_cart</span></div>
+          <div>
+            <strong>Order before noon</strong>
+            <span>Place your order any time before 12:00pm for same-day delivery. Late orders are scheduled for the next morning.</span>
+          </div>
+        </div>
+        <div class="del-row">
+          <div class="del-ico"><span class="mi" style="font-size:20px">blender</span></div>
+          <div>
+            <strong>We cold-press your order</strong>
+            <span>Your drinks are pressed fresh right after your order is confirmed — never pre-made or stored. Zero preservatives.</span>
+          </div>
+        </div>
+        <div class="del-row">
+          <div class="del-ico"><span class="mi" style="font-size:20px">inventory_2</span></div>
+          <div>
+            <strong>Bottled & sealed</strong>
+            <span>Each bottle is sealed and labelled with the press time. If it's more than 4 hours old we won't send it.</span>
+          </div>
+        </div>
+        <div class="del-row">
+          <div class="del-ico"><span class="mi" style="font-size:20px">delivery_dining</span></div>
+          <div>
+            <strong>Fast delivery to your door</strong>
+            <span>Our riders use insulated refrigerated bags so your drinks arrive perfectly cold, every single time.</span>
+          </div>
+        </div>
+        <div class="del-row">
+          <div class="del-ico"><span class="mi" style="font-size:20px">recycling</span></div>
+          <div>
+            <strong>Return your bottles, earn rewards</strong>
+            <span>Hand empty glass bottles back to the rider and get 10% off your next order — automatically applied at checkout.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ FAQ ══════════════ -->
+    <div class="section-label">FAQ</div>
+    <div class="section-title" style="margin-bottom:1.25rem">Common questions</div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What time do I need to order by for same-day delivery?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">Orders placed before 12:00pm receive same-day delivery, typically within 2–3 hours. Orders placed after noon are scheduled for the following morning, delivered between 7am and 10am.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How are the drinks kept cold during delivery?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">All our riders carry professional-grade insulated cooler bags that maintain temperature for up to 4 hours. Your drinks will arrive cold — guaranteed. If they don't, we'll refund your order in full.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can I schedule a delivery for a specific time?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">Not yet, but this feature is coming soon! Currently, same-day orders are dispatched as soon as they are ready (usually within 60–90 minutes of placing your order). We'll notify you by SMS when your rider is on the way.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What happens if I'm not home?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">Your rider will wait up to 5 minutes and attempt to contact you. If there's no answer, they can leave the order with a guard or neighbour if you have provided those instructions in the order notes. Otherwise the order is returned and refunded.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How does the bottle return programme work?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">Simply rinse your empty glass bottles and hand them to the rider on your next delivery. They'll scan a QR code and the 10% discount is instantly applied to your next order — no voucher needed.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Is my area covered?
+          <span class="mi">expand_more</span>
+        </button>
+        <div class="faq-a">We currently deliver to District 1, District 3, Bình Thạnh and Thủ Đức. District 7 launches Q3 2026 and Nhà Bè launches Q4 2026. If your area isn't listed yet, drop us a message — high demand can accelerate our expansion.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════ CTA ══════════════ -->
+    <div class="cta-band">
+      <h2>Ready to order?</h2>
+      <p>Free delivery on your first order with code FRESHMARKET.<br>Fresh-pressed and at your door in under 3 hours.</p>
+      <a class="btn-white" href="/">
+        <span class="mi" style="font-size:17px;color:var(--green-dark)">menu_book</span>
+        Browse Menu
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-brand-mark">
+            <span class="mi" style="font-size:16px;color:#fff">storefront</span>
+          </div>
+          Fresh Market
+        </div>
+        <div class="footer-desc">Farm-fresh cold-pressed juices, herbal teas and smoothies delivered across Ho Chi Minh City every morning.</div>
+        <div class="footer-socials">
+          <div class="social-btn" onclick="showToast('Follow us @freshmarket on Instagram!')">
+            <span class="mi" style="font-size:18px">photo_camera</span>
+          </div>
+          <div class="social-btn" onclick="showToast('Like us on Facebook!')">
+            <span class="mi" style="font-size:18px">thumb_up</span>
+          </div>
+          <div class="social-btn" onclick="showToast('Chat with us on WhatsApp!')">
+            <span class="mi" style="font-size:18px">chat</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <a class="footer-link" href="/">All drinks</a>
+        <a class="footer-link" href="/">Cold-pressed juices</a>
+        <a class="footer-link" href="/">Smoothies</a>
+        <a class="footer-link" href="/">Herbal teas</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a class="footer-link" href="/">About us</a>
+        <a class="footer-link" href="/components/delivery.html">Delivery</a>
+        <a class="footer-link" href="#" onclick="showToast('Blog coming soon!')">Blog</a>
+        <a class="footer-link" href="#" onclick="showToast('Careers page coming soon!')">Careers</a>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <a class="footer-link" href="#" onclick="showToast('Team available 8am–8pm daily.')">Contact us</a>
+        <a class="footer-link" href="#" onclick="showToast('Full refund within 24 hours if unsatisfied.')">Returns</a>
+        <a class="footer-link" href="#" onclick="showToast('We never share your data.')">Privacy</a>
+        <a class="footer-link" href="#" onclick="showToast('Terms available on request.')">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fresh Market. All rights reserved.</span>
+      <span>Made with <span class="mi" style="font-size:14px;color:var(--green)">favorite</span> in Ho Chi Minh City</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Toast
+let toastTmr;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// FAQ accordion
+function toggleFaq(btn) {
+  const answer = btn.nextElementSibling;
+  const isOpen = answer.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+  // Open clicked if it was closed
+  if (!isOpen) {
+    answer.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+
+// Dashboard dropdown
+function toggleDashMenu() {
+  const menu = document.getElementById('dash-menu');
+  const chevron = document.getElementById('dash-chevron');
+  menu.classList.toggle('open');
+  chevron.style.transform = menu.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('nav-dashboard-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('dash-menu')?.classList.remove('open');
+    const ch = document.getElementById('dash-chevron');
+    if (ch) ch.style.transform = '';
+  }
+});
+
+// Session — show dashboard button & login state
+const AUTH_SESSION_KEY = 'fm_session';
+function getSession() { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || 'null'); }
+
+window.addEventListener('DOMContentLoaded', () => {
+  const s = getSession();
+  if (s) {
+    document.getElementById('nav-login-label').textContent = s.name.split(' ')[0];
+    document.getElementById('nav-login-btn').onclick = () => {
+      if (confirm('Sign out?')) { localStorage.removeItem(AUTH_SESSION_KEY); location.reload(); }
+    };
+    if (s.role === 'admin' || s.role === 'staff') {
+      document.getElementById('nav-dashboard-wrap').style.display = 'block';
+    }
+  }
+});
+</script>
+
+<!-- Nav dropdown & login styles (from header.html) -->
+<style>
+.nav-actions { display:flex; align-items:center; gap:8px; }
+.nav-dashboard-btn {
+  display:flex; align-items:center; gap:5px; font-size:13px;
+  color:var(--green-dark); padding:7px 14px; border-radius:var(--radius-sm);
+  border:1.5px solid var(--green); background:var(--green-light);
+  cursor:pointer; font-family:var(--sans); font-weight:500; transition:all .18s;
+}
+.nav-dashboard-btn:hover { background:var(--green); color:#fff; }
+.nav-dropdown { position:relative; }
+.nav-dropdown-menu {
+  position:absolute; top:calc(100% + 8px); right:0; background:#fff;
+  border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:0 12px 40px rgba(0,0,0,.12); min-width:240px; padding:6px;
+  display:none; flex-direction:column; gap:2px; z-index:999;
+}
+.nav-dropdown-menu.open { display:flex; }
+.nav-dropdown-item {
+  display:flex; align-items:center; gap:12px; padding:10px 12px;
+  border-radius:10px; text-decoration:none; transition:background .13s; cursor:pointer;
+}
+.nav-dropdown-item:hover { background:var(--bg2); }
+.nav-di-title { font-size:13px; font-weight:500; color:var(--text); }
+.nav-di-sub { font-size:11px; color:var(--text-light); margin-top:1px; }
+.nav-dropdown-divider { height:1px; background:var(--border); margin:4px 0; }
+.nav-login-btn {
+  display:flex; align-items:center; gap:6px; padding:7px 16px;
+  border:1.5px solid var(--green); color:var(--green);
+  border-radius:var(--radius-sm); background:none;
+  font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:all .18s;
+}
+.nav-login-btn:hover { background:var(--green); color:#fff; }
+</style>
+
+</body>
+</html>

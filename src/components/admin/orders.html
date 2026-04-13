@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders — Fresh Market Admin</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    .dash-shell { display:flex; min-height:100vh; background:var(--bg); }
+    .sidebar { width:220px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:1.4rem 1.25rem 1rem; font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); }
+    .sidebar-brand .logo-mark { width:32px; height:32px; background:var(--green); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sidebar-section { padding:.75rem 1rem .25rem; font-size:10px; letter-spacing:.1em; color:var(--text-light); text-transform:uppercase; }
+    .sidebar-link { display:flex; align-items:center; gap:9px; padding:9px 1.25rem; font-size:13px; color:var(--text-mid); border:none; background:none; font-family:var(--sans); width:100%; text-align:left; transition:all .15s; text-decoration:none; cursor:pointer; }
+    .sidebar-link:hover { background:var(--bg2); color:var(--text); }
+    .sidebar-link.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+    .sidebar-link .mi { font-size:17px; }
+    .sidebar-bottom { margin-top:auto; padding:1rem; border-top:1px solid var(--border); }
+    .sidebar-user { display:flex; align-items:center; gap:10px; }
+    .sidebar-avatar { width:34px; height:34px; border-radius:50%; background:var(--green-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
+    .dash-content { padding:1.75rem 2rem; flex:1; }
+
+    /* Toolbar */
+    .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .search-wrap { position:relative; flex:1; min-width:200px; }
+    .search-wrap input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; }
+    .search-wrap input:focus { border-color:var(--green); }
+    .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-light); font-size:18px; }
+    .filter-tabs { display:flex; background:var(--bg2); border-radius:var(--radius-sm); padding:3px; gap:3px; }
+    .filter-tab { padding:7px 14px; border:none; background:none; border-radius:8px; font-size:12px; font-weight:500; color:var(--text-mid); cursor:pointer; font-family:var(--sans); transition:all .15s; white-space:nowrap; }
+    .filter-tab.active { background:#fff; color:var(--green-dark); box-shadow:0 1px 4px rgba(0,0,0,.09); }
+
+    /* Table */
+    .table-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:11px 1.25rem; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-light); background:var(--bg2); font-weight:500; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+    tbody tr { transition:background .12s; cursor:pointer; }
+    tbody tr:hover { background:var(--bg2); }
+    tbody td { padding:13px 1.25rem; font-size:13px; color:var(--text-mid); border-bottom:1px solid rgba(0,0,0,.04); vertical-align:middle; }
+    .order-id { font-weight:600; color:var(--text); font-family:var(--serif); }
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
+    .badge-delivered  { background:#dcfce7; color:#15803d; }
+    .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
+    .pay-chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--text-mid); }
+
+    /* Pagination */
+    .pagination { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; border-top:1px solid var(--border); }
+    .page-info { font-size:12px; color:var(--text-light); }
+    .page-btns { display:flex; gap:4px; }
+    .page-btn { width:32px; height:32px; border:1px solid var(--border); background:#fff; border-radius:8px; font-size:12px; cursor:pointer; font-family:var(--sans); display:flex; align-items:center; justify-content:center; transition:.15s; }
+    .page-btn:hover { background:var(--bg2); }
+    .page-btn.active { background:var(--green); color:#fff; border-color:var(--green); }
+
+    /* Empty */
+    .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-light); }
+    .empty-state .mi { font-size:48px; margin-bottom:1rem; display:block; }
+
+    /* Drawer */
+    .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:400; display:none; }
+    .drawer-overlay.open { display:block; }
+    .drawer { position:fixed; right:0; top:0; bottom:0; width:420px; max-width:95vw; background:#fff; border-left:1px solid var(--border); z-index:401; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); overflow-y:auto; }
+    .drawer.open { transform:translateX(0); }
+    .drawer-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+    .drawer-title { font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); }
+    .drawer-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .drawer-close:hover { background:var(--bg2); }
+    .drawer-body { padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem; flex:1; }
+    .drawer-section { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); margin-bottom:.5rem; }
+    .drawer-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text-mid); padding:6px 0; border-bottom:1px solid rgba(0,0,0,.04); }
+    .drawer-row:last-child { border:none; }
+    .drawer-row strong { color:var(--text); }
+    .drawer-items { display:flex; flex-direction:column; gap:8px; }
+    .drawer-item { display:flex; justify-content:space-between; align-items:center; background:var(--bg2); border-radius:var(--radius-sm); padding:10px 12px; font-size:13px; }
+    .drawer-item-name { font-weight:500; color:var(--text); }
+    .drawer-item-meta { font-size:11px; color:var(--text-light); }
+    .drawer-total { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; color:var(--text); padding:12px 0 0; border-top:2px solid var(--border); margin-top:4px; }
+    .status-select { padding:7px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; cursor:pointer; transition:border-color .2s; }
+    .status-select:focus { border-color:var(--green); }
+    .btn-update { display:flex; align-items:center; gap:7px; padding:10px 20px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; width:100%; justify-content:center; margin-top:.5rem; }
+    .btn-update:hover { background:var(--green-dark); }
+
+    /* Toast */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- ORDER DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="orderDrawer">
+  <div class="drawer-hd">
+    <div class="drawer-title" id="drawer-title">Order Detail</div>
+    <button class="drawer-close" onclick="closeDrawer()"><span class="mi" style="font-size:18px;color:var(--text-mid)">close</span></button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<div class="dash-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+      Fresh Market
+    </div>
+    <div class="sidebar-section">Overview</div>
+    <a class="sidebar-link" href="dashboard.html"><span class="mi">dashboard</span> Dashboard</a>
+    <div class="sidebar-section">Manage</div>
+    <a class="sidebar-link" href="user.html"><span class="mi">group</span> Users</a>
+    <a class="sidebar-link active" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
+    <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
+    <div class="sidebar-section">Settings</div>
+    <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><span class="mi" style="font-size:18px;color:var(--green)">person</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text)" id="sb-name">—</div>
+          <div style="font-size:11px;color:var(--text-light)" id="sb-role">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title">Orders</div>
+      <span id="order-count" style="font-size:12px;color:var(--text-light)"></span>
+    </div>
+
+    <div class="dash-content">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="mi search-icon">search</span>
+          <input type="text" id="search-input" placeholder="Search by order ID or customer…" oninput="renderTable()" />
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tab" onclick="setFilter('processing',this)">Processing</button>
+          <button class="filter-tab" onclick="setFilter('delivered',this)">Delivered</button>
+          <button class="filter-tab" onclick="setFilter('cancelled',this)">Cancelled</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+          <div id="empty-state" class="empty-state" style="display:none">
+            <span class="mi">receipt_long</span>
+            No orders found.
+          </div>
+        </div>
+        <div class="pagination">
+          <div class="page-info" id="page-info"></div>
+          <div class="page-btns" id="page-btns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FM_ORDERS_KEY  = 'fm_orders';
+const FM_SESSION_KEY = 'fm_session';
+
+function getOrders()  { return JSON.parse(localStorage.getItem(FM_ORDERS_KEY)  || '[]'); }
+function saveOrders(o){ localStorage.setItem(FM_ORDERS_KEY, JSON.stringify(o)); }
+function getSession() { return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+
+let currentFilter = 'all';
+let currentPage   = 1;
+const PAGE_SIZE   = 10;
+let openOrderIdx  = -1; // index into getOrders() for the open drawer
+
+// Toast
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// Money formatting
+function fmtMoney(v){
+  if(v>=1000000) return '₫'+(v/1000000).toFixed(1)+'M';
+  if(v>=1000)    return '₫'+(v/1000).toFixed(0)+'K';
+  return '₫'+v.toFixed(0);
+}
+
+function setFilter(f, btn){
+  currentFilter = f; currentPage = 1;
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function getFiltered(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let orders = [...getOrders()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(currentFilter !== 'all') orders = orders.filter(o=>o.status===currentFilter);
+  if(q) orders = orders.filter(o=>
+    o.id.toLowerCase().includes(q) ||
+    o.customer.toLowerCase().includes(q) ||
+    (o.email||'').toLowerCase().includes(q)
+  );
+  return orders;
+}
+
+function renderTable(){
+  const filtered   = getFiltered();
+  const allOrders  = [...getOrders()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total      = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const slice = filtered.slice(start, start+PAGE_SIZE);
+
+  document.getElementById('order-count').textContent = `${total} order${total!==1?'s':''}`;
+  document.getElementById('page-info').textContent   = total ? `Showing ${start+1}–${Math.min(start+PAGE_SIZE,total)} of ${total}` : '';
+
+  const tbody = document.getElementById('orders-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if(!slice.length){ tbody.innerHTML=''; empty.style.display='block'; buildPager(0,0); return; }
+  empty.style.display='none';
+
+  tbody.innerHTML = slice.map(o=>{
+    const realIdx = allOrders.findIndex(x=>x.id===o.id);
+    const d = new Date(o.date);
+    const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const itemSummary = o.items.map(i=>`${i.name}${i.qty>1?' ×'+i.qty:''}`).join(', ');
+    const payIcon = o.payment==='momo'
+      ? '<span class="mi" style="font-size:16px;color:#ae2070;vertical-align:middle">smartphone</span>'
+      : '<span class="mi" style="font-size:16px;color:#16a34a;vertical-align:middle">payments</span>';
+    const payLabel = o.payment==='momo' ? 'MoMo' : 'Cash';
+    return `<tr onclick="openDrawer(${realIdx})">
+      <td class="order-id">#${o.id}</td>
+      <td>
+        <div style="font-weight:500;color:var(--text);font-size:13px">${o.customer}</div>
+        <div style="font-size:11px;color:var(--text-light)">${o.email||''}</div>
+      </td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${itemSummary}</td>
+      <td style="font-weight:600;color:var(--text)">${fmtMoney(o.total)}</td>
+      <td><span class="pay-chip">${payIcon} ${payLabel}</span></td>
+      <td><span class="badge badge-${o.status||'processing'}">${cap(o.status||'processing')}</span></td>
+      <td>
+        <div style="font-size:12px;color:var(--text)">${dateStr}</div>
+        <div style="font-size:11px;color:var(--text-light)">${timeStr}</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  buildPager(totalPages, currentPage);
+}
+
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function buildPager(total, cur){
+  const wrap = document.getElementById('page-btns');
+  if(total<=1){ wrap.innerHTML=''; return; }
+  let html = `<button class="page-btn" onclick="goPage(${cur-1})" ${cur<=1?'disabled':''} style="${cur<=1?'opacity:.4;cursor:default':''}"><span class="mi" style="font-size:16px">chevron_left</span></button>`;
+  for(let i=1;i<=total;i++) html+=`<button class="page-btn${i===cur?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  html+=`<button class="page-btn" onclick="goPage(${cur+1})" ${cur>=total?'disabled':''} style="${cur>=total?'opacity:.4;cursor:default':''}"><span class="mi" style="font-size:16px">chevron_right</span></button>`;
+  wrap.innerHTML = html;
+}
+
+function goPage(p){ currentPage=p; renderTable(); }
+
+// Drawer
+function openDrawer(idx){
+  const orders = [...getOrders()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const o = orders[idx];
+  // find real index in unsorted array for saving
+  openOrderIdx = getOrders().findIndex(x=>x.id===o.id);
+
+  const d = new Date(o.date);
+  const payLabel = o.payment==='momo'
+    ? '<span class="mi" style="font-size:16px;color:#ae2070;vertical-align:middle">smartphone</span> MoMo'
+    : '<span class="mi" style="font-size:16px;color:#16a34a;vertical-align:middle">payments</span> Cash';
+
+  document.getElementById('drawer-title').textContent = `Order #${o.id}`;
+  document.getElementById('drawer-body').innerHTML = `
+    <div>
+      <div class="drawer-section">Customer</div>
+      <div class="drawer-row"><span>Name</span><strong>${o.customer}</strong></div>
+      <div class="drawer-row"><span>Email</span><strong>${o.email||'—'}</strong></div>
+    </div>
+    <div>
+      <div class="drawer-section">Order Info</div>
+      <div class="drawer-row"><span>Date</span><strong>${d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} at ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</strong></div>
+      <div class="drawer-row"><span>Payment</span><strong>${payLabel}</strong></div>
+    </div>
+    <div>
+      <div class="drawer-section">Items</div>
+      <div class="drawer-items">
+        ${o.items.map(i=>`
+          <div class="drawer-item">
+            <div>
+              <div class="drawer-item-name">${i.name}</div>
+              <div class="drawer-item-meta">${cap(i.cat||'other')} · ${fmtMoney(i.price)} each</div>
+            </div>
+            <div style="font-weight:600;color:var(--text)">×${i.qty} &nbsp; ${fmtMoney(i.price*i.qty)}</div>
+          </div>`).join('')}
+        <div class="drawer-total"><span>Total</span><span>${fmtMoney(o.total)}</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="drawer-section">Update Status</div>
+      <select class="status-select" id="status-select" style="width:100%;margin-bottom:10px">
+        <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+        <option value="delivered"  ${o.status==='delivered' ?'selected':''}>Delivered</option>
+        <option value="cancelled"  ${o.status==='cancelled' ?'selected':''}>Cancelled</option>
+      </select>
+      <button class="btn-update" onclick="updateStatus()">
+        <span class="mi" style="font-size:16px;color:#fff">save</span> Save Status
+      </button>
+    </div>
+  `;
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('orderDrawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('orderDrawer').classList.remove('open');
+  openOrderIdx = -1;
+}
+
+function updateStatus(){
+  if(openOrderIdx < 0) return;
+  const val = document.getElementById('status-select').value;
+  const orders = getOrders();
+  orders[openOrderIdx].status = val;
+  saveOrders(orders);
+  showToast(`Order status updated to "${cap(val)}"`);
+  renderTable();
+  closeDrawer();
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  const s = getSession();
+  if(!s || (s.role!=='admin' && s.role!=='staff')){ alert('Access denied.'); window.location.href='/'; return; }
+  document.getElementById('sb-name').textContent = s.name;
+  document.getElementById('sb-role').textContent = s.role;
+  renderTable();
+});
+</script>
+</body>
+</html>

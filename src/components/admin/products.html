@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products — Fresh Market Admin</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    .dash-shell { display:flex; min-height:100vh; background:var(--bg); }
+    .sidebar { width:220px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:1.4rem 1.25rem 1rem; font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); }
+    .sidebar-brand .logo-mark { width:32px; height:32px; background:var(--green); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sidebar-section { padding:.75rem 1rem .25rem; font-size:10px; letter-spacing:.1em; color:var(--text-light); text-transform:uppercase; }
+    .sidebar-link { display:flex; align-items:center; gap:9px; padding:9px 1.25rem; font-size:13px; color:var(--text-mid); border:none; background:none; font-family:var(--sans); width:100%; text-align:left; transition:all .15s; text-decoration:none; cursor:pointer; }
+    .sidebar-link:hover { background:var(--bg2); color:var(--text); }
+    .sidebar-link.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+    .sidebar-link .mi { font-size:17px; }
+    .sidebar-bottom { margin-top:auto; padding:1rem; border-top:1px solid var(--border); }
+    .sidebar-user { display:flex; align-items:center; gap:10px; }
+    .sidebar-avatar { width:34px; height:34px; border-radius:50%; background:var(--green-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
+    .dash-content { padding:1.75rem 2rem; flex:1; }
+
+    /* Toolbar */
+    .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .search-wrap { position:relative; flex:1; min-width:200px; }
+    .search-wrap input { width:100%; padding:9px 14px 9px 38px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; }
+    .search-wrap input:focus { border-color:var(--green); }
+    .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-light); font-size:18px; }
+    .filter-tabs { display:flex; background:var(--bg2); border-radius:var(--radius-sm); padding:3px; gap:3px; }
+    .filter-tab { padding:7px 14px; border:none; background:none; border-radius:8px; font-size:12px; font-weight:500; color:var(--text-mid); cursor:pointer; font-family:var(--sans); transition:all .15s; white-space:nowrap; }
+    .filter-tab.active { background:#fff; color:var(--green-dark); box-shadow:0 1px 4px rgba(0,0,0,.09); }
+    .btn-add { display:flex; align-items:center; gap:7px; padding:9px 18px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; white-space:nowrap; }
+    .btn-add:hover { background:var(--green-dark); }
+
+    /* Grid */
+    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+    .prod-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:box-shadow .2s,transform .2s; display:flex; flex-direction:column; }
+    .prod-card:hover { box-shadow:0 8px 28px rgba(0,0,0,.09); transform:translateY(-2px); }
+    .prod-img { width:100%; height:160px; object-fit:cover; background:var(--bg2); }
+    .prod-body { padding:1rem; flex:1; display:flex; flex-direction:column; gap:6px; }
+    .prod-cat { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--green-dark); font-weight:600; }
+    .prod-name { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .prod-desc { font-size:12px; color:var(--text-light); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .prod-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+    .prod-tag { font-size:10px; padding:2px 8px; background:var(--bg2); border-radius:99px; color:var(--text-mid); }
+    .prod-footer { display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; border-top:1px solid var(--border); }
+    .prod-price { font-family:var(--serif); font-size:1.05rem; font-weight:700; color:var(--green-dark); }
+    .prod-actions { display:flex; gap:6px; }
+    .act-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.15s; }
+    .act-btn:hover { background:var(--bg2); }
+    .act-btn.danger:hover { background:#fee2e2; border-color:#fca5a5; }
+    .feat-badge { font-size:10px; padding:2px 8px; border-radius:99px; background:#fef9c3; color:#854d0e; font-weight:500; display:inline-flex; align-items:center; gap:3px; }
+    .stock-toggle { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-mid); cursor:pointer; }
+    .stock-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; flex-shrink:0; }
+    .stock-dot.out { background:#ef4444; }
+
+    /* Empty */
+    .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-light); grid-column:1/-1; }
+    .empty-state .mi { font-size:48px; margin-bottom:1rem; display:block; }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:500; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:var(--radius); width:520px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.18); animation:slideUp .25s cubic-bezier(.34,1.3,.64,1); }
+    @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .modal-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+    .modal-title { font-family:var(--serif); font-size:1.1rem; font-weight:600; color:var(--text); }
+    .modal-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .modal-close:hover { background:var(--bg2); }
+    .modal-body { padding:1.5rem; display:flex; flex-direction:column; gap:1rem; }
+    .modal-footer { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; position:sticky; bottom:0; background:#fff; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .form-label { font-size:12px; font-weight:500; color:var(--text-mid); }
+    .form-input { padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
+    .form-input:focus { border-color:var(--green); }
+    select.form-input { cursor:pointer; }
+    textarea.form-input { resize:vertical; min-height:80px; }
+    .btn-cancel { padding:9px 18px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text-mid); background:#fff; cursor:pointer; transition:.15s; }
+    .btn-cancel:hover { background:var(--bg2); }
+    .btn-save { padding:9px 22px; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; background:var(--green); color:#fff; cursor:pointer; transition:.15s; }
+    .btn-save:hover { background:var(--green-dark); }
+    .img-preview { width:100%; height:140px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--border); display:none; margin-top:6px; background:var(--bg2); }
+    .img-preview.show { display:block; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="prodModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="modal-title">Add Product</div>
+      <button class="modal-close" onclick="closeModal()"><span class="mi" style="font-size:18px;color:var(--text-mid)">close</span></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-index" value="-1" />
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input class="form-input" id="f-name" placeholder="e.g. Sunrise Blend" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-input" id="f-cat">
+            <option value="juice">Juice</option>
+            <option value="smoothie">Smoothie</option>
+            <option value="tea">Tea</option>
+            <option value="detox">Detox</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea class="form-input" id="f-desc" placeholder="Describe the product…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (USD) *</label>
+          <input class="form-input" id="f-price" type="number" min="0" step="0.5" placeholder="6.50" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input class="form-input" id="f-tags" placeholder="vitamin-c, ginger, juice" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL</label>
+        <input class="form-input" id="f-img" placeholder="https://…" oninput="previewImg()" />
+        <img class="img-preview" id="img-preview" src="" alt="Preview" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Featured</label>
+          <select class="form-input" id="f-feat">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">In Stock</label>
+          <select class="form-input" id="f-stock">
+            <option value="true">In Stock</option>
+            <option value="false">Out of Stock</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+      Fresh Market
+    </div>
+    <div class="sidebar-section">Overview</div>
+    <a class="sidebar-link" href="dashboard.html"><span class="mi">dashboard</span> Dashboard</a>
+    <div class="sidebar-section">Manage</div>
+    <a class="sidebar-link" href="user.html"><span class="mi">group</span> Users</a>
+    <a class="sidebar-link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
+    <a class="sidebar-link active" href="products.html"><span class="mi">inventory_2</span> Products</a>
+    <div class="sidebar-section">Settings</div>
+    <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><span class="mi" style="font-size:18px;color:var(--green)">person</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text)" id="sb-name">—</div>
+          <div style="font-size:11px;color:var(--text-light)" id="sb-role">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title">Products</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="prod-count" style="font-size:12px;color:var(--text-light)"></span>
+        <button class="btn-add" onclick="openAddModal()">
+          <span class="mi" style="font-size:17px">add</span> Add Product
+        </button>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="mi search-icon">search</span>
+          <input type="text" id="search-input" placeholder="Search products…" oninput="renderGrid()" />
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tab" onclick="setFilter('juice',this)">Juice</button>
+          <button class="filter-tab" onclick="setFilter('smoothie',this)">Smoothie</button>
+          <button class="filter-tab" onclick="setFilter('tea',this)">Tea</button>
+          <button class="filter-tab" onclick="setFilter('detox',this)">Detox</button>
+          <button class="filter-tab" onclick="setFilter('featured',this)">Featured</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="products-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Keys ──
+const FM_SESSION_KEY  = 'fm_session';
+const FM_PRODUCTS_KEY = 'fm_products';
+
+function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION_KEY)||'null'); }
+function getProducts(){ return JSON.parse(localStorage.getItem(FM_PRODUCTS_KEY)||'null'); }
+function saveProducts(p){ localStorage.setItem(FM_PRODUCTS_KEY, JSON.stringify(p)); }
+
+// ── Seed from script.js products array (embedded here) ──
+const DEFAULT_PRODUCTS = [
+  { id:1,  name:'Sunrise Blend',     desc:'Orange, carrot & ginger cold-press. A vibrant morning kick packed with vitamin C and anti-inflammatory ginger.',  price:6.5, img:'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600&q=80',   tags:['juice','vitamin-c','ginger'],        cat:'juice',   feat:false, inStock:true },
+  { id:2,  name:'Green Detox',       desc:'Spinach, cucumber, apple & lemon. Our bestselling cleanse blend — light, refreshing and deeply nourishing. Zero sugar added.',                      price:7.0, img:'https://i.pinimg.com/736x/dc/67/4d/dc674d79ea8be1c0eac3e26d036badc9.jpg',    tags:['detox','no sugar','bestseller'],     cat:'detox',   feat:true,  inStock:true },
+  { id:3,  name:'Berry Boost',       desc:'Strawberry, blueberry & chia. Antioxidant-rich and naturally sweet — bursting with flavour.',                       price:6.5, img:'https://i.pinimg.com/736x/57/85/62/5785628a0589fc5d4642191eabfa1897.jpg',    tags:['smoothie','antioxidant','chia'],     cat:'smoothie',feat:false, inStock:true },
+  { id:4,  name:'Calm Tea',          desc:'Chamomile, lavender & raw honey. Wind down with this soothing herbal blend, served chilled over ice.',              price:5.0, img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=80',      tags:['tea','caffeine-free','calming'],     cat:'tea',     feat:false, inStock:true },
+  { id:5,  name:'Mango Turmeric',    desc:'Mango, turmeric, black pepper & coconut water. Anti-inflammatory powerhouse with a tropical twist.',                price:7.5, img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&q=80',   tags:['juice','anti-inflammatory','tropical'], cat:'juice', feat:false, inStock:true },
+  { id:6,  name:'Pineapple Mint',    desc:'Pineapple, fresh mint & coconut water. Refreshing, digestive-friendly and perfect for hot afternoons.',             price:6.0, img:'https://i.pinimg.com/736x/c3/6d/c6/c36dc6f1ab564db5e718d64c9d339134.jpg',  tags:['juice','digestive','refreshing'],    cat:'juice',   feat:false, inStock:true },
+  { id:7,  name:'Cacao Almond',      desc:'Raw cacao, almond milk, banana & dates. A rich, satisfying smoothie that tastes like dessert.',                     price:8.0, img:'https://i.pinimg.com/736x/63/6c/07/636c07b90ea93363bfe8fb948a99e55e.jpg',  tags:['smoothie','protein','cacao'],        cat:'smoothie',feat:false, inStock:true },
+  { id:8,  name:'Lemongrass Ginger', desc:'Lemongrass, ginger, honey & lime. A warming herbal brew served over ice — cleansing and deeply aromatic.',          price:5.5, img:'https://i.pinimg.com/736x/0f/a8/1d/0fa81d87fa393328eb883a8aea6e17a6.jpg',  tags:['tea','warming','aromatic'],          cat:'tea',     feat:false, inStock:true },
+  { id:9,  name:'Watermelon Lime',   desc:'Fresh watermelon, lime juice & sea salt. Hydration in a bottle — cool, crisp and naturally sweet.',                 price:5.5, img:'https://i.pinimg.com/736x/d2/7e/c8/d27ec878f2929eb474a3f588481c5cdf.jpg',  tags:['juice','hydrating','summer'],        cat:'juice',   feat:false, inStock:true },
+  { id:10, name:'Avocado Banana',    desc:'Creamy avocado, banana, oat milk & honey. A filling, nutrient-dense smoothie with healthy fats.',                   price:8.5, img:'https://i.pinimg.com/736x/cd/86/90/cd8690dd32dba2382e46fba715dfb62d.jpg',  tags:['smoothie','healthy fats','filling'], cat:'smoothie',feat:false, inStock:true },
+  { id:11, name:'Hibiscus Cooler',   desc:'Hibiscus flowers, rose water & cardamom served chilled. A floral, tangy brew rich in antioxidants.',                price:5.0, img:'https://i.pinimg.com/1200x/0d/49/3c/0d493cb062f6448f98e014de1eeccbd8.jpg', tags:['tea','floral','vitamin-c'],          cat:'tea',     feat:false, inStock:true },
+  { id:12, name:'Celery Citrus',     desc:'Celery, green apple, lemon & ginger. Reduces bloating, supports gut health and boosts energy levels.',              price:7.0, img:'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&q=80',   tags:['detox','celery','gut health'],       cat:'detox',   feat:false, inStock:true },
+  { id:13, name:'Dragon Fruit Glow', desc:'Dragon fruit, coconut water & lime. A stunning pink blend rich in iron, magnesium and skin-loving antioxidants.',    price:8.0, img:'https://i.pinimg.com/736x/b5/bc/fc/b5bcfc58aaa8da3d434ef6b44e7173b2.jpg',  tags:['juice','superfood','glow'],          cat:'juice',   feat:false, inStock:true },
+  { id:14, name:'Peanut Butter Oat', desc:'Natural peanut butter, oats, banana & almond milk. Protein-rich, slow digesting and insanely delicious.',           price:9.0, img:'https://i.pinimg.com/736x/ae/7f/1a/ae7f1a0cd52c4d9849a36902ae35ac8b.jpg',  tags:['smoothie','high protein','gym'],     cat:'smoothie',feat:false, inStock:true },
+  { id:15, name:'Beet Warrior',      desc:'Beetroot, apple, carrot & ginger. Boosts athletic stamina — our most popular pre-workout drink.',                   price:7.5, img:'https://i.pinimg.com/1200x/34/36/80/343680a3df644ec646cad537a6424eee.jpg', tags:['juice','pre-workout','beet'],        cat:'juice',   feat:false, inStock:true },
+  { id:16, name:'Jasmine Green',     desc:'Cold-brewed jasmine green tea with a hint of lychee. Delicate, fragrant and perfectly balanced.',                   price:5.5, img:'https://i.pinimg.com/736x/83/bf/b5/83bfb5668177fbc7e2660a08c80a25ee.jpg',  tags:['tea','jasmine','lychee'],            cat:'tea',     feat:false, inStock:true },
+  { id:17, name:'Triple Citrus',     desc:'Orange, grapefruit & blood orange pressed together. A zesty explosion of vitamin C.',                               price:6.5, img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&q=80',   tags:['juice','citrus','immune'],           cat:'juice',   feat:false, inStock:true },
+  { id:18, name:'Coconut Matcha',    desc:'Ceremonial grade matcha, coconut milk & a touch of vanilla. A creamy, earthy latte served cold.',                   price:8.5, img:'https://i.pinimg.com/736x/ad/3f/41/ad3f4106c41ab654cd55f01eb7b28c54.jpg',  tags:['smoothie','matcha','focus'],         cat:'smoothie',feat:false, inStock:true },
+  { id:19, name:'Liver Cleanse',     desc:'Dandelion root, burdock, apple & lemon. Our most powerful detox blend formulated with traditional herbal medicine.', price:7.5, img:'https://i.pinimg.com/1200x/56/9f/a0/569fa0f6be45d9d9022c2ceb54c72800.jpg', tags:['detox','liver','herbal'],            cat:'detox',   feat:false, inStock:true },
+  { id:20, name:'Passion Ginger',    desc:'Passionfruit, pineapple & fresh ginger cold-pressed. A tropical-tangy combination with a warming ginger finish.',   price:7.0, img:'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&q=80',   tags:['juice','tropical','ginger'],         cat:'juice',   feat:false, inStock:true },
+];
+
+function seedProducts(){
+  if(!getProducts()) saveProducts(DEFAULT_PRODUCTS);
+}
+
+// Toast
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+let currentFilter = 'all';
+
+function setFilter(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function getFiltered(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let products = getProducts() || [];
+  if(currentFilter === 'featured') products = products.filter(p=>p.feat);
+  else if(currentFilter !== 'all') products = products.filter(p=>p.cat===currentFilter);
+  if(q) products = products.filter(p=>
+    p.name.toLowerCase().includes(q) ||
+    p.desc.toLowerCase().includes(q) ||
+    (p.tags||[]).some(t=>t.toLowerCase().includes(q))
+  );
+  return products;
+}
+
+function renderGrid(){
+  const products = getFiltered();
+  const grid = document.getElementById('products-grid');
+  const all  = getProducts()||[];
+  document.getElementById('prod-count').textContent = `${all.length} product${all.length!==1?'s':''}`;
+
+  if(!products.length){
+    grid.innerHTML=`<div class="empty-state"><span class="mi">search_off</span>No products found.</div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(p=>{
+    const realIdx = all.findIndex(x=>x.id===p.id);
+    return `
+    <div class="prod-card">
+      <img class="prod-img" src="${p.img||''}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=60'" />
+      <div class="prod-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span class="prod-cat">${p.cat}</span>
+          ${p.feat ? '<span class="feat-badge"><span class="mi" style="font-size:11px">star</span> Featured</span>' : ''}
+        </div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc}</div>
+        <div class="prod-tags">${(p.tags||[]).map(t=>`<span class="prod-tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="prod-footer">
+        <div>
+          <div class="prod-price">$${p.price.toFixed(2)}</div>
+          <div class="stock-toggle" onclick="toggleStock(${realIdx})">
+            <div class="stock-dot ${p.inStock===false?'out':''}"></div>
+            <span>${p.inStock===false?'Out of stock':'In stock'}</span>
+          </div>
+        </div>
+        <div class="prod-actions">
+          <button class="act-btn" title="Edit" onclick="openEditModal(${realIdx})">
+            <span class="mi" style="font-size:16px;color:var(--text-mid)">edit</span>
+          </button>
+          <button class="act-btn danger" title="Delete" onclick="deleteProduct(${realIdx})">
+            <span class="mi" style="font-size:16px;color:#dc2626">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleStock(idx){
+  const products = getProducts();
+  products[idx].inStock = !products[idx].inStock;
+  saveProducts(products);
+  showToast(products[idx].inStock ? `${products[idx].name} marked as in stock` : `${products[idx].name} marked as out of stock`);
+  renderGrid();
+}
+
+function deleteProduct(idx){
+  const products = getProducts();
+  const name = products[idx].name;
+  if(!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  products.splice(idx,1);
+  saveProducts(products);
+  showToast(`${name} deleted`);
+  renderGrid();
+}
+
+// Modal
+function openAddModal(){
+  document.getElementById('modal-title').textContent = 'Add Product';
+  document.getElementById('edit-index').value = '-1';
+  document.getElementById('f-name').value  = '';
+  document.getElementById('f-desc').value  = '';
+  document.getElementById('f-price').value = '';
+  document.getElementById('f-tags').value  = '';
+  document.getElementById('f-img').value   = '';
+  document.getElementById('f-cat').value   = 'juice';
+  document.getElementById('f-feat').value  = 'false';
+  document.getElementById('f-stock').value = 'true';
+  document.getElementById('img-preview').classList.remove('show');
+  document.getElementById('prodModal').classList.add('open');
+}
+
+function openEditModal(idx){
+  const p = (getProducts())[idx];
+  document.getElementById('modal-title').textContent = 'Edit Product';
+  document.getElementById('edit-index').value = idx;
+  document.getElementById('f-name').value  = p.name;
+  document.getElementById('f-desc').value  = p.desc;
+  document.getElementById('f-price').value = p.price;
+  document.getElementById('f-tags').value  = (p.tags||[]).join(', ');
+  document.getElementById('f-img').value   = p.img||'';
+  document.getElementById('f-cat').value   = p.cat;
+  document.getElementById('f-feat').value  = String(p.feat||false);
+  document.getElementById('f-stock').value = String(p.inStock!==false);
+  previewImg();
+  document.getElementById('prodModal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('prodModal').classList.remove('open'); }
+
+function previewImg(){
+  const url = document.getElementById('f-img').value.trim();
+  const prev = document.getElementById('img-preview');
+  if(url){ prev.src=url; prev.classList.add('show'); }
+  else { prev.classList.remove('show'); }
+}
+
+function saveProduct(){
+  const idx   = parseInt(document.getElementById('edit-index').value);
+  const name  = document.getElementById('f-name').value.trim();
+  const desc  = document.getElementById('f-desc').value.trim();
+  const price = parseFloat(document.getElementById('f-price').value);
+  const tags  = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const img   = document.getElementById('f-img').value.trim();
+  const cat   = document.getElementById('f-cat').value;
+  const feat  = document.getElementById('f-feat').value === 'true';
+  const inStock = document.getElementById('f-stock').value === 'true';
+
+  if(!name)          { showToast('Please enter a product name'); return; }
+  if(!desc)          { showToast('Please enter a description');  return; }
+  if(isNaN(price)||price<0) { showToast('Please enter a valid price'); return; }
+
+  const products = getProducts()||[];
+
+  if(idx === -1){
+    const newId = products.length ? Math.max(...products.map(p=>p.id))+1 : 1;
+    products.push({ id:newId, name, desc, price, tags, img, cat, feat, inStock });
+    showToast(`${name} added!`);
+  } else {
+    products[idx] = { ...products[idx], name, desc, price, tags, img, cat, feat, inStock };
+    showToast(`${name} updated`);
+  }
+
+  saveProducts(products);
+  closeModal();
+  renderGrid();
+}
+
+document.getElementById('prodModal').addEventListener('click', function(e){
+  if(e.target===this) closeModal();
+});
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  const s = getSession();
+  if(!s || (s.role!=='admin' && s.role!=='staff')){ alert('Access denied.'); window.location.href='/'; return; }
+  document.getElementById('sb-name').textContent = s.name;
+  document.getElementById('sb-role').textContent = s.role;
+  seedProducts();
+  renderGrid();
+});
+</script>
+</body>
+</html>
