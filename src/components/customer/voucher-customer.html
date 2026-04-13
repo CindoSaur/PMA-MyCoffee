@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>My Vouchers - Fresh Market</title>
+	<link rel="stylesheet" href="/style/style.css" />
+	<style>
+		body { background:var(--bg); }
+		.wrap { display:flex; min-height:100vh; }
+		.sidebar { width:220px; background:#fff; border-right:1px solid var(--border); padding:1rem; }
+		.brand { display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; margin-bottom:1rem; }
+		.logo { width:30px; height:30px; border-radius:8px; background:var(--green); display:grid; place-items:center; }
+		.slink { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; text-decoration:none; color:var(--text-mid); font-size:13px; }
+		.slink:hover { background:var(--bg2); }
+		.slink.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+		.main { flex:1; padding:1.5rem; }
+		.title { font-family:var(--serif); font-size:1.5rem; margin-bottom:.4rem; }
+		.sub { color:var(--text-mid); font-size:13px; margin-bottom:1rem; }
+		.list { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+		.voucher { background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px; }
+		.code { font-size:18px; font-weight:700; color:var(--green-dark); letter-spacing:.05em; }
+		.desc { margin-top:5px; font-size:12px; color:var(--text-mid); }
+		.row { margin-top:10px; display:flex; justify-content:space-between; align-items:center; }
+		.btn { border:none; border-radius:8px; padding:7px 10px; background:var(--green); color:#fff; font-size:12px; cursor:pointer; }
+		.exp { font-size:11px; color:var(--text-light); }
+		@media(max-width:768px){ .sidebar{display:none;} .main{padding:1rem;} }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<aside class="sidebar">
+			<div class="brand"><div class="logo"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>Fresh Market</div>
+			<a class="slink" href="/components/customer/dashboard-customer.html"><span class="mi">dashboard</span> Overview</a>
+			<a class="slink active" href="/components/customer/voucher-customer.html"><span class="mi">local_offer</span> My Vouchers</a>
+			<a class="slink" href="/components/customer/orders-customer.html"><span class="mi">receipt_long</span> My Orders</a>
+			<a class="slink" href="/components/customer/setting-customer.html"><span class="mi">settings</span> Settings</a>
+			<a class="slink" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+		</aside>
+		<main class="main">
+			<div class="title">My Vouchers</div>
+			<div class="sub">Use these codes at checkout in the store page.</div>
+			<div class="list" id="list"></div>
+		</main>
+	</div>
+
+	<script>
+		const FM_VOUCHERS_KEY = 'fm_vouchers';
+		const seeds = [
+			{ code:'FRESH15', desc:'15% off first order', exp:'2026-12-31' },
+			{ code:'GREENSHIP', desc:'Free delivery on any order', exp:'2026-12-31' },
+			{ code:'DETOX10', desc:'10% off detox category', exp:'2026-10-31' },
+		];
+		function getVouchers(){ return JSON.parse(localStorage.getItem(FM_VOUCHERS_KEY) || '[]'); }
+		function saveVouchers(v){ localStorage.setItem(FM_VOUCHERS_KEY, JSON.stringify(v)); }
+		function init(){ if(!getVouchers().length) saveVouchers(seeds); }
+		async function copyCode(code){
+			try { await navigator.clipboard.writeText(code); alert('Copied: ' + code); }
+			catch { alert('Code: ' + code); }
+		}
+		function render(){
+			const list = getVouchers();
+			document.getElementById('list').innerHTML = list.map(v => `
+				<div class="voucher">
+					<div class="code">${v.code}</div>
+					<div class="desc">${v.desc}</div>
+					<div class="row">
+						<div class="exp">Expires ${v.exp}</div>
+						<button class="btn" onclick="copyCode('${v.code}')">Copy</button>
+					</div>
+				</div>`).join('');
+		}
+		window.addEventListener('DOMContentLoaded', ()=>{ init(); render(); });
+	</script>
+</body>
+</html>

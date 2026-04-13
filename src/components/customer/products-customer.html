@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Products - Fresh Market</title>
+	<link rel="stylesheet" href="/style/style.css" />
+	<style>
+		body { background:var(--bg); }
+		.wrap { display:flex; min-height:100vh; }
+		.sidebar { width:220px; background:#fff; border-right:1px solid var(--border); padding:1rem; }
+		.brand { display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; margin-bottom:1rem; }
+		.logo { width:30px; height:30px; border-radius:8px; background:var(--green); display:grid; place-items:center; }
+		.slink { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; text-decoration:none; color:var(--text-mid); font-size:13px; }
+		.slink:hover { background:var(--bg2); }
+		.slink.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+		.main { flex:1; padding:1.5rem; }
+		.title { font-family:var(--serif); font-size:1.5rem; }
+		.sub { color:var(--text-mid); font-size:13px; margin:.35rem 0 1rem; }
+		.search { width:100%; max-width:340px; padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; margin-bottom:1rem; }
+		.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+		.card { background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+		.card img { width:100%; height:150px; object-fit:cover; background:var(--bg2); }
+		.body { padding:10px; }
+		.name { font-family:var(--serif); font-weight:600; }
+		.meta { font-size:12px; color:var(--text-light); margin-top:4px; }
+		.row { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+		.price { color:var(--green-dark); font-weight:700; }
+		.btn { border:none; border-radius:8px; padding:7px 9px; background:var(--green); color:#fff; font-size:12px; cursor:pointer; }
+		@media(max-width:768px){ .sidebar{display:none;} .main{padding:1rem;} }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<aside class="sidebar">
+			<div class="brand"><div class="logo"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>Fresh Market</div>
+			<a class="slink" href="/components/customer/dashboard-customer.html"><span class="mi">dashboard</span> Overview</a>
+			<a class="slink active" href="/components/customer/products-customer.html"><span class="mi">inventory_2</span> Products</a>
+			<a class="slink" href="/components/customer/orders-customer.html"><span class="mi">receipt_long</span> My Orders</a>
+			<a class="slink" href="/components/customer/setting-customer.html"><span class="mi">settings</span> Settings</a>
+			<a class="slink" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+		</aside>
+		<main class="main">
+			<div class="title">Products</div>
+			<div class="sub">Browse live menu items synced from admin products.</div>
+			<input id="search" class="search" placeholder="Search products" oninput="render()" />
+			<div class="grid" id="grid"></div>
+		</main>
+	</div>
+
+	<script>
+		const FM_PRODUCTS_KEY = 'fm_products';
+		function getProducts(){ return JSON.parse(localStorage.getItem(FM_PRODUCTS_KEY) || '[]'); }
+		function render(){
+			const q = (document.getElementById('search').value || '').toLowerCase();
+			const list = getProducts().filter(p => p.inStock !== false).filter(p =>
+				p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)
+			);
+			const el = document.getElementById('grid');
+			if(!list.length){ el.innerHTML = '<div class="card" style="padding:1rem">No products found.</div>'; return; }
+			el.innerHTML = list.map(p => `
+				<div class="card">
+					<img src="${p.img || ''}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=60'" />
+					<div class="body">
+						<div class="name">${p.name}</div>
+						<div class="meta">${p.desc}</div>
+						<div class="row">
+							<div class="price">$${Number(p.price || 0).toFixed(2)}</div>
+							<button class="btn" onclick="window.location.href='/'">Order</button>
+						</div>
+					</div>
+				</div>
+			`).join('');
+		}
+		window.addEventListener('DOMContentLoaded', render);
+	</script>
+</body>
+</html>

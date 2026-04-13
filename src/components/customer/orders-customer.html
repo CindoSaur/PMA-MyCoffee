@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>My Orders - Fresh Market</title>
+	<link rel="stylesheet" href="/style/style.css" />
+	<style>
+		body { background:var(--bg); }
+		.wrap { display:flex; min-height:100vh; }
+		.sidebar { width:220px; background:#fff; border-right:1px solid var(--border); padding:1rem; }
+		.brand { display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; margin-bottom:1rem; }
+		.logo { width:30px; height:30px; border-radius:8px; background:var(--green); display:grid; place-items:center; }
+		.slink { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; text-decoration:none; color:var(--text-mid); font-size:13px; }
+		.slink:hover { background:var(--bg2); }
+		.slink.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+		.main { flex:1; padding:1.5rem; }
+		.title { font-family:var(--serif); font-size:1.5rem; margin-bottom:.3rem; }
+		.sub { color:var(--text-mid); font-size:13px; margin-bottom:1rem; }
+		.card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:12px; }
+		.row { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+		.id { font-size:13px; font-weight:700; color:var(--text); }
+		.meta { font-size:12px; color:var(--text-light); margin-top:3px; }
+		.badge { padding:4px 9px; border-radius:99px; font-size:11px; font-weight:600; }
+		.b-processing { background:#fff7cc; color:#92400e; }
+		.b-shipping { background:#dbeafe; color:#1e3a8a; }
+		.b-delivered { background:#dcfce7; color:#166534; }
+		.b-cancelled { background:#fee2e2; color:#b91c1c; }
+		.items { margin-top:10px; font-size:12px; color:var(--text-mid); }
+		.empty { text-align:center; padding:2rem; color:var(--text-light); }
+		@media(max-width:768px){ .sidebar{display:none;} .main{padding:1rem;} }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<aside class="sidebar">
+			<div class="brand"><div class="logo"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>Fresh Market</div>
+			<a class="slink" href="/components/customer/dashboard-customer.html"><span class="mi">dashboard</span> Overview</a>
+			<a class="slink active" href="/components/customer/orders-customer.html"><span class="mi">receipt_long</span> My Orders</a>
+			<a class="slink" href="/components/customer/delivery-customer.html"><span class="mi">delivery_dining</span> Track Delivery</a>
+			<a class="slink" href="/components/customer/setting-customer.html"><span class="mi">settings</span> Settings</a>
+			<a class="slink" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+		</aside>
+
+		<main class="main">
+			<div class="title">My Orders</div>
+			<div class="sub">All orders placed from your account.</div>
+			<div id="list"></div>
+		</main>
+	</div>
+
+	<script>
+		const FM_SESSION_KEY = 'fm_session';
+		const FM_ORDERS_KEY = 'fm_orders';
+
+		function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+		function getOrders(){ return JSON.parse(localStorage.getItem(FM_ORDERS_KEY) || '[]'); }
+		function fmtMoney(v){ if(v>=1000000) return '₫'+(v/1000000).toFixed(1)+'M'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+Number(v||0).toFixed(0); }
+
+		function render(){
+			const s = getSession();
+			if(!s){ window.location.href='/components/auth/login.html'; return; }
+
+			const orders = getOrders()
+				.filter(o => String(o.email || '').toLowerCase() === String(s.email || '').toLowerCase())
+				.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+			const list = document.getElementById('list');
+			if(!orders.length){
+				list.innerHTML = '<div class="card empty">No orders yet. <a href="/" style="color:var(--green)">Start shopping</a></div>';
+				return;
+			}
+
+			list.innerHTML = orders.map(o => {
+				const status = o.status || 'processing';
+				const d = new Date(o.date || Date.now());
+				const items = (o.items || []).map(i => i.name + (i.qty > 1 ? ' ×' + i.qty : '')).join(', ');
+				return `<div class="card">
+					<div class="row">
+						<div>
+							<div class="id">Order #${o.id}</div>
+							<div class="meta">${d.toLocaleString('en-GB')}</div>
+						</div>
+						<div class="badge b-${status}">${status}</div>
+					</div>
+					<div class="items">${items}</div>
+					<div class="meta" style="margin-top:8px">Total: <strong style="color:var(--text)">${fmtMoney(o.total)}</strong></div>
+				</div>`;
+			}).join('');
+		}
+
+		window.addEventListener('DOMContentLoaded', render);
+	</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Vouchers - Fresh Market Admin</title>
+	<link rel="stylesheet" href="/style/style.css" />
+	<style>
+		body{background:var(--bg);} .shell{display:flex;min-height:100vh;} .side{width:220px;background:#fff;border-right:1px solid var(--border);padding:1rem;}
+		.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;margin-bottom:1rem;} .logo{width:30px;height:30px;background:var(--green);border-radius:8px;display:grid;place-items:center;}
+		.link{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;text-decoration:none;color:var(--text-mid);font-size:13px;} .link:hover{background:var(--bg2);} .link.active{background:var(--green-light);color:var(--green-dark);font-weight:500;}
+		.main{flex:1;padding:1.5rem;} .title{font-family:var(--serif);font-size:1.5rem;} .sub{font-size:13px;color:var(--text-mid);margin:.35rem 0 1rem;}
+		.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;} .input{padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;} .btn{border:none;border-radius:10px;padding:10px 12px;background:var(--green);color:#fff;cursor:pointer;}
+		table{width:100%;background:#fff;border:1px solid var(--border);border-radius:12px;border-collapse:collapse;overflow:hidden;} th,td{padding:10px;border-bottom:1px solid var(--border);font-size:13px;text-align:left;} th{background:var(--bg2);font-size:12px;color:var(--text-mid);} tr:last-child td{border-bottom:none;}
+		.danger{background:#fff;border:1px solid #fca5a5;color:#dc2626;}
+		@media(max-width:768px){ .side{display:none;} .main{padding:1rem;} }
+	</style>
+</head>
+<body>
+	<div class="shell">
+		<aside class="side">
+			<div class="brand"><div class="logo"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>Fresh Market</div>
+			<a class="link" href="dashboard.html"><span class="mi">dashboard</span> Dashboard</a>
+			<a class="link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
+			<a class="link" href="products.html"><span class="mi">inventory_2</span> Products</a>
+			<a class="link active" href="voucher.html"><span class="mi">local_offer</span> Vouchers</a>
+			<a class="link" href="setting.html"><span class="mi">settings</span> Settings</a>
+			<a class="link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
+		</aside>
+		<main class="main">
+			<div class="title">Voucher Manager</div>
+			<div class="sub">Create and manage coupon codes used by customer pages.</div>
+			<div class="bar">
+				<input class="input" id="code" placeholder="Code" />
+				<input class="input" id="desc" placeholder="Description" style="min-width:260px" />
+				<input class="input" id="exp" type="date" />
+				<button class="btn" onclick="addVoucher()">Add Voucher</button>
+			</div>
+			<table>
+				<thead><tr><th>Code</th><th>Description</th><th>Expires</th><th></th></tr></thead>
+				<tbody id="rows"></tbody>
+			</table>
+		</main>
+	</div>
+
+	<script>
+		const FM_SESSION_KEY = 'fm_session';
+		const FM_VOUCHERS_KEY = 'fm_vouchers';
+		function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+		function getVouchers(){ return JSON.parse(localStorage.getItem(FM_VOUCHERS_KEY) || '[]'); }
+		function saveVouchers(v){ localStorage.setItem(FM_VOUCHERS_KEY, JSON.stringify(v)); }
+
+		function render(){
+			const list = getVouchers();
+			document.getElementById('rows').innerHTML = list.map((v, i) => `
+				<tr>
+					<td><strong>${v.code}</strong></td>
+					<td>${v.desc}</td>
+					<td>${v.exp}</td>
+					<td><button class="btn danger" onclick="removeVoucher(${i})">Delete</button></td>
+				</tr>`).join('');
+		}
+
+		function addVoucher(){
+			const code = document.getElementById('code').value.trim().toUpperCase();
+			const desc = document.getElementById('desc').value.trim();
+			const exp = document.getElementById('exp').value;
+			if(!code || !desc || !exp){ alert('Please fill all fields'); return; }
+			const list = getVouchers();
+			if(list.some(v => v.code === code)){ alert('Code already exists'); return; }
+			list.push({ code, desc, exp });
+			saveVouchers(list);
+			document.getElementById('code').value='';
+			document.getElementById('desc').value='';
+			document.getElementById('exp').value='';
+			render();
+		}
+
+		function removeVoucher(i){
+			const list = getVouchers();
+			const v = list[i];
+			if(!v) return;
+			if(!confirm('Delete voucher ' + v.code + '?')) return;
+			list.splice(i, 1);
+			saveVouchers(list);
+			render();
+		}
+
+		window.addEventListener('DOMContentLoaded', ()=>{
+			const s = getSession();
+			if(!s || (s.role !== 'admin' && s.role !== 'staff')){ alert('Access denied.'); window.location.href='/'; return; }
+			render();
+		});
+	</script>
+</body>
+</html>

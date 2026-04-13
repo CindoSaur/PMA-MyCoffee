@@ -297,27 +297,27 @@
 
           <div class="danger-row">
             <div>
-              <div class="danger-name">Clear all demo orders</div>
-              <div class="danger-desc">Remove all seeded demo orders from localStorage. Real orders placed in-app are also removed.</div>
+              <div class="danger-name">Clear my order history</div>
+              <div class="danger-desc">Remove only your own orders from this account.</div>
             </div>
-            <button class="btn-outline-danger" onclick="clearOrders()">Clear orders</button>
+            <button class="btn-outline-danger" onclick="clearMyOrders()">Clear my orders</button>
           </div>
 
           <div class="danger-row">
             <div>
-              <div class="danger-name">Reset user accounts</div>
-              <div class="danger-desc">Delete all user accounts and restore only the 3 seed accounts.</div>
+              <div class="danger-name">Reset my settings</div>
+              <div class="danger-desc">Reset your personal preferences in this page only.</div>
             </div>
-            <button class="btn-outline-danger" onclick="resetUsers()">Reset users</button>
+            <button class="btn-outline-danger" onclick="resetMySettings()">Reset settings</button>
           </div>
 
           <div class="danger-row">
             <div>
-              <div class="danger-name">Clear all localStorage</div>
-              <div class="danger-desc">Wipes everything — orders, users, session. You will be logged out.</div>
+              <div class="danger-name">Delete my account</div>
+              <div class="danger-desc">Permanently remove your account and sign out.</div>
             </div>
-            <button class="btn-danger" onclick="nukeStorage()">
-              <span class="mi" style="font-size:14px;color:#fff;vertical-align:middle">delete_forever</span> Wipe everything
+            <button class="btn-danger" onclick="deleteMyAccount()">
+              <span class="mi" style="font-size:14px;color:#fff;vertical-align:middle">person_remove</span> Delete account
             </button>
           </div>
         </div>
@@ -336,8 +336,9 @@ const FM_SETTINGS_KEY  = 'fm_settings';
 function getSession(){ return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)||'null'); }
 function getUsers()  { return JSON.parse(localStorage.getItem(AUTH_USERS_KEY)||'[]'); }
 function saveUsers(u){ localStorage.setItem(AUTH_USERS_KEY,JSON.stringify(u)); }
-function loadSettings(){ return JSON.parse(localStorage.getItem(FM_SETTINGS_KEY)||'{}'); }
-function persistSettings(s){ localStorage.setItem(FM_SETTINGS_KEY,JSON.stringify(s)); }
+function settingsKeyFor(email){ return FM_SETTINGS_KEY + ':' + String(email || '').toLowerCase(); }
+function loadSettings(email){ return JSON.parse(localStorage.getItem(settingsKeyFor(email))||'{}'); }
+function persistSettings(email, settings){ localStorage.setItem(settingsKeyFor(email),JSON.stringify(settings)); }
 
 // Tabs
 function switchSettingsTab(id, btn){
@@ -349,6 +350,8 @@ function switchSettingsTab(id, btn){
 
 // Save general + notifications
 function saveAllSettings(){
+  const session = getSession();
+  if (!session) return;
   const s = {
     storeName:    document.getElementById('s-store-name').value,
     contactEmail: document.getElementById('s-contact-email').value,
@@ -367,7 +370,7 @@ function saveAllSettings(){
       stock:       document.getElementById('n-stock').checked,
     }
   };
-  persistSettings(s);
+  persistSettings(session.email, s);
   showToast('Settings saved ✓');
 }
 
@@ -396,27 +399,41 @@ function saveAccountSettings(){
 }
 
 // Danger zone actions
-function clearOrders(){
-  if(!confirm('Clear ALL orders? This cannot be undone.')) return;
-  localStorage.removeItem(FM_ORDERS_KEY);
-  showToast('All orders cleared');
+function clearMyOrders(){
+  const session = getSession();
+  if (!session) return;
+  if(!confirm('Clear all orders belonging to your account?')) return;
+  const orders = JSON.parse(localStorage.getItem(FM_ORDERS_KEY) || '[]');
+  const kept = orders.filter(o => String(o.email || '').toLowerCase() !== String(session.email).toLowerCase());
+  localStorage.setItem(FM_ORDERS_KEY, JSON.stringify(kept));
+  showToast('Your order history has been cleared');
 }
 
-function resetUsers(){
-  if(!confirm('Reset all user accounts to defaults?')) return;
-  const seeds = [
-    { name:'Admin User',  email:'admin@polycoffee.vn',    password:'admin1234',    role:'admin',    blocked:false, joined:'2025-01-01' },
-    { name:'Linh Nguyen', email:'customer@polycoffee.vn', password:'customer1234', role:'customer', blocked:false, joined:'2025-03-15' },
-    { name:'Minh Staff',  email:'staff@polycoffee.vn',    password:'staff1234',    role:'staff',    blocked:false, joined:'2025-02-10' },
-  ];
-  saveUsers(seeds);
-  showToast('Users reset to defaults');
+function resetMySettings(){
+  const session = getSession();
+  if (!session) return;
+  if(!confirm('Reset your settings to defaults?')) return;
+  localStorage.removeItem(settingsKeyFor(session.email));
+  showToast('Your settings have been reset');
+  window.location.reload();
 }
 
-function nukeStorage(){
-  if(!confirm('⚠️ This will delete EVERYTHING including your session. You will be logged out. Continue?')) return;
-  localStorage.clear();
-  window.location.href = '/components/auth/login.html';
+function deleteMyAccount(){
+  const session = getSession();
+  if (!session) return;
+  if(!confirm('Delete your account permanently? This cannot be undone.')) return;
+
+  const users = getUsers();
+  const nextUsers = users.filter(u => String(u.email || '').toLowerCase() !== String(session.email).toLowerCase());
+  saveUsers(nextUsers);
+
+  const orders = JSON.parse(localStorage.getItem(FM_ORDERS_KEY) || '[]');
+  const nextOrders = orders.filter(o => String(o.email || '').toLowerCase() !== String(session.email).toLowerCase());
+  localStorage.setItem(FM_ORDERS_KEY, JSON.stringify(nextOrders));
+
+  localStorage.removeItem(settingsKeyFor(session.email));
+  localStorage.removeItem(AUTH_SESSION_KEY);
+  window.location.href = '/components/auth/register.html';
 }
 
 // Toast
@@ -431,7 +448,7 @@ function showToast(msg){
 // Init
 window.addEventListener('DOMContentLoaded',()=>{
   const s = getSession();
-  if(!s || (s.role!=='admin' && s.role!=='staff')){ alert('Access denied.'); window.location.href='/'; return; }
+  if(!s){ alert('Please sign in first.'); window.location.href='/components/auth/login.html'; return; }
   document.getElementById('sb-name').textContent = s.name;
   document.getElementById('sb-role').textContent = s.role;
   document.getElementById('a-name').value  = s.name;
@@ -439,7 +456,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('a-role').value  = s.role;
 
   // Load saved settings
-  const saved = loadSettings();
+  const saved = loadSettings(s.email);
   if(saved.storeName)    document.getElementById('s-store-name').value    = saved.storeName;
   if(saved.contactEmail) document.getElementById('s-contact-email').value = saved.contactEmail;
   if(saved.phone)        document.getElementById('s-phone').value         = saved.phone;
