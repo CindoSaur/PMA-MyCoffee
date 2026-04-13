@@ -1,4 +1,4 @@
-# Tauri Project - [Tên App]
+# Tauri Project - [PolyCoffee]
 
 Hướng dẫn cài đặt và chạy Tauri cho team dev trên macOS / Linux / Windows.
 
