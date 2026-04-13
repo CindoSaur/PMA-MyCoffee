@@ -703,22 +703,58 @@ function logout() {
 }
 
 // Update the Login button → show name + logout once header is loaded
+// Avatar color helper (same as dashboard)
+const NAV_AVATAR_COLORS = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6'];
+function navAvatarColor(email) {
+  let h = 0;
+  for (const c of email) h = (h * 31 + c.charCodeAt(0)) % NAV_AVATAR_COLORS.length;
+  return NAV_AVATAR_COLORS[h];
+}
+function navInitials(name) {
+  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
 function applySessionToNav() {
   const session = getSession();
 
-  // ── Login / user pill ──
-  const loginBtn = document.getElementById('nav-login-btn');
+  // ── User dropdown label ──
   const loginLbl = document.getElementById('nav-login-label');
-  if (loginBtn && loginLbl) {
+  if (loginLbl) {
+    loginLbl.textContent = session ? session.name.split(' ')[0] : 'Login';
+  }
+
+  // ── Show correct guest vs logged-in menu ──
+  const guestMenu    = document.getElementById('user-menu-guest');
+  const loggedinMenu = document.getElementById('user-menu-loggedin');
+  if (guestMenu && loggedinMenu) {
     if (session) {
-      loginLbl.textContent = session.name.split(' ')[0];
-      loginBtn.title = 'Click to sign out';
-      loginBtn.onclick = () => {
-        if (confirm('Sign out of Fresh Market?')) logout();
-      };
+      guestMenu.style.display    = 'none';
+      loggedinMenu.style.display = 'flex';
+
+      // Populate user info
+      const av = document.getElementById('user-menu-avatar');
+      if (av) {
+        av.textContent        = navInitials(session.name);
+        av.style.background   = navAvatarColor(session.email);
+      }
+      const nameEl  = document.getElementById('user-menu-name');
+      const emailEl = document.getElementById('user-menu-email');
+      const badge   = document.getElementById('user-menu-badge');
+      if (nameEl)  nameEl.textContent  = session.name;
+      if (emailEl) emailEl.textContent = session.email;
+      if (badge) {
+        badge.textContent  = session.role || 'customer';
+        badge.className    = 'user-menu-badge ' + (session.role || 'customer');
+      }
+
+      // Show admin shortcut for admin/staff
+      const adminLinks = document.getElementById('user-menu-admin-links');
+      if (adminLinks && (session.role === 'admin' || session.role === 'staff')) {
+        adminLinks.style.display = 'block';
+      }
     } else {
-      loginLbl.textContent = 'Login';
-      loginBtn.onclick = () => { window.location.href = '/components/auth/login.html'; };
+      guestMenu.style.display    = 'flex';
+      loggedinMenu.style.display = 'none';
     }
   }
 
@@ -728,23 +764,58 @@ function applySessionToNav() {
     dashWrap.style.display = 'block';
   }
 
-  // ── Dropdown toggle (defined here so it works after innerHTML inject) ──
+  // ── Toggle functions ──
   window.toggleDashMenu = function () {
     const menu    = document.getElementById('dash-menu');
     const chevron = document.getElementById('dash-chevron');
+    const uMenu   = document.getElementById('user-menu-guest') || document.getElementById('user-menu-loggedin');
+    // Close user menu if open
+    const uWrap = document.getElementById('nav-user-wrap');
+    if (uWrap) {
+      uWrap.querySelectorAll('.nav-dropdown-menu').forEach(m => m.classList.remove('open'));
+      const uc = document.getElementById('user-chevron');
+      if (uc) uc.style.transform = 'rotate(0deg)';
+    }
     if (!menu) return;
     const isOpen = menu.classList.toggle('open');
     if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
   };
 
-  // Close dropdown when clicking outside
+  window.toggleUserMenu = function () {
+    // Close dash menu if open
+    const dashMenu = document.getElementById('dash-menu');
+    const dashChev = document.getElementById('dash-chevron');
+    if (dashMenu) { dashMenu.classList.remove('open'); }
+    if (dashChev) { dashChev.style.transform = 'rotate(0deg)'; }
+
+    const session  = getSession();
+    const menuId   = session ? 'user-menu-loggedin' : 'user-menu-guest';
+    const menu     = document.getElementById(menuId);
+    const chevron  = document.getElementById('user-chevron');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('open');
+    if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  };
+
+  window.confirmLogout = function () {
+    if (confirm('Sign out of Fresh Market?')) logout();
+  };
+
+  // Close both dropdowns when clicking outside
   document.addEventListener('click', function (e) {
-    const wrap = document.getElementById('nav-dashboard-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-      const menu    = document.getElementById('dash-menu');
-      const chevron = document.getElementById('dash-chevron');
-      if (menu)    menu.classList.remove('open');
-      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    const dashWrap = document.getElementById('nav-dashboard-wrap');
+    const userWrap = document.getElementById('nav-user-wrap');
+
+    if (dashWrap && !dashWrap.contains(e.target)) {
+      const m = document.getElementById('dash-menu');
+      const c = document.getElementById('dash-chevron');
+      if (m) m.classList.remove('open');
+      if (c) c.style.transform = 'rotate(0deg)';
+    }
+    if (userWrap && !userWrap.contains(e.target)) {
+      userWrap.querySelectorAll('.nav-dropdown-menu').forEach(m => m.classList.remove('open'));
+      const c = document.getElementById('user-chevron');
+      if (c) c.style.transform = 'rotate(0deg)';
     }
   }, { capture: true });
 }

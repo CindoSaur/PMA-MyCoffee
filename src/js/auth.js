@@ -28,25 +28,6 @@ function clearSession() {
   localStorage.removeItem(AUTH_SESSION_KEY);
 }
 
-// ── Seed test accounts (runs once on first load, never overwrites) ──
-
-const SEED_ACCOUNTS = [
-  { name: 'Admin User',  email: 'admin@polycoffee.vn',    password: 'admin1234',    role: 'admin'    },
-  { name: 'Linh Nguyen', email: 'customer@polycoffee.vn', password: 'customer1234', role: 'customer' },
-  { name: 'Minh Staff',  email: 'staff@polycoffee.vn',    password: 'staff1234',    role: 'staff'    },
-];
-
-function seedAccounts() {
-  const users = getUsers();
-  let changed = false;
-  for (const seed of SEED_ACCOUNTS) {
-    if (!users.find(u => u.email === seed.email)) {
-      users.push(seed);
-      changed = true;
-    }
-  }
-  if (changed) saveUsers(users);
-}
 
 // ── Tab switching ─────────────────────────────
 
@@ -143,7 +124,6 @@ function showToast(msg) {
 // ── On page load: seed accounts + redirect if already logged in ──
 
 window.addEventListener('DOMContentLoaded', () => {
-  seedAccounts();
   const session = getSession();
   if (session) {
     window.location.href = '/';

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track My Order — Fresh Market</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    body { background:var(--bg); }
+    .portal-wrap { display:flex; min-height:100vh; }
+
+    /* Sidebar */
+    .sidebar { width:260px; flex-shrink:0; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; padding:1.4rem 1.25rem 1rem; font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); text-decoration:none; }
+    .sidebar-brand .logo-mark { width:32px; height:32px; background:var(--green); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sidebar-section { padding:.75rem 1rem .25rem; font-size:10px; letter-spacing:.1em; color:var(--text-light); text-transform:uppercase; }
+    .sidebar-link { display:flex; align-items:center; gap:9px; padding:9px 1.25rem; font-size:13px; color:var(--text-mid); border:none; background:none; font-family:var(--sans); width:100%; text-align:left; transition:all .15s; text-decoration:none; cursor:pointer; }
+    .sidebar-link:hover { background:var(--bg2); color:var(--text); }
+    .sidebar-link.active { background:var(--green-light); color:var(--green-dark); font-weight:500; }
+    .sidebar-link .mi { font-size:17px; }
+    .sidebar-bottom { margin-top:auto; padding:1rem; border-top:1px solid var(--border); }
+    .sidebar-profile { display:flex; align-items:center; gap:10px; padding:.5rem 0; }
+    .profile-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#fff; flex-shrink:0; }
+    .profile-name { font-size:13px; font-weight:500; color:var(--text); }
+    .profile-email { font-size:11px; color:var(--text-light); }
+    .btn-logout { display:flex; align-items:center; gap:6px; width:100%; padding:.6rem .75rem; margin-top:.5rem; background:none; border:1.5px solid var(--border); border-radius:var(--radius-sm); color:var(--text-mid); font-size:13px; font-family:var(--sans); cursor:pointer; transition:.15s; }
+    .btn-logout:hover { border-color:#e05252; color:#e05252; background:#fff5f5; }
+
+    /* Main */
+    .main { flex:1; min-width:0; padding:2rem 2.5rem; }
+    .page-hd { margin-bottom:1.75rem; }
+    .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
+    .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
+
+    /* No orders */
+    .empty-state { text-align:center; padding:4rem; color:var(--text-light); background:#fff; border-radius:var(--radius); border:1px solid var(--border); }
+    .empty-state .mi { font-size:56px; display:block; margin-bottom:1rem; }
+
+    /* Order card */
+    .order-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; transition:box-shadow .2s; }
+    .order-card:hover { box-shadow:0 4px 20px rgba(0,0,0,.07); }
+    .order-card-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); gap:1rem; flex-wrap:wrap; cursor:pointer; }
+    .order-card-id { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .order-card-date { font-size:12px; color:var(--text-light); margin-top:2px; }
+    .order-card-body { padding:1.5rem; }
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:500; }
+    .badge-delivered  { background:#dcfce7; color:#15803d; }
+    .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-shipping   { background:#dbeafe; color:#1d4ed8; }
+    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
+
+    /* Progress tracker */
+    .progress-track { display:flex; align-items:flex-start; gap:0; margin:1.25rem 0; position:relative; }
+    .track-step { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+    .track-step::before {
+      content:''; position:absolute; top:16px; left:50%; width:100%; height:2px;
+      background:var(--border); z-index:0; transform:translateX(0);
+    }
+    .track-step:last-child::before { display:none; }
+    .track-dot {
+      width:34px; height:34px; border-radius:50%; border:2px solid var(--border);
+      background:#fff; display:flex; align-items:center; justify-content:center;
+      font-size:16px; z-index:1; position:relative; transition:all .3s;
+      flex-shrink:0;
+    }
+    .track-dot.done   { background:var(--green); border-color:var(--green); color:#fff; }
+    .track-dot.active { background:#fff; border-color:var(--green); color:var(--green); box-shadow:0 0 0 4px var(--green-light); }
+    .track-dot.pending { color:var(--text-light); }
+    .track-line-fill {
+      position:absolute; top:16px; left:50%; height:2px;
+      background:var(--green); z-index:0; transition:width .5s ease;
+    }
+    .track-label { margin-top:8px; font-size:11px; font-weight:500; color:var(--text-mid); text-align:center; }
+    .track-label.active { color:var(--green-dark); font-weight:600; }
+    .track-label.done   { color:var(--text-light); }
+
+    /* Shipper card */
+    .shipper-card { background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1px solid #bae6fd; border-radius:var(--radius-sm); padding:1.25rem 1.5rem; display:flex; align-items:center; gap:1.25rem; margin:1.25rem 0; }
+    .shipper-avatar { width:52px; height:52px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700; color:#fff; flex-shrink:0; }
+    .shipper-info-name { font-size:14px; font-weight:600; color:#0369a1; }
+    .shipper-info-sub { font-size:12px; color:#0284c7; margin-top:2px; }
+    .shipper-eta { margin-left:auto; text-align:center; flex-shrink:0; }
+    .shipper-eta-time { font-size:1.2rem; font-weight:700; color:#0369a1; font-family:var(--serif); }
+    .shipper-eta-lbl { font-size:10px; color:#7dd3fc; text-transform:uppercase; letter-spacing:.06em; }
+
+    /* Items list */
+    .items-list { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
+    .item-row { display:flex; align-items:center; justify-content:space-between; background:var(--bg2); border-radius:var(--radius-sm); padding:10px 14px; font-size:13px; }
+    .item-name { font-weight:500; color:var(--text); }
+    .item-meta { font-size:11px; color:var(--text-light); margin-top:1px; }
+    .item-price { font-weight:600; color:var(--text); }
+
+    /* Rating section */
+    .rating-section { margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border); }
+    .rating-section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); margin-bottom:1rem; display:flex; align-items:center; gap:8px; }
+
+    /* Star rating widget */
+    .star-widget { display:flex; align-items:center; gap:4px; margin-bottom:1rem; }
+    .star-btn { font-size:28px; cursor:pointer; color:#d1d5db; transition:color .15s, transform .15s; border:none; background:none; padding:0 2px; line-height:1; }
+    .star-btn:hover,
+    .star-btn.selected { color:#f59e0b; }
+    .star-btn:hover ~ .star-btn { color:#d1d5db !important; }
+    .star-widget:hover .star-btn { color:#f59e0b; }
+    .star-widget .star-btn:hover ~ .star-btn { color:#d1d5db; }
+
+    /* Submitted review */
+    .submitted-review { background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-sm); padding:1.25rem 1.5rem; }
+    .submitted-stars { font-size:22px; color:#f59e0b; margin-bottom:6px; }
+    .submitted-comment { font-size:13px; color:var(--text-mid); font-style:italic; line-height:1.6; }
+    .submitted-meta { font-size:11px; color:var(--text-light); margin-top:8px; }
+
+    .rating-textarea { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); resize:vertical; min-height:80px; outline:none; transition:border-color .2s; margin-bottom:12px; }
+    .rating-textarea:focus { border-color:var(--green); }
+    .btn-submit-review { display:flex; align-items:center; gap:8px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
+    .btn-submit-review:hover { background:var(--green-dark); }
+    .btn-submit-review:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* Pulse animation for active shipping */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .shipping-pulse { animation:pulse 1.8s infinite; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+
+    @media(max-width:768px){
+      .sidebar { display:none; }
+      .main { padding:1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<div class="portal-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a class="sidebar-brand" href="/">
+      <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+      Fresh Market
+    </a>
+
+    <div class="sidebar-section">My Account</div>
+    <a class="sidebar-link" href="/components/customer/dashboard-customer.html">
+      <span class="mi">dashboard</span> Overview
+    </a>
+    <a class="sidebar-link" href="/components/customer/orders-customer.html">
+      <span class="mi">receipt_long</span> My Orders
+    </a>
+    <a class="sidebar-link active" href="/components/customer/delivery-customer.html">
+      <span class="mi">delivery_dining</span> Track Delivery
+    </a>
+    <a class="sidebar-link" href="/components/customer/setting-customer.html">
+      <span class="mi">settings</span> Settings
+    </a>
+
+    <div class="sidebar-section">Store</div>
+    <a class="sidebar-link" href="/">
+      <span class="mi" style="color:var(--green)">storefront</span> Back to Store
+    </a>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-profile">
+        <div class="profile-avatar" id="sb-avatar" style="background:var(--green)"></div>
+        <div>
+          <div class="profile-name" id="sb-name">—</div>
+          <div class="profile-email" id="sb-email">—</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <span class="mi" style="font-size:16px">logout</span> Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-hd">
+      <h2>Track My Deliveries</h2>
+      <p>See real-time status of your orders — shipper info, ETA, and leave a rating once delivered.</p>
+    </div>
+
+    <div id="orders-container">
+      <div class="empty-state">
+        <span class="mi">hourglass_empty</span>
+        Loading your orders…
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const FM_ORDERS_KEY  = 'fm_orders';
+const FM_SESSION_KEY = 'fm_session';
+const FM_USERS_KEY   = 'fm_users';
+
+function getOrders()  { return JSON.parse(localStorage.getItem(FM_ORDERS_KEY)  || '[]'); }
+function saveOrders(o){ localStorage.setItem(FM_ORDERS_KEY, JSON.stringify(o)); }
+function getSession() { return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+function getUsers()   { return JSON.parse(localStorage.getItem(FM_USERS_KEY)   || '[]'); }
+
+function logout(){
+  localStorage.removeItem(FM_SESSION_KEY);
+  window.location.href = '/';
+}
+
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function fmtMoney(v){
+  if(v>=1000000) return '₫'+(v/1000000).toFixed(1)+'M';
+  if(v>=1000)    return '₫'+(v/1000).toFixed(0)+'K';
+  return '₫'+v.toFixed(0);
+}
+
+const AVATAR_COLORS = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6'];
+function avatarColor(email){
+  let h=0; for(const c of email) h=(h*31+c.charCodeAt(0))%AVATAR_COLORS.length;
+  return AVATAR_COLORS[h];
+}
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+// Steps definition
+const STEPS = [
+  { key:'processing', label:'Order Placed',    icon:'receipt_long' },
+  { key:'shipping',   label:'Out for Delivery', icon:'delivery_dining' },
+  { key:'delivered',  label:'Delivered',        icon:'check_circle' },
+];
+const STATUS_ORDER = { processing:0, shipping:1, delivered:2, cancelled:-1 };
+
+function stepStatus(stepKey, orderStatus){
+  if(orderStatus==='cancelled') return 'pending';
+  const stepIdx = STATUS_ORDER[stepKey];
+  const curIdx  = STATUS_ORDER[orderStatus] ?? 0;
+  if(stepIdx < curIdx) return 'done';
+  if(stepIdx === curIdx) return 'active';
+  return 'pending';
+}
+
+function buildProgressTrack(status){
+  if(status==='cancelled'){
+    return `<div style="display:flex;align-items:center;gap:8px;padding:.75rem 1rem;background:#fee2e2;border-radius:var(--radius-sm);color:#b91c1c;font-size:13px;font-weight:500;">
+      <span class="mi" style="font-size:18px">cancel</span> This order was cancelled.
+    </div>`;
+  }
+  const curIdx = STATUS_ORDER[status] ?? 0;
+  let html = '<div class="progress-track">';
+  STEPS.forEach((step, i) => {
+    const ss = stepStatus(step.key, status);
+    html += `<div class="track-step">`;
+    // connector line fill (between steps)
+    if(i < STEPS.length-1){
+      const fillPct = ss==='done' ? '100%' : ss==='active' ? '50%' : '0%';
+      html += `<div class="track-line-fill" style="width:${fillPct}"></div>`;
+    }
+    html += `<div class="track-dot ${ss}">
+      <span class="mi" style="font-size:16px;${ss==='active'&&status==='shipping'?'animation:pulse 1.8s infinite':''}">${step.icon}</span>
+    </div>
+    <div class="track-label ${ss}">${step.label}</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildShipperCard(o){
+  if(!o.shipper) return '';
+  if(o.status==='delivered' || o.status==='cancelled') return ''; // show in rating section instead
+  const init = o.shipper.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const color = avatarColor(o.shipper);
+  const eta = o.status==='shipping' ? 'ETA ~20 min' : '';
+  return `<div class="shipper-card">
+    <div class="shipper-avatar" style="background:${color}">${init}</div>
+    <div>
+      <div class="shipper-info-name">${o.shipper}</div>
+      <div class="shipper-info-sub">
+        <span class="mi" style="font-size:13px">delivery_dining</span> Your shipper · On the way
+      </div>
+    </div>
+    ${eta ? `<div class="shipper-eta">
+      <div class="shipper-eta-time">${eta}</div>
+      <div class="shipper-eta-lbl">Estimated</div>
+    </div>` : ''}
+  </div>`;
+}
+
+function buildRatingSection(o){
+  // Only show if delivered and has a shipper
+  if(o.status !== 'delivered' || !o.shipper) return '';
+
+  if(o.shipperRating){
+    // Already rated
+    return `<div class="rating-section">
+      <div class="rating-section-title">
+        <span class="mi" style="font-size:18px;color:#f59e0b">star</span>
+        Your Review for ${o.shipper}
+      </div>
+      <div class="submitted-review">
+        <div class="submitted-stars">${'★'.repeat(o.shipperRating)}${'☆'.repeat(5-o.shipperRating)}</div>
+        <div class="submitted-comment">"${o.shipperComment||'No comment.'}"</div>
+        <div class="submitted-meta">Submitted — thank you for your feedback!</div>
+      </div>
+    </div>`;
+  }
+
+  // Rating form
+  return `<div class="rating-section" id="rating-${o.id}">
+    <div class="rating-section-title">
+      <span class="mi" style="font-size:18px;color:#f59e0b">star_half</span>
+      Rate Your Shipper: ${o.shipper}
+    </div>
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:1rem;">
+      How was your delivery experience? Your feedback helps our team improve.
+    </div>
+    <div class="star-widget" id="stars-${o.id}" data-rating="0">
+      ${[1,2,3,4,5].map(n=>`
+        <button class="star-btn" data-val="${n}" onclick="setStar('${o.id}', ${n})" title="${n} star${n>1?'s':''}">★</button>
+      `).join('')}
+    </div>
+    <textarea class="rating-textarea" id="comment-${o.id}" placeholder="Tell us about your experience — was the shipper friendly? Was delivery fast? (optional)"></textarea>
+    <button class="btn-submit-review" onclick="submitRating('${o.id}')">
+      <span class="mi" style="font-size:16px;color:#fff">send</span>
+      Submit Review
+    </button>
+  </div>`;
+}
+
+let ratings = {}; // temp storage: orderId -> rating value
+
+function setStar(orderId, val){
+  ratings[orderId] = val;
+  const widget = document.getElementById(`stars-${orderId}`);
+  if(!widget) return;
+  widget.querySelectorAll('.star-btn').forEach(btn=>{
+    btn.classList.toggle('selected', parseInt(btn.dataset.val) <= val);
+  });
+}
+
+function submitRating(orderId){
+  const rating  = ratings[orderId] || 0;
+  const comment = (document.getElementById(`comment-${orderId}`)?.value || '').trim();
+  if(!rating){ showToast('Please select a star rating first'); return; }
+
+  const orders = getOrders();
+  const idx = orders.findIndex(o=>o.id===orderId);
+  if(idx===-1) return;
+  orders[idx].shipperRating  = rating;
+  orders[idx].shipperComment = comment;
+  saveOrders(orders);
+
+  showToast('Thank you for your feedback! ⭐');
+  // Re-render
+  const session = getSession();
+  renderOrders(session);
+}
+
+function buildOrderCard(o, session){
+  const d = new Date(o.date);
+  const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const items = o.items.map(i=>i.name+(i.qty>1?' ×'+i.qty:'')).join(', ');
+  const badgeClass = `badge-${o.status||'processing'}`;
+  const badgeLabel = {processing:'Processing',shipping:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'}[o.status||'processing'];
+
+  const itemsHtml = o.items.map(i=>`
+    <div class="item-row">
+      <div>
+        <div class="item-name">${i.name}</div>
+        <div class="item-meta">${(i.cat||'').charAt(0).toUpperCase()+(i.cat||'').slice(1)} · ${fmtMoney(i.price)} each</div>
+      </div>
+      <div class="item-price">×${i.qty} &nbsp;${fmtMoney(i.price*i.qty)}</div>
+    </div>`).join('');
+
+  const payIcon = o.payment==='momo'
+    ? '<span class="mi" style="font-size:14px;color:#ae2070;vertical-align:middle">smartphone</span> MoMo'
+    : '<span class="mi" style="font-size:14px;color:#16a34a;vertical-align:middle">payments</span> Cash';
+
+  return `<div class="order-card">
+    <div class="order-card-hd">
+      <div>
+        <div class="order-card-id">Order #${o.id}</div>
+        <div class="order-card-date">${dateStr}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">${fmtMoney(o.total)}</div>
+      </div>
+    </div>
+    <div class="order-card-body">
+
+      <!-- Progress tracker -->
+      ${buildProgressTrack(o.status||'processing')}
+
+      <!-- Shipper info (only when shipping) -->
+      ${buildShipperCard(o)}
+
+      <!-- Items -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:.5rem;">Your Drinks</div>
+      <div class="items-list">${itemsHtml}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--text-light)">${payIcon}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--text)">Total: ${fmtMoney(o.total)}</span>
+      </div>
+
+      <!-- Delivered: shipper name badge -->
+      ${o.status==='delivered' && o.shipper ? `
+        <div style="display:flex;align-items:center;gap:8px;margin-top:1rem;padding:.75rem 1rem;background:var(--green-light);border-radius:var(--radius-sm);">
+          <span class="mi" style="font-size:16px;color:var(--green)">check_circle</span>
+          <span style="font-size:13px;color:var(--green-dark);font-weight:500;">Delivered by <strong>${o.shipper}</strong></span>
+        </div>` : ''}
+
+      <!-- Rating section -->
+      ${buildRatingSection(o)}
+
+    </div>
+  </div>`;
+}
+
+function renderOrders(session){
+  const myOrders = getOrders()
+    .filter(o => o.email === session.email)
+    .sort((a,b) => {
+      // Active orders first
+      const prio = {shipping:0, processing:1, delivered:2, cancelled:3};
+      const pa = prio[a.status||'processing'] ?? 2;
+      const pb = prio[b.status||'processing'] ?? 2;
+      if(pa !== pb) return pa - pb;
+      return new Date(b.date) - new Date(a.date);
+    });
+
+  const container = document.getElementById('orders-container');
+
+  if(!myOrders.length){
+    container.innerHTML = `<div class="empty-state">
+      <span class="mi">local_drink</span>
+      No orders yet. <a href="/" style="color:var(--green);font-weight:500">Start shopping →</a>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = myOrders.map(o => buildOrderCard(o, session)).join('');
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', ()=>{
+  const session = getSession();
+  if(!session){ window.location.href='/components/auth/login.html'; return; }
+  if(session.role==='admin' || session.role==='staff'){
+    window.location.href='/components/admin/dashboard.html'; return;
+  }
+
+  const color = avatarColor(session.email);
+  const av    = document.getElementById('sb-avatar');
+  av.textContent     = initials(session.name);
+  av.style.background = color;
+  document.getElementById('sb-name').textContent  = session.name;
+  document.getElementById('sb-email').textContent = session.email;
+
+  renderOrders(session);
+
+  // Refresh every 30s to pick up admin status changes
+  setInterval(()=> renderOrders(session), 30000);
+});
+</script>
+</body>
+</html>

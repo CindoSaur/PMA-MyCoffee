@@ -46,8 +46,11 @@
     .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
     .badge-delivered  { background:#dcfce7; color:#15803d; }
     .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-shipping   { background:#dbeafe; color:#1d4ed8; }
     .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
     .pay-chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--text-mid); }
+    .shipper-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:3px 8px; border-radius:99px; background:#f0f9ff; color:#0369a1; font-weight:500; }
+    .no-shipper { font-size:11px; color:var(--text-light); font-style:italic; }
 
     /* Pagination */
     .pagination { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; border-top:1px solid var(--border); }
@@ -64,14 +67,14 @@
     /* Drawer */
     .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:400; display:none; }
     .drawer-overlay.open { display:block; }
-    .drawer { position:fixed; right:0; top:0; bottom:0; width:420px; max-width:95vw; background:#fff; border-left:1px solid var(--border); z-index:401; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); overflow-y:auto; }
+    .drawer { position:fixed; right:0; top:0; bottom:0; width:460px; max-width:95vw; background:#fff; border-left:1px solid var(--border); z-index:401; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .28s cubic-bezier(.4,0,.2,1); overflow-y:auto; }
     .drawer.open { transform:translateX(0); }
     .drawer-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
     .drawer-title { font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); }
     .drawer-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
     .drawer-close:hover { background:var(--bg2); }
     .drawer-body { padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem; flex:1; }
-    .drawer-section { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); margin-bottom:.5rem; }
+    .drawer-section { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-light); margin-bottom:.5rem; font-weight:600; }
     .drawer-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text-mid); padding:6px 0; border-bottom:1px solid rgba(0,0,0,.04); }
     .drawer-row:last-child { border:none; }
     .drawer-row strong { color:var(--text); }
@@ -80,10 +83,26 @@
     .drawer-item-name { font-weight:500; color:var(--text); }
     .drawer-item-meta { font-size:11px; color:var(--text-light); }
     .drawer-total { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600; color:var(--text); padding:12px 0 0; border-top:2px solid var(--border); margin-top:4px; }
-    .status-select { padding:7px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; cursor:pointer; transition:border-color .2s; }
+    .status-select { padding:7px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; cursor:pointer; transition:border-color .2s; width:100%; }
     .status-select:focus { border-color:var(--green); }
-    .btn-update { display:flex; align-items:center; gap:7px; padding:10px 20px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; width:100%; justify-content:center; margin-top:.5rem; }
+    .btn-update { display:flex; align-items:center; gap:7px; padding:10px 20px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; width:100%; justify-content:center; }
     .btn-update:hover { background:var(--green-dark); }
+
+    /* Shipper section */
+    .shipper-panel { background:var(--bg2); border-radius:var(--radius-sm); padding:1rem 1.25rem; }
+    .shipper-panel-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:.75rem; display:flex; align-items:center; gap:6px; }
+    .shipper-input { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; margin-bottom:8px; }
+    .shipper-input:focus { border-color:var(--green); }
+    .shipper-preset-list { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .shipper-preset { padding:5px 10px; background:#fff; border:1px solid var(--border); border-radius:99px; font-size:11px; color:var(--text-mid); cursor:pointer; font-family:var(--sans); transition:.15s; }
+    .shipper-preset:hover { border-color:var(--green); color:var(--green-dark); }
+    .shipper-current { display:flex; align-items:center; gap:8px; background:#e0f2fe; border-radius:var(--radius-sm); padding:8px 12px; font-size:12px; color:#0369a1; font-weight:500; }
+
+    /* Review section in drawer */
+    .review-box { background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-sm); padding:1rem 1.25rem; }
+    .review-stars { color:#f59e0b; font-size:18px; margin-bottom:6px; }
+    .review-comment { font-size:13px; color:var(--text-mid); font-style:italic; line-height:1.6; }
+    .review-author { font-size:11px; color:var(--text-light); margin-top:6px; }
 
     /* Toast */
     .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
@@ -119,7 +138,9 @@
     <a class="sidebar-link" href="user.html"><span class="mi">group</span> Users</a>
     <a class="sidebar-link active" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
     <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
+    <a class="sidebar-link" href="delivery.html"><span class="mi">delivery_dining</span> Delivery</a>
     <div class="sidebar-section">Settings</div>
+    <a class="sidebar-link" href="setting.html"><span class="mi">settings</span> Settings</a>
     <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
     <div class="sidebar-bottom">
       <div class="sidebar-user">
@@ -135,7 +156,7 @@
   <!-- MAIN -->
   <div class="dash-main">
     <div class="dash-topbar">
-      <div class="dash-title">Orders</div>
+      <div class="dash-title">Orders & Delivery</div>
       <span id="order-count" style="font-size:12px;color:var(--text-light)"></span>
     </div>
 
@@ -148,6 +169,7 @@
         <div class="filter-tabs">
           <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
           <button class="filter-tab" onclick="setFilter('processing',this)">Processing</button>
+          <button class="filter-tab" onclick="setFilter('shipping',this)">Shipping</button>
           <button class="filter-tab" onclick="setFilter('delivered',this)">Delivered</button>
           <button class="filter-tab" onclick="setFilter('cancelled',this)">Cancelled</button>
         </div>
@@ -163,6 +185,7 @@
                 <th>Items</th>
                 <th>Total</th>
                 <th>Payment</th>
+                <th>Shipper</th>
                 <th>Status</th>
                 <th>Date</th>
               </tr>
@@ -186,6 +209,8 @@
 <script>
 const FM_ORDERS_KEY  = 'fm_orders';
 const FM_SESSION_KEY = 'fm_session';
+const SHIPPERS = ['Nguyen Van A','Tran Thi B','Le Van C','Hoang Thi D','Pham Van E'];
+let currentUserRole = 'staff'; // will be set on DOMContentLoaded
 
 function getOrders()  { return JSON.parse(localStorage.getItem(FM_ORDERS_KEY)  || '[]'); }
 function saveOrders(o){ localStorage.setItem(FM_ORDERS_KEY, JSON.stringify(o)); }
@@ -194,9 +219,8 @@ function getSession() { return JSON.parse(localStorage.getItem(FM_SESSION_KEY) |
 let currentFilter = 'all';
 let currentPage   = 1;
 const PAGE_SIZE   = 10;
-let openOrderIdx  = -1; // index into getOrders() for the open drawer
+let openOrderIdx  = -1;
 
-// Toast
 let toastTmr;
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -205,12 +229,13 @@ function showToast(msg){
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// Money formatting
 function fmtMoney(v){
   if(v>=1000000) return '₫'+(v/1000000).toFixed(1)+'M';
   if(v>=1000)    return '₫'+(v/1000).toFixed(0)+'K';
   return '₫'+v.toFixed(0);
 }
+
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function setFilter(f, btn){
   currentFilter = f; currentPage = 1;
@@ -259,7 +284,10 @@ function renderTable(){
       ? '<span class="mi" style="font-size:16px;color:#ae2070;vertical-align:middle">smartphone</span>'
       : '<span class="mi" style="font-size:16px;color:#16a34a;vertical-align:middle">payments</span>';
     const payLabel = o.payment==='momo' ? 'MoMo' : 'Cash';
-    return `<tr onclick="openDrawer(${realIdx})">
+    const shipperHtml = o.shipper
+      ? `<span class="shipper-chip"><span class="mi" style="font-size:13px">person_pin</span>${o.shipper}</span>`
+      : `<span class="no-shipper">Unassigned</span>`;
+    return `<tr onclick="openDrawer('${o.id}')">
       <td class="order-id">#${o.id}</td>
       <td>
         <div style="font-weight:500;color:var(--text);font-size:13px">${o.customer}</div>
@@ -268,6 +296,7 @@ function renderTable(){
       <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${itemSummary}</td>
       <td style="font-weight:600;color:var(--text)">${fmtMoney(o.total)}</td>
       <td><span class="pay-chip">${payIcon} ${payLabel}</span></td>
+      <td>${shipperHtml}</td>
       <td><span class="badge badge-${o.status||'processing'}">${cap(o.status||'processing')}</span></td>
       <td>
         <div style="font-size:12px;color:var(--text)">${dateStr}</div>
@@ -278,8 +307,6 @@ function renderTable(){
 
   buildPager(totalPages, currentPage);
 }
-
-function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function buildPager(total, cur){
   const wrap = document.getElementById('page-btns');
@@ -292,17 +319,31 @@ function buildPager(total, cur){
 
 function goPage(p){ currentPage=p; renderTable(); }
 
-// Drawer
-function openDrawer(idx){
-  const orders = [...getOrders()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+function openDrawer(orderId){
+  const orders = getOrders();
+  const idx = orders.findIndex(x=>x.id===orderId);
+  if(idx===-1) return;
+  openOrderIdx = idx;
   const o = orders[idx];
-  // find real index in unsorted array for saving
-  openOrderIdx = getOrders().findIndex(x=>x.id===o.id);
 
   const d = new Date(o.date);
   const payLabel = o.payment==='momo'
     ? '<span class="mi" style="font-size:16px;color:#ae2070;vertical-align:middle">smartphone</span> MoMo'
     : '<span class="mi" style="font-size:16px;color:#16a34a;vertical-align:middle">payments</span> Cash';
+
+  const presets = SHIPPERS.map(s=>
+    `<button class="shipper-preset" onclick="setShipperPreset('${s}')">${s}</button>`
+  ).join('');
+
+  const reviewHtml = o.shipperRating ? `
+    <div>
+      <div class="drawer-section">Customer Review for Shipper</div>
+      <div class="review-box">
+        <div class="review-stars">${'★'.repeat(o.shipperRating)}${'☆'.repeat(5-o.shipperRating)}</div>
+        <div class="review-comment">"${o.shipperComment||'No comment left.'}"</div>
+        <div class="review-author">— ${o.customer} · rated ${o.shipperRating}/5 stars</div>
+      </div>
+    </div>` : '';
 
   document.getElementById('drawer-title').textContent = `Order #${o.id}`;
   document.getElementById('drawer-body').innerHTML = `
@@ -310,6 +351,7 @@ function openDrawer(idx){
       <div class="drawer-section">Customer</div>
       <div class="drawer-row"><span>Name</span><strong>${o.customer}</strong></div>
       <div class="drawer-row"><span>Email</span><strong>${o.email||'—'}</strong></div>
+      <div class="drawer-row"><span>Address</span><strong>${o.address||'—'}</strong></div>
     </div>
     <div>
       <div class="drawer-section">Order Info</div>
@@ -330,26 +372,68 @@ function openDrawer(idx){
         <div class="drawer-total"><span>Total</span><span>${fmtMoney(o.total)}</span></div>
       </div>
     </div>
+
+    <!-- SHIPPER ASSIGNMENT — admin only -->
+    ${currentUserRole === 'admin' ? `
+    <div>
+      <div class="drawer-section">Assign Shipper</div>
+      <div class="shipper-panel">
+        <div class="shipper-panel-title">
+          <span class="mi" style="font-size:16px;color:#0369a1">delivery_dining</span>
+          ${o.shipper ? `Currently assigned to <strong>${o.shipper}</strong>` : 'No shipper assigned yet'}
+        </div>
+        ${o.shipper ? `<div class="shipper-current" style="margin-bottom:10px"><span class="mi" style="font-size:16px">person_pin</span>${o.shipper}</div>` : ''}
+        <div style="font-size:11px;color:var(--text-light);margin-bottom:6px">Quick assign:</div>
+        <div class="shipper-preset-list">${presets}</div>
+        <input class="shipper-input" type="text" id="shipper-name-input" placeholder="Or type shipper name…" value="${o.shipper||''}" />
+        <button class="btn-update" style="background:#0369a1" onclick="assignShipper()">
+          <span class="mi" style="font-size:16px;color:#fff">delivery_dining</span> Assign Shipper
+        </button>
+      </div>
+    </div>` : o.shipper ? `
+    <div>
+      <div class="drawer-section">Shipper</div>
+      <div class="shipper-current"><span class="mi" style="font-size:16px">person_pin</span>${o.shipper}</div>
+    </div>` : ''}
+
+    <!-- STATUS -->
     <div>
       <div class="drawer-section">Update Status</div>
-      <select class="status-select" id="status-select" style="width:100%;margin-bottom:10px">
-        <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
-        <option value="delivered"  ${o.status==='delivered' ?'selected':''}>Delivered</option>
-        <option value="cancelled"  ${o.status==='cancelled' ?'selected':''}>Cancelled</option>
+      <select class="status-select" id="status-select" style="margin-bottom:10px">
+        <option value="processing" ${(o.status||'processing')==='processing'?'selected':''}>🟡 Processing</option>
+        <option value="shipping"   ${o.status==='shipping'  ?'selected':''}>🔵 Shipping (Out for delivery)</option>
+        <option value="delivered"  ${o.status==='delivered' ?'selected':''}>🟢 Delivered</option>
+        <option value="cancelled"  ${o.status==='cancelled' ?'selected':''}>🔴 Cancelled</option>
       </select>
       <button class="btn-update" onclick="updateStatus()">
         <span class="mi" style="font-size:16px;color:#fff">save</span> Save Status
       </button>
     </div>
+
+    ${reviewHtml}
   `;
   document.getElementById('drawerOverlay').classList.add('open');
   document.getElementById('orderDrawer').classList.add('open');
 }
 
-function closeDrawer(){
-  document.getElementById('drawerOverlay').classList.remove('open');
-  document.getElementById('orderDrawer').classList.remove('open');
-  openOrderIdx = -1;
+function setShipperPreset(name){
+  document.getElementById('shipper-name-input').value = name;
+}
+
+function assignShipper(){
+  if(openOrderIdx < 0) return;
+  const name = document.getElementById('shipper-name-input').value.trim();
+  if(!name){ showToast('Please enter a shipper name'); return; }
+  const orders = getOrders();
+  orders[openOrderIdx].shipper = name;
+  // Auto-set status to shipping if currently processing
+  if(!orders[openOrderIdx].status || orders[openOrderIdx].status === 'processing'){
+    orders[openOrderIdx].status = 'shipping';
+  }
+  saveOrders(orders);
+  showToast(`Shipper "${name}" assigned & status set to Shipping ✓`);
+  renderTable();
+  openDrawer(orders[openOrderIdx].id);
 }
 
 function updateStatus(){
@@ -358,16 +442,40 @@ function updateStatus(){
   const orders = getOrders();
   orders[openOrderIdx].status = val;
   saveOrders(orders);
-  showToast(`Order status updated to "${cap(val)}"`);
+  showToast(`Order status updated to "${cap(val)}" ✓`);
   renderTable();
   closeDrawer();
+}
+
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('orderDrawer').classList.remove('open');
+  openOrderIdx = -1;
+}
+
+// Seed demo orders for testing
+function seedOrders(){
+  const existing = getOrders();
+  if(existing.length > 0) return;
+  const demo = [
+    { id:'FM-10001', customer:'Linh Nguyen', email:'customer@polycoffee.vn', address:'123 Nguyen Hue, D1, HCMC', items:[{name:'Green Detox',cat:'detox',price:70000,qty:2},{name:'Berry Boost',cat:'smoothie',price:65000,qty:1}], total:205000, payment:'momo', status:'processing', date: new Date(Date.now()-3600000).toISOString() },
+    { id:'FM-10002', customer:'Minh Hung',   email:'minh@example.com',        address:'45 Le Loi, D1, HCMC',      items:[{name:'Sunrise Blend',cat:'juice',price:65000,qty:1}],                                                total:65000,  payment:'cash', status:'shipping', shipper:'Nguyen Van A', date: new Date(Date.now()-7200000).toISOString() },
+    { id:'FM-10003', customer:'Sara A.',      email:'sara@example.com',         address:'88 Tran Hung Dao, D5, HCMC', items:[{name:'Calm Tea',cat:'tea',price:50000,qty:3}],                                                  total:150000, payment:'momo', status:'delivered', shipper:'Tran Thi B', shipperRating:5, shipperComment:'Super fast and friendly! Will order again.', date: new Date(Date.now()-86400000).toISOString() },
+    { id:'FM-10004', customer:'Khoa Tran',    email:'khoa@example.com',         address:'10 Pham Ngu Lao, D1, HCMC', items:[{name:'Mango Turmeric',cat:'juice',price:75000,qty:2},{name:'Coconut Matcha',cat:'smoothie',price:85000,qty:1}], total:235000, payment:'cash', status:'processing', date: new Date(Date.now()-1800000).toISOString() },
+    { id:'FM-10005', customer:'An Pham',      email:'an@example.com',           address:'22 Vo Van Tan, D3, HCMC',   items:[{name:'Beet Warrior',cat:'juice',price:75000,qty:1}],                                              total:75000,  payment:'momo', status:'cancelled', date: new Date(Date.now()-172800000).toISOString() },
+    { id:'FM-10006', customer:'Thu Le',       email:'thu@example.com',          address:'56 CMT8, D3, HCMC',          items:[{name:'Peanut Butter Oat',cat:'smoothie',price:90000,qty:2},{name:'Hibiscus Cooler',cat:'tea',price:50000,qty:2}], total:280000, payment:'cash', status:'shipping', shipper:'Le Van C', date: new Date(Date.now()-5400000).toISOString() },
+    { id:'FM-10007', customer:'Duc Nguyen',   email:'duc@example.com',          address:'77 Dinh Tien Hoang, BT, HCMC', items:[{name:'Dragon Fruit Glow',cat:'juice',price:80000,qty:1}],                                    total:80000,  payment:'momo', status:'delivered', shipper:'Hoang Thi D', shipperRating:4, shipperComment:'Good service, a bit late but polite.', date: new Date(Date.now()-259200000).toISOString() },
+  ];
+  saveOrders(demo);
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
   const s = getSession();
   if(!s || (s.role!=='admin' && s.role!=='staff')){ alert('Access denied.'); window.location.href='/'; return; }
+  currentUserRole = s.role;
   document.getElementById('sb-name').textContent = s.name;
   document.getElementById('sb-role').textContent = s.role;
+  seedOrders();
   renderTable();
 });
 </script>

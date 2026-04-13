@@ -36,9 +36,9 @@
   <!-- Right side actions -->
   <div class="nav-actions">
 
-    <!-- Dashboard dropdown — shown only for admin/staff via applySessionToNav() -->
+    <!-- Dashboard dropdown — shown only for admin/staff -->
     <div class="nav-dropdown" id="nav-dashboard-wrap" style="display:none">
-      <button class="nav-btn nav-dashboard-btn" onclick="toggleDashMenu()">
+      <button class="nav-pill nav-pill-green" onclick="toggleDashMenu()">
         <span class="mi" style="font-size:15px">dashboard</span>
         Dashboard
         <span class="mi nav-chevron" id="dash-chevron" style="font-size:14px;transition:transform .2s">expand_more</span>
@@ -58,22 +58,103 @@
             <div class="nav-di-sub">Manage accounts & roles</div>
           </div>
         </a>
-        <div class="nav-dropdown-divider"></div>
-        <a class="nav-dropdown-item" href="#" onclick="showToast('Orders page coming soon!')">
-          <span class="mi" style="font-size:16px;color:var(--text-light)">receipt_long</span>
+        <a class="nav-dropdown-item" href="/components/admin/orders.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">receipt_long</span>
           <div>
             <div class="nav-di-title">Orders</div>
             <div class="nav-di-sub">Track & manage orders</div>
           </div>
         </a>
+        <a class="nav-dropdown-item" href="/components/admin/products.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">inventory_2</span>
+          <div>
+            <div class="nav-di-title">Products</div>
+            <div class="nav-di-sub">Manage your menu items</div>
+          </div>
+        </a>
+        <div class="nav-dropdown-divider"></div>
+        <a class="nav-dropdown-item" href="/components/admin/setting.html">
+          <span class="mi" style="font-size:16px;color:var(--text-light)">settings</span>
+          <div>
+            <div class="nav-di-title">Settings</div>
+            <div class="nav-di-sub">Store configuration</div>
+          </div>
+        </a>
       </div>
     </div>
 
-    <!-- Login / User pill -->
-    <button class="nav-login-btn" id="nav-login-btn" onclick="window.location.href='/components/auth/login.html'">
-      <span class="mi" style="font-size:15px">person</span>
-      <span id="nav-login-label">Login</span>
-    </button>
+    <!-- User dropdown — always shown, changes content based on session -->
+    <div class="nav-dropdown" id="nav-user-wrap">
+      <button class="nav-pill nav-pill-outline" id="nav-user-btn" onclick="toggleUserMenu()">
+        <span class="mi" style="font-size:15px">person</span>
+        <span id="nav-login-label">Login</span>
+        <span class="mi nav-chevron" id="user-chevron" style="font-size:14px;transition:transform .2s">expand_more</span>
+      </button>
+
+      <!-- Guest menu (not logged in) -->
+      <div class="nav-dropdown-menu" id="user-menu-guest">
+        <div style="padding:12px 14px 8px">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Welcome!</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:2px">Sign in to track your orders</div>
+        </div>
+        <div class="nav-dropdown-divider"></div>
+        <a class="nav-dropdown-item" href="/components/auth/login.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">login</span>
+          <div>
+            <div class="nav-di-title">Sign In</div>
+            <div class="nav-di-sub">Access your account</div>
+          </div>
+        </a>
+        <a class="nav-dropdown-item" href="/components/auth/register.html">
+          <span class="mi" style="font-size:16px;color:var(--green)">person_add</span>
+          <div>
+            <div class="nav-di-title">Create Account</div>
+            <div class="nav-di-sub">New to PolyCoffee?</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Logged-in menu -->
+      <div class="nav-dropdown-menu" id="user-menu-loggedin" style="display:none">
+        <!-- Profile header -->
+        <div class="user-menu-header">
+          <div class="user-menu-avatar" id="user-menu-avatar"></div>
+          <div>
+            <div class="user-menu-name"  id="user-menu-name">—</div>
+            <div class="user-menu-email" id="user-menu-email">—</div>
+            <span class="user-menu-badge" id="user-menu-badge">customer</span>
+          </div>
+        </div>
+        <div class="nav-dropdown-divider"></div>
+        <!-- Customer links -->
+        <div id="user-menu-customer-links">
+          <a class="nav-dropdown-item" href="/components/customer/dashboard-customer.html">
+            <span class="mi" style="font-size:16px;color:var(--green)">dashboard</span>
+            <div>
+              <div class="nav-di-title">My Account</div>
+              <div class="nav-di-sub">Orders, profile & addresses</div>
+            </div>
+          </a>
+        </div>
+        <!-- Admin/staff extra links -->
+        <div id="user-menu-admin-links" style="display:none">
+          <a class="nav-dropdown-item" href="/components/admin/dashboard.html">
+            <span class="mi" style="font-size:16px;color:var(--green)">bar_chart</span>
+            <div>
+              <div class="nav-di-title">Admin Dashboard</div>
+              <div class="nav-di-sub">Analytics & management</div>
+            </div>
+          </a>
+        </div>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item nav-signout-btn" onclick="confirmLogout()">
+          <span class="mi" style="font-size:16px;color:#e05252">logout</span>
+          <div>
+            <div class="nav-di-title" style="color:#e05252">Sign Out</div>
+          </div>
+        </button>
+      </div>
+    </div>
 
     <!-- Cart -->
     <button class="cart-trigger" onclick="openCart()">
@@ -85,42 +166,40 @@
 </nav>
 
 <style>
-  /* ── Nav actions group ── */
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .nav-actions { display:flex; align-items:center; gap:8px; }
 
-  /* ── Dashboard dropdown button ── */
-  .nav-dashboard-btn {
+  /* ── Shared pill style ── */
+  .nav-pill {
     display: flex;
     align-items: center;
     gap: 5px;
     font-size: 13px;
-    color: var(--green-dark);
     padding: 7px 14px;
     border-radius: var(--radius-sm);
-    border: 1.5px solid var(--green);
-    background: var(--green-light);
-    cursor: pointer;
     font-family: var(--sans);
     font-weight: 500;
+    cursor: pointer;
     transition: all .18s;
-    position: relative;
-  }
-  .nav-dashboard-btn:hover {
-    background: var(--green);
-    color: #fff;
-  }
-  .nav-dashboard-btn:hover .nav-chevron {
-    color: #fff;
   }
 
-  /* ── Dropdown wrapper ── */
-  .nav-dropdown {
-    position: relative;
+  .nav-pill-green {
+    color: var(--green-dark);
+    border: 1.5px solid var(--green);
+    background: var(--green-light);
   }
+  .nav-pill-green:hover { background: var(--green); color: #fff; }
+  .nav-pill-green:hover .nav-chevron { color: #fff; }
+
+  .nav-pill-outline {
+    color: var(--green);
+    border: 1.5px solid var(--green);
+    background: none;
+  }
+  .nav-pill-outline:hover { background: var(--green); color: #fff; }
+  .nav-pill-outline:hover .nav-chevron { color: #fff; }
+
+  /* ── Dropdown wrapper ── */
+  .nav-dropdown { position: relative; }
 
   /* ── Dropdown menu ── */
   .nav-dropdown-menu {
@@ -130,21 +209,26 @@
     background: #fff;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: 0 12px 40px rgba(0,0,0,.12);
+    box-shadow: 0 12px 40px rgba(0,0,0,.13);
     min-width: 240px;
     padding: 6px;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 2px;
     z-index: 999;
-    animation: dropIn .18s cubic-bezier(.34,1.3,.64,1);
+    /* Hidden by default — no display:none so animation fires correctly */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .18s, transform .18s cubic-bezier(.34,1.3,.64,1), visibility 0s .18s;
   }
   .nav-dropdown-menu.open {
-    display: flex;
-  }
-  @keyframes dropIn {
-    from { opacity:0; transform:translateY(-8px); }
-    to   { opacity:1; transform:translateY(0); }
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+    transition: opacity .18s, transform .18s cubic-bezier(.34,1.3,.64,1), visibility 0s 0s;
   }
 
   /* ── Dropdown items ── */
@@ -157,46 +241,48 @@
     text-decoration: none;
     transition: background .13s;
     cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--sans);
   }
-  .nav-dropdown-item:hover {
-    background: var(--bg2);
-  }
-  .nav-di-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .nav-di-sub {
-    font-size: 11px;
-    color: var(--text-light);
-    margin-top: 1px;
-  }
-  .nav-dropdown-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 4px 0;
-  }
+  .nav-dropdown-item:hover { background: var(--bg2); }
 
-  /* ── Login pill ── */
-  .nav-login-btn {
+  .nav-di-title { font-size:13px; font-weight:500; color:var(--text); }
+  .nav-di-sub   { font-size:11px; color:var(--text-light); margin-top:1px; }
+  .nav-dropdown-divider { height:1px; background:var(--border); margin:4px 0; }
+
+  /* ── User menu header ── */
+  .user-menu-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    border: 1.5px solid var(--green);
-    color: var(--green);
-    border-radius: var(--radius-sm);
-    background: none;
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .18s;
+    gap: 12px;
+    padding: 12px 14px 10px;
   }
-  .nav-login-btn:hover {
-    background: var(--green);
-    color: #fff;
+  .user-menu-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
   }
+  .user-menu-name  { font-size:13px; font-weight:600; color:var(--text); }
+  .user-menu-email { font-size:11px; color:var(--text-light); margin-top:1px; }
+  .user-menu-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px;
+    text-transform: capitalize;
+  }
+  .user-menu-badge.admin    { background:#ffeaea; color:#c0392b; }
+  .user-menu-badge.staff    { background:#eaf1ff; color:#2e6fd6; }
+  .user-menu-badge.customer { background:var(--green-light); color:var(--green-dark); }
+
+  /* ── Sign out button ── */
+  .nav-signout-btn { font-family:var(--sans); }
+  .nav-signout-btn:hover { background:#fff5f5 !important; }
 </style>
 
 <!-- Nav logic handled by script.js → applySessionToNav() -->
