@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fresh Market — Farm to Table</title>
+    <link rel="stylesheet" href="/style/style.css" />
+  </head>
+  <body>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast">
+      <div class="toast-dot"></div>
+      <span id="toast-msg"></span>
+    </div>
+
+    <!-- ══ HEADER (loaded from component) ══ -->
+    <div id="header-slot"></div>
+
+    <!-- ══════════════ HOME PAGE ══════════════ -->
+    <div class="page active" id="page-home">
+      <div class="hero">
+        <img src="https://i.pinimg.com/736x/fe/6a/26/fe6a26878d2b91ee7a1c7212bc5d3677.jpg" alt="MyCoffee" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-tag">
+            <span class="mi" style="font-size: 13px; color: #fff">eco</span>
+            100% Organic · Farm to Table
+          </div>
+<h1>
+  <span class="nowrap">Cà phê nguyên chất,</span><br />
+  <em>hương vị</em> thật
+</h1>
+<p>Cà phê cold brew, trà thảo mộc & sinh tố thủ công. Giao tươi tận cửa mỗi sáng.</p>
+          <div class="hero-btns">
+            <button class="btn-hero" onclick="showPage('menu')">
+              <span class="mi" style="font-size: 17px; color: #fff">menu_book</span>
+              Browse Menu
+            </button>
+            <button class="btn-ghost" onclick="showPage('about')">
+              <span class="mi" style="font-size: 17px; color: #fff">play_circle</span>
+              Our Story
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-item">
+          <div class="stat-icon-wrap"><span class="mi" style="font-size: 24px">people</span></div>
+          <div><div class="stat-num">12k+</div><div class="stat-lbl">Happy customers</div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-wrap"><span class="mi" style="font-size: 24px">eco</span></div>
+          <div><div class="stat-num">98%</div><div class="stat-lbl">Natural ingredients</div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-wrap"><span class="mi" style="font-size: 24px">schedule</span></div>
+          <div><div class="stat-num">2hr</div><div class="stat-lbl">Average delivery</div></div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="section">
+          <div class="sec-eyebrow">Best Sellers</div>
+          <div class="sec-title">Our most loved drinks</div>
+          <div class="sec-sub">Crafted fresh each morning. Tap any drink to see full details and add to cart.</div>
+          <div class="products-grid" id="home-products"></div>
+          <div style="text-align: center">
+            <button class="btn-hero" onclick="showPage('menu')" style="margin: 0 auto">
+              <span class="mi" style="font-size: 16px; color: #fff">grid_view</span>
+              View Full Menu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sec-divider" />
+      <div class="container">
+        <div class="section">
+          <div class="sec-eyebrow">Why Fresh Market</div>
+          <div class="sec-title">What makes us different</div>
+          <div class="features-grid">
+            <div class="feat-card" onclick="openFeatModal('organic')">
+              <div class="feat-icon"><span class="mi" style="font-size: 26px">eco</span></div>
+              <h4>Organic sourcing</h4>
+              <p>All produce sourced from certified farms within 50km.</p>
+              <div class="feat-learn"><span class="mi" style="font-size: 14px">arrow_forward</span> Learn more</div>
+            </div>
+            <div class="feat-card" onclick="openFeatModal('coldpress')">
+              <div class="feat-icon"><span class="mi" style="font-size: 26px">ac_unit</span></div>
+              <h4>Cold-pressed</h4>
+              <p>No heat — every enzyme and vitamin stays intact.</p>
+              <div class="feat-learn"><span class="mi" style="font-size: 14px">arrow_forward</span> Learn more</div>
+            </div>
+            <div class="feat-card" onclick="showPage('delivery')">
+              <div class="feat-icon"><span class="mi" style="font-size: 26px">delivery_dining</span></div>
+              <h4>Fast delivery</h4>
+              <p>Order before noon, receive same day — guaranteed.</p>
+              <div class="feat-learn"><span class="mi" style="font-size: 14px">arrow_forward</span> See delivery zones</div>
+            </div>
+            <div class="feat-card" onclick="openFeatModal('eco')">
+              <div class="feat-icon"><span class="mi" style="font-size: 26px">recycling</span></div>
+              <h4>Eco packaging</h4>
+              <p>100% recyclable glass. Return bottles for 10% off.</p>
+              <div class="feat-learn"><span class="mi" style="font-size: 14px">arrow_forward</span> Learn more</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sec-divider" />
+      <div class="container">
+        <div class="section">
+          <div class="sec-eyebrow">Reviews</div>
+          <div class="sec-title">What customers say</div>
+          <div class="reviews-grid">
+            <div class="rev-card">
+              <div class="rev-stars">
+                <span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span>
+              </div>
+              <p class="rev-text">"The Green Detox is now part of my daily routine. I've never felt better — the freshness is unreal."</p>
+              <div class="rev-author">
+                <div class="ava">LN</div>
+                <div><div class="ava-name">Linh Nguyen</div><div class="ava-loc"><span class="mi" style="font-size: 12px">location_on</span> Ho Chi Minh City</div></div>
+              </div>
+            </div>
+            <div class="rev-card">
+              <div class="rev-stars">
+                <span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span>
+              </div>
+              <p class="rev-text">"Always cold, always on time. The Sunrise Blend is my absolute go-to every single morning."</p>
+              <div class="rev-author">
+                <div class="ava">MH</div>
+                <div><div class="ava-name">Minh Hùng</div><div class="ava-loc"><span class="mi" style="font-size: 12px">location_on</span> District 1</div></div>
+              </div>
+            </div>
+            <div class="rev-card">
+              <div class="rev-stars">
+                <span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: var(--amber)">star</span><span class="mi" style="font-size: 17px; color: #e0e0e0">star</span>
+              </div>
+              <p class="rev-text">"Love the eco packaging and the flavors are genuinely clean — you can taste the real fruit."</p>
+              <div class="rev-author">
+                <div class="ava">SA</div>
+                <div><div class="ava-name">Sara A.</div><div class="ava-loc"><span class="mi" style="font-size: 12px">location_on</span> Thủ Đức</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="newsletter-band">
+        <h3>Get 15% off your first order</h3>
+        <p>Join our newsletter for seasonal drops, exclusive recipes and special offers.</p>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="your@email.com" id="nl-input" />
+          <button class="nl-btn" onclick="subscribeNewsletter()">Subscribe</button>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <span class="mi" style="font-size: 48px; color: rgba(255,255,255,0.38); display: block; margin-bottom: 1.25rem">local_drink</span>
+        <h2>Ready to drink better?</h2>
+        <p>Order before noon — same-day delivery is free on your very first order.</p>
+        <button class="btn-white" onclick="showPage('menu')">
+          <span class="mi" style="font-size: 17px; color: var(--green-dark)">rocket_launch</span>
+          Shop Now
+        </button>
+      </div>
+
+      <!-- ══ FOOTER (loaded from component) ══ -->
+      <div id="footer-slot"></div>
+    </div>
+
+    <!-- ══════════════ MENU PAGE ══════════════ -->
+    <div class="page" id="page-menu">
+      <div class="page-hero-green">
+        <h1>Our Menu</h1>
+        <p>Every drink crafted fresh daily from certified organic produce.</p>
+      </div>
+      <div class="search-wrap">
+        <div class="search-inner">
+          <span class="mi search-ico" style="font-size: 20px">search</span>
+          <input class="search-input" type="text" placeholder="Search drinks…" id="search-input" oninput="renderMenuProducts()" />
+        </div>
+      </div>
+      <div class="container">
+        <div class="section">
+          <div class="cat-tabs" id="cat-tabs">
+            <button class="cat-tab active" onclick="setCat('all');setActiveTab(this)">All</button>
+            <button class="cat-tab" onclick="setCat('juice');setActiveTab(this)">Cold-Pressed Juices</button>
+            <button class="cat-tab" onclick="setCat('smoothie');setActiveTab(this)">Smoothies</button>
+            <button class="cat-tab" onclick="setCat('tea');setActiveTab(this)">Herbal Teas</button>
+            <button class="cat-tab" onclick="setCat('detox');setActiveTab(this)">Detox</button>
+          </div>
+          <div class="products-grid" id="menu-products"></div>
+          <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+            <button class="load-more-btn" onclick="loadMoreProducts()">
+              <span class="mi" style="font-size:18px">expand_more</span>
+              Load <span id="load-more-count">10</span> more items
+            </button>
+            <div class="load-more-hint">Showing items — more below</div>
+          </div>
+        </div>
+      </div>
+      <div class="cta-band">
+        <h2>Not sure what to try?</h2>
+        <p>Our team can recommend the perfect drink for your health goals.</p>
+        <button class="btn-white" onclick="showToast('WhatsApp: +84 901 234 567 — we reply within minutes!')">
+          <span class="mi" style="font-size: 17px; color: var(--green-dark)">chat</span>
+          Ask Us
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════ ABOUT PAGE ══════════════ -->
+    <div class="page" id="page-about">
+      <div class="about-hero">
+        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&q=85&fit=crop&crop=center" alt="Farm" />
+        <div class="about-hero-ov">
+          <h1>Our Story</h1>
+          <p>Born from a love of real food and a desire to make healthy living delicious and accessible.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-img">
+            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85&fit=crop" alt="Making juices" />
+          </div>
+          <div class="about-text">
+            <h2>Farm to your door since 2021</h2>
+            <p>Fresh Market was founded by two friends frustrated with juice bars using concentrates, additives and sugar-loaded fruit. We wanted something honest.</p>
+            <p>We partner exclusively with organic farms within 50km of Ho Chi Minh City. Every morning, we cold-press fresh produce and bottle it for same-day delivery — no pasteurisation, no preservatives, no shortcuts.</p>
+            <p>Our mission is simple: make the healthiest drink you'll have all day also the best-tasting one.</p>
+            <button class="btn-hero" style="margin-top: 1.5rem" onclick="showPage('menu')">
+              <span class="mi" style="font-size: 16px; color: #fff">menu_book</span>
+              Explore our drinks
+            </button>
+          </div>
+        </div>
+        <div class="sec-eyebrow" style="margin-bottom: 10px">The Team</div>
+        <div class="sec-title" style="margin-bottom: 2rem">Meet the people behind Fresh Market</div>
+        <div class="team-grid">
+          <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80&fit=crop&crop=face" alt="Anh" />
+            <div class="team-body"><div class="team-name">Anh Nguyen</div><div class="team-role">Co-founder & Head of Flavour</div></div>
+          </div>
+          <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80&fit=crop&crop=face" alt="Minh" />
+            <div class="team-body"><div class="team-name">Minh Tran</div><div class="team-role">Co-founder & Operations</div></div>
+          </div>
+          <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80&fit=crop&crop=face" alt="Linh" />
+            <div class="team-body"><div class="team-name">Linh Pham</div><div class="team-role">Head of Farm Relations</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DELIVERY PAGE ══════════════ -->
+    <div class="page" id="page-delivery">
+      <div class="page-hero-teal">
+        <h1>Delivery Zones</h1>
+        <p>We deliver across Ho Chi Minh City, Monday to Saturday, 7am–7pm.</p>
+      </div>
+      <div class="container">
+        <div class="zones-grid">
+          <div class="zone-card available" onclick="showToast('District 1 – Same-day delivery if you order before noon!')">
+            <div class="zone-ico g"><span class="mi" style="font-size: 28px">location_on</span></div>
+            <div class="zone-name">District 1</div><div class="zone-info">Same-day · 2hr avg</div>
+            <div class="zone-tag avail">Available</div>
+          </div>
+          <div class="zone-card available" onclick="showToast('District 3 – Same-day delivery available!')">
+            <div class="zone-ico g"><span class="mi" style="font-size: 28px">location_on</span></div>
+            <div class="zone-name">District 3</div><div class="zone-info">Same-day · 2hr avg</div>
+            <div class="zone-tag avail">Available</div>
+          </div>
+          <div class="zone-card available" onclick="showToast('Bình Thạnh – Same-day delivery available!')">
+            <div class="zone-ico g"><span class="mi" style="font-size: 28px">location_on</span></div>
+            <div class="zone-name">Bình Thạnh</div><div class="zone-info">Same-day · 2.5hr avg</div>
+            <div class="zone-tag avail">Available</div>
+          </div>
+          <div class="zone-card available" onclick="showToast('Thủ Đức – Same-day delivery available!')">
+            <div class="zone-ico g"><span class="mi" style="font-size: 28px">location_on</span></div>
+            <div class="zone-name">Thủ Đức</div><div class="zone-info">Same-day · 3hr avg</div>
+            <div class="zone-tag avail">Available</div>
+          </div>
+          <div class="zone-card" onclick="showToast('District 7 – Launching Q3 2026. Join our waitlist!')">
+            <div class="zone-ico a"><span class="mi" style="font-size: 28px">schedule</span></div>
+            <div class="zone-name">District 7</div><div class="zone-info">Launching Q3 2026</div>
+            <div class="zone-tag soon">Coming soon</div>
+          </div>
+          <div class="zone-card" onclick="showToast('Nhà Bè – Launching Q4 2026. Join our waitlist!')">
+            <div class="zone-ico a"><span class="mi" style="font-size: 28px">schedule</span></div>
+            <div class="zone-name">Nhà Bè</div><div class="zone-info">Launching Q4 2026</div>
+            <div class="zone-tag soon">Coming soon</div>
+          </div>
+        </div>
+        <div class="del-info">
+          <h3>How it works</h3>
+          <div class="del-row">
+            <div class="del-ico"><span class="mi" style="font-size: 20px">shopping_cart</span></div>
+            <div><strong>Order before noon</strong><span>Place your order any time before 12:00pm for same-day delivery.</span></div>
+          </div>
+          <div class="del-row">
+            <div class="del-ico"><span class="mi" style="font-size: 20px">blender</span></div>
+            <div><strong>We cold-press your order</strong><span>Your drinks are pressed fresh right after your order — never pre-made or stored.</span></div>
+          </div>
+          <div class="del-row">
+            <div class="del-ico"><span class="mi" style="font-size: 20px">delivery_dining</span></div>
+            <div><strong>Fast delivery to your door</strong><span>Our riders deliver in refrigerated bags so your drinks arrive perfectly cold.</span></div>
+          </div>
+          <div class="del-row">
+            <div class="del-ico"><span class="mi" style="font-size: 20px">recycling</span></div>
+            <div><strong>Return your bottles</strong><span>Hand empty bottles to the rider and get 10% off your next order automatically.</span></div>
+          </div>
+        </div>
+        <div style="padding-bottom: 5rem">
+          <div class="cta-band" style="border-radius: var(--radius)">
+            <h2>Ready to order?</h2>
+            <p>Free delivery on your first order with code FRESHMARKET.</p>
+            <button class="btn-white" onclick="showPage('menu')">
+              <span class="mi" style="font-size: 17px; color: var(--green-dark)">menu_book</span>
+              Browse Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ CART SIDEBAR ══════════════ -->
+    <div class="overlay-bg" id="cart-overlay" onclick="closeCartOnOverlay(event)">
+      <div class="cart-sidebar">
+        <div class="cart-hd">
+          <h2>Your cart</h2>
+          <button class="icon-btn" onclick="closeCart()"><span class="mi" style="font-size: 20px">close</span></button>
+        </div>
+        <div class="cart-body" id="cart-body"></div>
+        <div class="cart-ft" id="cart-ft" style="display: none">
+          <div class="cart-total-row">
+            <span class="cart-total-lbl">Total</span><span class="cart-total-val" id="cart-total">$0.00</span>
+          </div>
+          <div class="cart-promo">
+            <span class="mi" style="font-size: 16px; color: var(--green)">local_offer</span>
+            Use code FRESHMARKET for free delivery
+          </div>
+          <button class="checkout-btn" onclick="openCheckout()">
+            <span class="mi" style="font-size: 17px; color: #fff">lock</span>
+            Proceed to Checkout
+          </button>
+          <button class="continue-btn" onclick="closeCart()">
+            <span class="mi" style="font-size: 16px">arrow_back</span> Continue shopping
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PRODUCT MODAL ══════════════ -->
+    <div class="modal-ov" id="product-modal" onclick="closePMOnOv(event)">
+      <div class="modal-box">
+        <div class="modal-img-side">
+          <img id="pm-img" class="modal-img" src="" alt="" />
+          <div class="modal-img-overlay"></div>
+          <div class="modal-img-cat" id="pm-cat-chip"></div>
+          <button class="modal-close-btn" onclick="closePM()">
+            <span class="mi" style="font-size:18px;color:var(--text)">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-top">
+            <div class="modal-title" id="pm-name"></div>
+            <div class="modal-price-tag" id="pm-price"></div>
+          </div>
+          <div class="modal-tags" id="pm-tags"></div>
+          <div class="modal-desc" id="pm-desc"></div>
+          <div class="pm-nutrition" id="pm-nutrition"></div>
+          <hr class="modal-divider" />
+          <div class="modal-footer">
+            <div class="qty-control">
+              <button class="qty-btn" onclick="pmQtyChange(-1)">−</button>
+              <span class="qty-num" id="pm-qty">1</span>
+              <button class="qty-btn" onclick="pmQtyChange(1)">+</button>
+            </div>
+            <button class="modal-add" id="pm-add-btn">
+              <span class="mi" style="font-size: 17px; color: #fff">add_shopping_cart</span>
+              Add to cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ FEATURE MODAL ══════════════ -->
+    <div class="feat-modal-ov" id="feat-modal" onclick="closeFMOnOv(event)">
+      <div class="feat-modal-box">
+        <img id="fm-img" class="feat-modal-img" src="" alt="" />
+        <div class="feat-modal-body">
+          <div class="feat-modal-hd">
+            <h3 id="fm-title"></h3>
+            <button class="icon-btn" onclick="document.getElementById('feat-modal').classList.remove('open')">
+              <span class="mi" style="font-size: 20px">close</span>
+            </button>
+          </div>
+          <p id="fm-p1"></p>
+          <p id="fm-p2"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ CHECKOUT MODAL ══════════════ -->
+    <div class="checkout-ov" id="checkout-ov" onclick="closeCOOnOv(event)">
+      <div class="checkout-box">
+        <div class="checkout-hd">
+          <h2>Checkout</h2>
+          <button class="icon-btn" onclick="closeCheckout()" style="border-color: rgba(255,255,255,0.2)">
+            <span class="mi" style="font-size: 20px; color: rgba(255,255,255,0.7)">close</span>
+          </button>
+        </div>
+        <div class="co-steps" id="co-steps">
+          <div class="co-step active" id="cs-1"><span class="co-step-num">1</span> Delivery</div>
+          <div class="co-step" id="cs-2"><span class="co-step-num">2</span> Payment</div>
+          <div class="co-step" id="cs-3"><span class="co-step-num">3</span> Review</div>
+        </div>
+        <div id="co-content"></div>
+        <div class="co-nav" id="co-nav"></div>
+      </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+
+    <!-- ══ Component Loader ══ -->
+    <script>
+      async function loadComponent(slotId, url) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Failed to load ${url}`);
+          const html = await res.text();
+          document.getElementById(slotId).innerHTML = html;
+        } catch (err) {
+          console.warn('Component load error:', err);
+        }
+      }
+
+      // Load header and footer components
+      loadComponent('header-slot', '/components/layout/header.html')
+        .then(() => applySessionToNav());
+      loadComponent('footer-slot', '/components/layout/footer.html');
+    </script>
+
+  </body>
+</html>

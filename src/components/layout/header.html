@@ -1,0 +1,47 @@
+<!-- ══════════════ PROMO BAR ══════════════ -->
+<div id="promo-bar" class="promo-bar">
+  <span class="mi" style="font-size: 16px">local_offer</span>
+  Free delivery on your first order — use code
+  <strong style="color: #fff; margin: 0 6px">FRESHMARKET</strong> at checkout
+  <button class="promo-close" onclick="this.parentElement.style.display='none'">
+    &times;
+  </button>
+</div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav class="nav">
+  <button class="logo" onclick="showPage('home')">
+    <div class="logo-mark">
+      <span class="mi" style="font-size: 18px; color: #fff">local_drink</span>
+    </div>
+    Fresh Market
+  </button>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+      <span class="mi" style="font-size: 15px">home</span> Home
+    </button>
+    <button class="nav-btn" id="nav-menu" onclick="showPage('menu')">
+      <span class="mi" style="font-size: 15px">restaurant_menu</span> Menu
+    </button>
+    <button class="nav-btn" id="nav-about" onclick="showPage('about')">
+      <span class="mi" style="font-size: 15px">info</span> About
+    </button>
+    <button class="nav-btn" id="nav-delivery" onclick="showPage('delivery')">
+      <span class="mi" style="font-size: 15px">delivery_dining</span> Delivery
+    </button>
+    <!-- Dashboard link — shown only for admin/staff via applySessionToNav() -->
+    <a id="nav-dashboard" href="/components/admin/users.html" style="display:none" class="nav-btn" style="border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:7px 16px;font-weight:500;text-decoration:none">
+      <span class="mi" style="font-size:15px">dashboard</span> Dashboard
+    </a>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+
+    <button class="nav-btn nav-login-btn" onclick="window.location.href='/components/auth/login.html'" style="border:1.5px solid var(--green);color:var(--green);border-radius:var(--radius-sm);padding:7px 16px;font-weight:500">
+      <span class="mi" style="font-size:15px">person</span> Login
+    </button>
+    <button class="cart-trigger" onclick="openCart()">
+      <span class="mi" style="font-size: 17px; color: #fff">shopping_cart</span>
+      Cart <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+  </div>
+</nav>

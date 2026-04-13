@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users — PolyCoffee</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    /* ── Layout ── */
+    body { background: var(--bg); }
+
+    .dash-wrap {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--green-dark);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 1.5rem 1.25rem;
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .sidebar-brand .logo-mark {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: rgba(255,255,255,.18);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-section {
+      padding: .75rem 1rem .25rem;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: .65rem 1.25rem;
+      color: rgba(255,255,255,.75);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 2px 8px;
+      transition: background .15s, color .15s;
+      text-decoration: none;
+      border: none;
+      background: none;
+      width: calc(100% - 16px);
+      text-align: left;
+    }
+    .sidebar-link:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .sidebar-link.active { background: rgba(255,255,255,.18); color: #fff; }
+    .sidebar-link .mi { font-size: 18px; }
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 1rem;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: .5rem .25rem;
+    }
+    .sidebar-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--green-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-user-info { flex: 1; overflow: hidden; }
+    .sidebar-user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,.5); text-transform: capitalize; }
+    .btn-logout {
+      display: flex; align-items: center; gap: 6px;
+      width: 100%; padding: .6rem .75rem;
+      margin-top: .5rem;
+      background: rgba(255,255,255,.08);
+      border: none; border-radius: 8px;
+      color: rgba(255,255,255,.7);
+      font-size: 13px; font-family: var(--sans);
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-logout:hover { background: rgba(255,80,80,.25); color: #fff; }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: 2rem 2.5rem;
+      min-height: 100vh;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .topbar-title { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; color: var(--text); }
+    .topbar-sub { font-size: 13px; color: var(--text-mid); margin-top: 2px; }
+
+    /* ── Stats row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .stat-card-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .stat-card-icon.green  { background: var(--green-light); color: var(--green); }
+    .stat-card-icon.amber  { background: #fff8ec;            color: var(--amber); }
+    .stat-card-icon.blue   { background: #eaf1ff;            color: #3a7bd5; }
+    .stat-card-icon.red    { background: #ffeaea;            color: #e05252; }
+    .stat-card-num  { font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-card-lbl  { font-size: 12px; color: var(--text-mid); margin-top: 3px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      flex: 1; min-width: 220px;
+    }
+    .search-box input {
+      border: none; outline: none;
+      font-family: var(--sans); font-size: 14px;
+      background: none; color: var(--text); width: 100%;
+    }
+    .search-box .mi { color: var(--text-light); font-size: 18px; }
+    .filter-select {
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px;
+      background: #fff; color: var(--text);
+      cursor: pointer; outline: none;
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+      background: var(--green);
+      color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background .2s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--green-dark); }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--bg2); }
+    th {
+      padding: .85rem 1.25rem;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+    td {
+      padding: 1rem 1.25rem;
+      font-size: 14px;
+      color: var(--text);
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:hover td { background: var(--bg); }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .user-name  { font-weight: 500; }
+    .user-email { font-size: 12px; color: var(--text-mid); }
+
+    /* Role badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge.admin    { background: #ffeaea; color: #c0392b; }
+    .badge.staff    { background: #eaf1ff; color: #2e6fd6; }
+    .badge.customer { background: var(--green-light); color: var(--green-dark); }
+
+    /* Action buttons */
+    .actions { display: flex; gap: 6px; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+      color: var(--text-mid);
+    }
+    .btn-icon .mi { font-size: 16px; }
+    .btn-icon:hover { border-color: var(--green); color: var(--green); }
+    .btn-icon.del:hover { border-color: #e05252; color: #e05252; background: #fff5f5; }
+
+    /* Read-only indicator */
+    .readonly-note {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-light);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 4rem;
+      text-align: center;
+      color: var(--text-mid);
+    }
+    .empty-state .mi { font-size: 48px; color: var(--border); display: block; margin-bottom: 1rem; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      width: 100%; max-width: 480px;
+      padding: 2rem;
+      transform: translateY(16px);
+      transition: transform .2s;
+      margin: 1rem;
+    }
+    .modal-backdrop.open .modal { transform: translateY(0); }
+    .modal-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .modal-hd h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; }
+    .modal-close {
+      width: 32px; height: 32px;
+      border-radius: 8px; border: 1.5px solid var(--border);
+      background: none; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; color: var(--text-mid);
+    }
+    .modal-close:hover { border-color: var(--text); color: var(--text); }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    .form-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .form-input {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px;
+      color: var(--text); background: #fff; outline: none;
+      transition: border-color .2s;
+    }
+    .form-input:focus { border-color: var(--green); }
+    .form-select {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px;
+      color: var(--text); background: #fff; outline: none;
+      cursor: pointer;
+    }
+    .form-select:focus { border-color: var(--green); }
+    .modal-ft { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .btn-cancel {
+      padding: 10px 20px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: none; font-family: var(--sans); font-size: 14px;
+      cursor: pointer; color: var(--text-mid);
+    }
+    .btn-cancel:hover { border-color: var(--text); color: var(--text); }
+    .btn-save {
+      padding: 10px 24px;
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-save:hover { background: var(--green-dark); }
+
+    /* ── Confirm delete modal ── */
+    .confirm-modal {
+      background: #fff;
+      border-radius: var(--radius);
+      width: 100%; max-width: 380px;
+      padding: 2rem;
+      text-align: center;
+      transform: translateY(16px);
+      transition: transform .2s;
+      margin: 1rem;
+    }
+    .modal-backdrop.open .confirm-modal { transform: translateY(0); }
+    .confirm-icon {
+      width: 56px; height: 56px;
+      background: #fff5f5; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .confirm-icon .mi { font-size: 28px; color: #e05252; }
+    .confirm-title { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; margin-bottom: .5rem; }
+    .confirm-text  { font-size: 14px; color: var(--text-mid); margin-bottom: 1.5rem; line-height: 1.6; }
+    .confirm-btns  { display: flex; gap: .75rem; justify-content: center; }
+    .btn-delete {
+      padding: 10px 24px;
+      background: #e05252; color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-delete:hover { background: #c0392b; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--text); color: #fff;
+      padding: .75rem 1.25rem; border-radius: 999px;
+      font-size: 14px; display: flex; align-items: center; gap: 8px;
+      z-index: 9999; transition: transform .3s;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast-dot  { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* ── Access denied ── */
+    .access-denied {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      gap: 1rem;
+      padding: 2rem;
+    }
+    .access-denied .mi { font-size: 64px; color: var(--border); }
+    .access-denied h2  { font-family: var(--serif); font-size: 1.5rem; }
+    .access-denied p   { color: var(--text-mid); font-size: 14px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1.25rem; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- ACCESS DENIED (shown for customers) -->
+<div class="access-denied" id="access-denied">
+  <span class="mi">lock</span>
+  <h2>Access Denied</h2>
+  <p>You don't have permission to view this page.</p>
+  <button class="btn-save" onclick="window.location.href='/'">
+    <span class="mi" style="font-size:15px;color:#fff">arrow_back</span> Back to Store
+  </button>
+</div>
+
+<!-- DASHBOARD WRAPPER -->
+<div class="dash-wrap" id="dash-wrap" style="display:none">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
+      PolyCoffee
+    </div>
+
+    <div class="sidebar-section">Main</div>
+    <a class="sidebar-link" href="/" >
+      <span class="mi">storefront</span> Store
+    </a>
+
+    <div class="sidebar-section">Management</div>
+    <button class="sidebar-link active" onclick="">
+      <span class="mi">group</span> Users
+    </button>
+    <button class="sidebar-link" onclick="showToast('Products page coming soon!')">
+      <span class="mi">inventory_2</span> Products
+    </button>
+    <button class="sidebar-link" onclick="showToast('Orders page coming soon!')">
+      <span class="mi">receipt_long</span> Orders
+    </button>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sb-avatar"></div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sb-name"></div>
+          <div class="sidebar-user-role" id="sb-role"></div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <span class="mi" style="font-size:16px">logout</span> Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">User Management</div>
+        <div class="topbar-sub" id="topbar-sub">Manage all accounts and roles</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-icon green"><span class="mi">group</span></div>
+        <div><div class="stat-card-num" id="stat-total">0</div><div class="stat-card-lbl">Total users</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon red"><span class="mi">admin_panel_settings</span></div>
+        <div><div class="stat-card-num" id="stat-admin">0</div><div class="stat-card-lbl">Admins</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon blue"><span class="mi">badge</span></div>
+        <div><div class="stat-card-num" id="stat-staff">0</div><div class="stat-card-lbl">Staff</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon amber"><span class="mi">person</span></div>
+        <div><div class="stat-card-num" id="stat-customer">0</div><div class="stat-card-lbl">Customers</div></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="mi">search</span>
+        <input type="text" id="search-input" placeholder="Search by name or email…" oninput="renderTable()" />
+      </div>
+      <select class="filter-select" id="role-filter" onchange="renderTable()">
+        <option value="all">All roles</option>
+        <option value="admin">Admin</option>
+        <option value="staff">Staff</option>
+        <option value="customer">Customer</option>
+      </select>
+      <!-- Add button: only shown to admin -->
+      <button class="btn-add" id="btn-add" onclick="openAddModal()" style="display:none">
+        <span class="mi" style="font-size:16px;color:#fff">person_add</span> Add User
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Added</th>
+            <th id="th-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody"></tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ ADD / EDIT MODAL ══ -->
+<div class="modal-backdrop" id="user-modal" onclick="closeMOnBg(event)">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modal-title">Add User</h3>
+      <button class="modal-close" onclick="closeModal()"><span class="mi" style="font-size:18px">close</span></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Full name</label>
+      <input class="form-input" type="text" id="f-name" placeholder="Nguyen Van A" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input class="form-input" type="email" id="f-email" placeholder="user@polycoffee.vn" />
+    </div>
+    <div class="form-group" id="f-pw-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="f-password" placeholder="Min. 8 characters" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-select" id="f-role">
+        <option value="customer">Customer</option>
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveUser()">Save user</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DELETE MODAL ══ -->
+<div class="modal-backdrop" id="confirm-modal" onclick="closeConfirmOnBg(event)">
+  <div class="confirm-modal">
+    <div class="confirm-icon"><span class="mi">delete_forever</span></div>
+    <div class="confirm-title">Delete user?</div>
+    <div class="confirm-text" id="confirm-text">This action cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-delete" onclick="confirmDelete()">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  users.js — inline for single-file component
+// ════════════════════════════════════════════
+
+const AUTH_USERS_KEY   = 'fm_users';
+const AUTH_SESSION_KEY = 'fm_session';
+
+// ── Permission map ──────────────────────────
+//  admin   → can view, add, edit (role + name), delete anyone except self
+//  staff   → can view only (read-only)
+//  customer → redirected away (no access)
+
+const PERMISSIONS = {
+  admin:    { canAdd: true,  canEdit: true,  canDelete: true  },
+  staff:    { canAdd: false, canEdit: false, canDelete: false },
+  customer: { canAdd: false, canEdit: false, canDelete: false },
+};
+
+// ── State ───────────────────────────────────
+let currentSession = null;
+let editingEmail   = null;   // null = add mode, string = edit mode
+let deletingEmail  = null;
+
+// ── Storage helpers ─────────────────────────
+function getUsers()       { return JSON.parse(localStorage.getItem(AUTH_USERS_KEY)   || '[]');  }
+function saveUsers(u)     { localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(u));            }
+function getSession()     { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || 'null');}
+
+function logout() {
+  localStorage.removeItem(AUTH_SESSION_KEY);
+  window.location.href = '/';
+}
+
+// ── Seed accounts (same as auth.js) ─────────
+const SEED_ACCOUNTS = [
+  { name: 'Admin User',  email: 'admin@polycoffee.vn',    password: 'admin1234',    role: 'admin',    createdAt: '2025-01-01' },
+  { name: 'Linh Nguyen', email: 'customer@polycoffee.vn', password: 'customer1234', role: 'customer', createdAt: '2025-01-01' },
+  { name: 'Minh Staff',  email: 'staff@polycoffee.vn',    password: 'staff1234',    role: 'staff',    createdAt: '2025-01-01' },
+];
+
+function seedAccounts() {
+  const users = getUsers();
+  let changed = false;
+  for (const seed of SEED_ACCOUNTS) {
+    if (!users.find(u => u.email === seed.email)) {
+      users.push(seed);
+      changed = true;
+    }
+  }
+  if (changed) saveUsers(users);
+}
+
+// ── Avatar helpers ───────────────────────────
+const AVATAR_COLORS = ['#1d9e75','#3a7bd5','#e07b39','#9b59b6','#e05252','#2ecc71'];
+function avatarColor(email) {
+  let h = 0;
+  for (let i = 0; i < email.length; i++) h = email.charCodeAt(i) + ((h << 5) - h);
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function initials(name) {
+  return name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
+
+// ── Init ─────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  seedAccounts();
+  currentSession = getSession();
+
+  if (!currentSession) {
+    window.location.href = '/components/auth/login.html';
+    return;
+  }
+
+  const role = currentSession.role || 'customer';
+
+  // Customers get kicked out
+  if (role === 'customer') {
+    document.getElementById('access-denied').style.display = 'flex';
+    return;
+  }
+
+  // Show dashboard
+  document.getElementById('dash-wrap').style.display = 'flex';
+
+  // Populate sidebar
+  const av = document.getElementById('sb-avatar');
+  av.textContent = initials(currentSession.name);
+  av.style.background = avatarColor(currentSession.email);
+  document.getElementById('sb-name').textContent = currentSession.name;
+  document.getElementById('sb-role').textContent  = role;
+
+  // Role-specific UI
+  const perms = PERMISSIONS[role];
+  if (perms.canAdd) {
+    document.getElementById('btn-add').style.display = 'flex';
+  }
+  if (!perms.canEdit && !perms.canDelete) {
+    document.getElementById('topbar-sub').textContent = 'Read-only view — contact an admin to make changes';
+    document.getElementById('th-actions').textContent = 'Access';
+  }
+
+  renderStats();
+  renderTable();
+});
+
+// ── Stats ────────────────────────────────────
+function renderStats() {
+  const users = getUsers();
+  document.getElementById('stat-total').textContent    = users.length;
+  document.getElementById('stat-admin').textContent    = users.filter(u => u.role === 'admin').length;
+  document.getElementById('stat-staff').textContent    = users.filter(u => u.role === 'staff').length;
+  document.getElementById('stat-customer').textContent = users.filter(u => u.role === 'customer').length;
+}
+
+// ── Table render ─────────────────────────────
+function renderTable() {
+  const q      = document.getElementById('search-input').value.trim().toLowerCase();
+  const filter = document.getElementById('role-filter').value;
+  const perms  = PERMISSIONS[currentSession.role || 'customer'];
+
+  let users = getUsers();
+
+  if (filter !== 'all') users = users.filter(u => u.role === filter);
+  if (q) users = users.filter(u =>
+    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('user-tbody');
+
+  if (users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">
+      <div class="empty-state">
+        <span class="mi">person_search</span>
+        No users found
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => {
+    const isSelf = u.email === currentSession.email;
+    const date   = u.createdAt || '—';
+
+    const actionsHtml = perms.canEdit || perms.canDelete
+      ? `<div class="actions">
+          ${perms.canEdit
+            ? `<button class="btn-icon" onclick="openEditModal('${u.email}')" title="Edit">
+                <span class="mi">edit</span>
+               </button>`
+            : ''}
+          ${perms.canDelete && !isSelf
+            ? `<button class="btn-icon del" onclick="openConfirm('${u.email}')" title="Delete">
+                <span class="mi">delete</span>
+               </button>`
+            : isSelf
+            ? `<span style="font-size:12px;color:var(--text-light);padding:0 4px">You</span>`
+            : ''}
+         </div>`
+      : `<div class="readonly-note"><span class="mi" style="font-size:15px">visibility</span> View only</div>`;
+
+    return `<tr>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar" style="background:${avatarColor(u.email)}">${initials(u.name)}</div>
+          <div>
+            <div class="user-name">${u.name}${isSelf ? ' <span style="font-size:11px;color:var(--green)">(you)</span>' : ''}</div>
+            <div class="user-email">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge ${u.role}">${u.role}</span></td>
+      <td style="color:var(--text-mid);font-size:13px">${date}</td>
+      <td>${actionsHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Add modal ────────────────────────────────
+function openAddModal() {
+  editingEmail = null;
+  document.getElementById('modal-title').textContent = 'Add User';
+  document.getElementById('f-name').value     = '';
+  document.getElementById('f-email').value    = '';
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-role').value     = 'customer';
+  document.getElementById('f-pw-group').style.display = 'flex';
+  document.getElementById('f-email').disabled = false;
+  document.getElementById('user-modal').classList.add('open');
+}
+
+// ── Edit modal ───────────────────────────────
+function openEditModal(email) {
+  const users = getUsers();
+  const user  = users.find(u => u.email === email);
+  if (!user) return;
+
+  editingEmail = email;
+  document.getElementById('modal-title').textContent = 'Edit User';
+  document.getElementById('f-name').value     = user.name;
+  document.getElementById('f-email').value    = user.email;
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-role').value     = user.role || 'customer';
+  // Hide password field in edit mode (don't force reset)
+  document.getElementById('f-pw-group').style.display = 'none';
+  document.getElementById('f-email').disabled = true;  // email is the key, can't change
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('user-modal').classList.remove('open');
+}
+function closeMOnBg(e) {
+  if (e.target === document.getElementById('user-modal')) closeModal();
+}
+
+// ── Save (add or edit) ───────────────────────
+function saveUser() {
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim().toLowerCase();
+  const pw    = document.getElementById('f-password').value;
+  const role  = document.getElementById('f-role').value;
+
+  if (!name)                          { showToast('Name is required');              return; }
+  if (!email || !email.includes('@')) { showToast('Valid email is required');       return; }
+
+  const users = getUsers();
+
+  if (editingEmail) {
+    // Edit mode
+    const idx = users.findIndex(u => u.email === editingEmail);
+    if (idx === -1) return;
+    users[idx].name = name;
+    users[idx].role = role;
+    // Update session if editing self
+    if (editingEmail === currentSession.email) {
+      currentSession.name = name;
+      currentSession.role = role;
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(currentSession));
+    }
+    saveUsers(users);
+    showToast('User updated ✓');
+  } else {
+    // Add mode
+    if (pw.length < 8) { showToast('Password must be at least 8 characters'); return; }
+    if (users.find(u => u.email === email)) { showToast('Email already exists'); return; }
+    users.push({
+      name, email, password: pw, role,
+      createdAt: new Date().toISOString().split('T')[0]
+    });
+    saveUsers(users);
+    showToast('User added ✓');
+  }
+
+  closeModal();
+  renderStats();
+  renderTable();
+}
+
+// ── Delete ───────────────────────────────────
+function openConfirm(email) {
+  const users = getUsers();
+  const user  = users.find(u => u.email === email);
+  if (!user) return;
+  deletingEmail = email;
+  document.getElementById('confirm-text').textContent =
+    `Delete "${user.name}" (${user.email})? This cannot be undone.`;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  deletingEmail = null;
+}
+function closeConfirmOnBg(e) {
+  if (e.target === document.getElementById('confirm-modal')) closeConfirm();
+}
+function confirmDelete() {
+  const users    = getUsers();
+  const filtered = users.filter(u => u.email !== deletingEmail);
+  saveUsers(filtered);
+  closeConfirm();
+  showToast('User deleted');
+  renderStats();
+  renderTable();
+}
+
+// ── Toast ────────────────────────────────────
+let toastTmr;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
