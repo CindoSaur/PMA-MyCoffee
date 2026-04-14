@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toppings - Fresh Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <style>
+    :root{--green:#2f7d58;--green-dark:#20563d;--bg:#f6f8f7;--card:#fff;--text:#16251f;--muted:#64716b;--border:#d7e1dc;--radius:12px;--sans:'DM Sans',sans-serif;--serif:'Playfair Display',serif}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    .dash-shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+    .sidebar{background:#fff;border-right:1px solid var(--border);padding:16px 14px;display:flex;flex-direction:column}
+    .sidebar-brand{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:16px}
+    .logo-mark{width:28px;height:28px;border-radius:8px;background:var(--green);display:grid;place-items:center}
+    .sidebar-section{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 8px 6px}
+    .sidebar-link{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;text-decoration:none;color:var(--text);font-size:14px}
+    .sidebar-link:hover{background:#eef5f1}
+    .sidebar-link.active{background:#e6f2ed;color:var(--green-dark);font-weight:600}
+    .sidebar-bottom{margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+    .sidebar-user{display:flex;gap:10px;align-items:center}
+    .sidebar-avatar{width:34px;height:34px;border-radius:50%;background:#eef5f1;display:grid;place-items:center}
+    .dash-main{padding:20px 24px}
+    .dash-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .dash-title{font-family:var(--serif);font-size:28px;font-weight:700}
+    .btn-add{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border:none;border-radius:10px;background:var(--green);color:#fff;font:600 14px var(--sans);cursor:pointer}
+    .btn-add:hover{background:var(--green-dark)}
+    .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .search{flex:1;min-width:220px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font:inherit;outline:none}
+    .search:focus{border-color:var(--green)}
+    .table-card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 14px;border-bottom:1px solid #edf2ef;text-align:left;font-size:13px}
+    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    tr:last-child td{border-bottom:none}
+    .badge{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
+    .badge-active{background:#dcfce7;color:#166534}
+    .badge-inactive{background:#f3f4f6;color:#4b5563}
+    .btn-icon{background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 8px;cursor:pointer}
+    .btn-icon:hover{border-color:#b7c8bf}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.26);display:none;align-items:center;justify-content:center;padding:18px}
+    .modal.open{display:flex}
+    .modal-box{width:100%;max-width:520px;background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden}
+    .modal-hd{padding:14px 16px;border-bottom:1px solid var(--border);font:700 17px var(--serif)}
+    .modal-bd{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .group{grid-column:span 1}
+    .group.full{grid-column:1/-1}
+    .label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}
+    .input{width:100%;padding:10px 11px;border:1.5px solid var(--border);border-radius:10px;font:inherit;outline:none}
+    .input:focus{border-color:var(--green)}
+    .modal-ft{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    .btn{padding:9px 12px;border-radius:10px;font:600 13px var(--sans);cursor:pointer}
+    .btn-cancel{border:1px solid var(--border);background:#fff}
+    .btn-save{border:none;background:var(--green);color:#fff}
+    .toast{position:fixed;right:18px;bottom:18px;background:#1f2937;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s}
+    .toast.show{opacity:1}
+    @media (max-width:900px){.dash-shell{grid-template-columns:1fr}.sidebar{display:none}.dash-main{padding:14px}}
+  </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-hd" id="modal-title">Add Topping</div>
+    <div class="modal-bd">
+      <div class="group full">
+        <label class="label">Topping Name</label>
+        <input id="f-name" class="input" placeholder="Cheese foam, Jelly, Boba..." />
+      </div>
+      <div class="group">
+        <label class="label">Price (VND)</label>
+        <input id="f-price" class="input" type="number" min="0" step="1000" placeholder="5000" />
+      </div>
+      <div class="group">
+        <label class="label">Status</label>
+        <select id="f-active" class="input">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-save" onclick="saveTopping()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-mark"><span class="material-icons-round" style="font-size:16px;color:#fff">local_drink</span></div>
+      Fresh Market
+    </div>
+    <div class="sidebar-section">Overview</div>
+    <a class="sidebar-link" href="dashboard.html"><span class="material-icons-round" style="font-size:18px">dashboard</span> Dashboard</a>
+    <div class="sidebar-section">Manage</div>
+    <a class="sidebar-link" href="user.html"><span class="material-icons-round" style="font-size:18px">group</span> Users</a>
+    <a class="sidebar-link" href="orders.html"><span class="material-icons-round" style="font-size:18px">receipt_long</span> Orders</a>
+    <a class="sidebar-link" href="products.html"><span class="material-icons-round" style="font-size:18px">inventory_2</span> Products</a>
+    <a class="sidebar-link active" href="topping.html"><span class="material-icons-round" style="font-size:18px">bubble_chart</span> Toppings</a>
+    <a class="sidebar-link" href="delivery.html"><span class="material-icons-round" style="font-size:18px">delivery_dining</span> Delivery</a>
+    <div class="sidebar-section">Settings</div>
+    <a class="sidebar-link" href="setting.html"><span class="material-icons-round" style="font-size:18px">settings</span> Settings</a>
+    <a class="sidebar-link" href="/"><span class="material-icons-round" style="font-size:18px;color:var(--green)">storefront</span> Back to Store</a>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar"><span class="material-icons-round" style="font-size:18px;color:var(--green)">person</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:600" id="sb-name">-</div>
+          <div style="font-size:11px;color:var(--muted)" id="sb-role">-</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title">Topping Management</div>
+      <button class="btn-add" onclick="openAddModal()"><span class="material-icons-round" style="font-size:18px">add</span>Add Topping</button>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" class="search" placeholder="Search topping name..." oninput="renderTable()" />
+      <span id="tp-count" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th style="width:130px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+const FM_TOPPING_KEY = 'fm_toppings';
+const FM_SESSION_KEY = 'fm_session';
+let editingId = null;
+
+function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION_KEY) || 'null'); }
+function getToppings(){ return JSON.parse(localStorage.getItem(FM_TOPPING_KEY) || 'null'); }
+function saveToppings(v){ localStorage.setItem(FM_TOPPING_KEY, JSON.stringify(v)); }
+
+function seedToppings(){
+  if(getToppings()) return;
+  saveToppings([
+    { id: 1, name: 'Cheese Foam', price: 12000, active: true },
+    { id: 2, name: 'White Boba', price: 8000, active: true },
+    { id: 3, name: 'Coffee Jelly', price: 10000, active: true },
+    { id: 4, name: 'Chia Seeds', price: 7000, active: false }
+  ]);
+}
+
+let tmr;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(tmr);
+  tmr = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function fmtVND(v){ return Number(v || 0).toLocaleString('vi-VN') + ' đ'; }
+
+function openAddModal(){
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add Topping';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-price').value = '';
+  document.getElementById('f-active').value = 'true';
+  document.getElementById('modal').classList.add('open');
+}
+
+function openEditModal(id){
+  const list = getToppings() || [];
+  const item = list.find(t => t.id === id);
+  if(!item) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Topping';
+  document.getElementById('f-name').value = item.name;
+  document.getElementById('f-price').value = item.price;
+  document.getElementById('f-active').value = item.active ? 'true' : 'false';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function saveTopping(){
+  const name = document.getElementById('f-name').value.trim();
+  const price = Number(document.getElementById('f-price').value || 0);
+  const active = document.getElementById('f-active').value === 'true';
+  if(!name){ showToast('Please enter topping name'); return; }
+  if(price < 0){ showToast('Price must be >= 0'); return; }
+
+  const list = getToppings() || [];
+  if(editingId === null){
+    const nextId = list.length ? Math.max(...list.map(x => x.id)) + 1 : 1;
+    list.push({ id: nextId, name, price, active });
+    showToast('Topping created');
+  } else {
+    const idx = list.findIndex(t => t.id === editingId);
+    if(idx === -1) return;
+    list[idx] = { ...list[idx], name, price, active };
+    showToast('Topping updated');
+  }
+
+  saveToppings(list);
+  closeModal();
+  renderTable();
+}
+
+function deleteTopping(id){
+  if(!confirm('Delete this topping?')) return;
+  const next = (getToppings() || []).filter(t => t.id !== id);
+  saveToppings(next);
+  showToast('Topping deleted');
+  renderTable();
+}
+
+function renderTable(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let list = (getToppings() || []).slice();
+  if(q) list = list.filter(t => (t.name || '').toLowerCase().includes(q));
+
+  document.getElementById('tp-count').textContent = list.length + ' topping(s)';
+  document.getElementById('tbody').innerHTML = list.length ? list.map(t => `
+    <tr>
+      <td>${t.name}</td>
+      <td>${fmtVND(t.price)}</td>
+      <td><span class="badge ${t.active ? 'badge-active' : 'badge-inactive'}">${t.active ? 'Active' : 'Inactive'}</span></td>
+      <td>
+        <button class="btn-icon" onclick="openEditModal(${t.id})">Edit</button>
+        <button class="btn-icon" onclick="deleteTopping(${t.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No toppings found</td></tr>';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const s = getSession();
+  if(!s || (s.role !== 'admin' && s.role !== 'staff')){
+    alert('Access denied.');
+    window.location.href = '/';
+    return;
+  }
+  document.getElementById('sb-name').textContent = s.name || '-';
+  document.getElementById('sb-role').textContent = s.role || '-';
+  seedToppings();
+  renderTable();
+});
+</script>
+</body>
+</html>

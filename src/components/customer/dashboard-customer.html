@@ -3,735 +3,402 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Delivery — Fresh Market</title>
+  <title>Dashboard - Customer</title>
   <link rel="stylesheet" href="/style/style.css" />
   <style>
-    /* ── Page layout ── */
-    body { min-height: 100vh; display: flex; flex-direction: column; }
-    main { flex: 1; }
-
-    /* ── Hero ── */
-    .page-hero-teal {
-      width: 100%;
-      padding: 5rem 3rem;
-      text-align: center;
-      background: var(--green);
-      position: relative;
-      overflow: hidden;
-    }
-    .page-hero-teal::before {
-      content: '';
-      position: absolute;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.07);
-      top: -200px; right: -100px;
-      pointer-events: none;
-    }
-    .page-hero-teal::after {
-      content: '';
-      position: absolute;
-      width: 400px; height: 400px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.05);
-      bottom: -180px; left: -80px;
-      pointer-events: none;
-    }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,.15);
-      color: #fff; font-size: 12px; font-weight: 500;
-      padding: 5px 14px; border-radius: 99px;
-      margin-bottom: 1.25rem;
-      letter-spacing: .06em; text-transform: uppercase;
-    }
-    .page-hero-teal h1 {
-      font-family: var(--serif);
-      font-size: 48px;
-      color: #fff;
-      margin-bottom: 14px;
-      position: relative;
-    }
-    .page-hero-teal p {
-      font-size: 16px;
-      color: rgba(255,255,255,.82);
-      line-height: 1.7;
-      max-width: 540px;
-      margin: 0 auto 2rem;
-      position: relative;
-    }
-    .hero-stats {
-      display: flex; align-items: center; justify-content: center; gap: 2.5rem;
-      position: relative;
-    }
-    .hero-stat {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-    }
-    .hero-stat-num {
-      font-family: var(--serif); font-size: 26px; font-weight: 600; color: #fff;
-    }
-    .hero-stat-lbl { font-size: 12px; color: rgba(255,255,255,.7); }
-    .hero-stat-div { width: 1px; height: 40px; background: rgba(255,255,255,.2); }
-
-    /* ── Container ── */
-    .container {
-      width: 100%; max-width: 1100px;
-      margin: 0 auto; padding: 0 2.5rem;
-    }
-
-    /* ── Zones section ── */
-    .section-label {
-      font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--green); font-weight: 600; margin-bottom: .5rem;
-    }
-    .section-title {
-      font-family: var(--serif); font-size: 28px; font-weight: 600;
-      color: var(--text); margin-bottom: .5rem;
-    }
-    .section-sub { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
-
-    .zones-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 2rem 0 3.5rem;
-    }
-    .zone-card {
+    .page { display: flex; min-height: 100vh; background: var(--bg); }
+    .main { flex: 1; min-width: 0; }
+    .topbar {
       background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all .22s;
-      position: relative;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .zone-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--green);
-      box-shadow: 0 12px 32px rgba(29,158,117,.12);
-    }
-    .zone-card.available { border-color: var(--green-mid); }
-    .zone-ico {
-      width: 58px; height: 58px; border-radius: 50%;
-      margin: 0 auto 14px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .zone-ico.g { background: var(--green-light); color: var(--green-dark); }
-    .zone-ico.a { background: #fef3c7; color: #92400e; }
-    .zone-name {
-      font-family: var(--serif); font-size: 19px;
-      font-weight: 600; margin-bottom: 5px; color: var(--text);
-    }
-    .zone-time { font-size: 12px; color: var(--text-mid); margin-bottom: 14px; }
-    .zone-tag {
-      font-size: 11px; padding: 5px 14px;
-      border-radius: 99px; display: inline-block; font-weight: 500;
-    }
-    .zone-tag.avail { background: var(--green-light); color: var(--green-dark); }
-    .zone-tag.soon  { background: #fef3c7; color: #92400e; }
-    .zone-pop {
-      position: absolute; top: 12px; right: 12px;
-      background: var(--green); color: #fff;
-      font-size: 10px; padding: 3px 8px; border-radius: 99px; font-weight: 600;
-    }
-
-    /* ── How it works ── */
-    .how-card {
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem;
-      margin-bottom: 2rem;
-    }
-    .how-steps { display: flex; flex-direction: column; gap: 0; margin-top: 1.5rem; }
-    .del-row {
-      display: flex; align-items: flex-start; gap: 18px;
-      padding: 18px 0; border-bottom: 1px solid var(--border);
-      position: relative;
-    }
-    .del-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .del-ico {
-      width: 46px; height: 46px; border-radius: var(--radius-sm);
-      background: var(--green-light);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--green-dark); flex-shrink: 0;
-    }
-    .del-step-num {
-      position: absolute; left: 16px; top: 18px;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--green); color: #fff;
-      font-size: 10px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      transform: translate(-50%, -0px);
-    }
-    .del-row strong {
-      font-size: 14px; font-weight: 600; color: var(--text);
-      display: block; margin-bottom: 4px;
-    }
-    .del-row span { font-size: 13px; color: var(--text-mid); line-height: 1.65; }
-
-    /* ── Pricing strip ── */
-    .pricing-strip {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 14px; margin: 2.5rem 0;
-    }
-    .price-tile {
-      background: #fff; border: 1.5px solid var(--border);
-      border-radius: var(--radius); padding: 1.5rem 1.25rem;
-      text-align: center;
-    }
-    .price-tile .pt-icon {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: var(--green-light); color: var(--green-dark);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 12px;
-    }
-    .pt-label { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
-    .pt-val { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--text); }
-    .pt-sub { font-size: 11px; color: var(--text-mid); margin-top: 4px; }
-
-    /* ── FAQ ── */
-    .faq-list { margin-bottom: 3.5rem; }
-    .faq-item {
-      background: #fff; border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden;
-    }
-    .faq-q {
-      width: 100%; display: flex; align-items: center; justify-content: space-between;
-      padding: 1.1rem 1.4rem; border: none; background: none;
-      font-family: var(--sans); font-size: 14px; font-weight: 500;
-      color: var(--text); cursor: pointer; gap: 12px; text-align: left;
-      transition: background .15s;
-    }
-    .faq-q:hover { background: var(--bg2); }
-    .faq-q .mi { color: var(--green); flex-shrink: 0; transition: transform .2s; }
-    .faq-q.open .mi { transform: rotate(180deg); }
-    .faq-a {
-      display: none; padding: 0 1.4rem 1.1rem;
-      font-size: 13px; color: var(--text-mid); line-height: 1.7;
-      border-top: 1px solid var(--border);
-    }
-    .faq-a.open { display: block; }
-
-    /* ── CTA band ── */
-    .cta-band {
-      background: var(--green-dark);
-      padding: 5rem 3rem;
-      text-align: center;
-      position: relative; overflow: hidden;
-      border-radius: var(--radius);
-      margin-bottom: 5rem;
-    }
-    .cta-band::before {
-      content: ''; position: absolute;
-      width: 400px; height: 400px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.07);
-      top: -150px; right: -80px; pointer-events: none;
-    }
-    .cta-band::after {
-      content: ''; position: absolute;
-      width: 500px; height: 500px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.05);
-      bottom: -200px; left: -120px; pointer-events: none;
-    }
-    .cta-band h2 {
-      font-family: var(--serif); font-size: 38px;
-      color: #fff; margin-bottom: 12px; position: relative;
-    }
-    .cta-band p {
-      font-size: 16px; color: rgba(255,255,255,.72);
-      margin-bottom: 2.25rem; position: relative; line-height: 1.65;
-    }
-    .btn-white {
-      display: inline-flex; align-items: center; gap: 9px;
-      background: #fff; color: var(--green-dark);
-      border: none; padding: 15px 34px;
+    .topbar h1 { margin: 0; font-family: var(--serif); font-size: 26px; color: var(--text); }
+    .lang-switch {
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 15px; font-weight: 500;
-      cursor: pointer; font-family: var(--sans);
-      transition: all .2s; position: relative;
+      background: #fff;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: var(--text);
     }
-    .btn-white:hover { opacity:.92; transform: translateY(-1px); }
+    .content { padding: 24px; max-width: 1120px; }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 28px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1a1a18; color: #fff;
-      padding: 14px 22px; border-radius: var(--radius);
-      font-size: 13px; white-space: nowrap;
-      opacity: 0; pointer-events: none;
-      transition: all .35s cubic-bezier(.34,1.56,.64,1);
-      z-index: 9999; display: flex; align-items: center; gap: 10px;
-      border: 1px solid rgba(255,255,255,.1);
+    .welcome {
+      border-radius: var(--radius);
+      padding: 20px;
+      background: linear-gradient(135deg, #0f3f33, #1d9e75);
+      color: #fff;
+      margin-bottom: 18px;
     }
-    .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
-    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+    .welcome h2 { margin: 0 0 6px; font-size: 24px; }
+    .welcome p { margin: 0; color: rgba(255,255,255,.85); }
 
-    @media (max-width: 768px) {
-      .zones-grid { grid-template-columns: 1fr 1fr; }
-      .pricing-strip { grid-template-columns: 1fr; }
-      .hero-stats { gap: 1.5rem; }
-      .page-hero-teal h1 { font-size: 34px; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
     }
-    @media (max-width: 480px) {
-      .zones-grid { grid-template-columns: 1fr; }
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .kpi .lbl { color: var(--text-light); font-size: 12px; }
+    .kpi .val { color: var(--text); font-size: 28px; font-weight: 700; margin-top: 4px; }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .chart-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .chart-title { margin: 0 0 10px; font-weight: 600; color: var(--text); }
+    .canvas-wrap { position: relative; height: 320px; }
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .quick-links a {
+      text-decoration: none;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-weight: 600;
+      transition: .15s;
+    }
+    .quick-links a:hover { border-color: var(--green); color: var(--green-dark); }
+
+    .empty {
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      color: var(--text-mid);
+    }
+
+    @media (max-width: 900px) {
+      .chart-grid { grid-template-columns: 1fr; }
+      .canvas-wrap { height: 260px; }
     }
   </style>
 </head>
 <body>
+  <div class="page">
+    <div id="sidebar-slot"></div>
 
-<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+    <main class="main">
+      <div class="topbar">
+        <h1 id="page-title">Customer Dashboard</h1>
+        <select id="lang-select" class="lang-switch" aria-label="Language">
+          <option value="en">English</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </div>
 
-<!-- Dashboard layout: sidebar + main content -->
-<div style="display:flex;min-height:100vh">
-  <div id="sidebar-slot"></div>
-  <div class="dash-main">
-    <div class="dash-topbar"><div class="dash-title">Delivery</div></div>
-    <div class="dash-content">
+      <div class="content">
+        <section class="welcome">
+          <h2 id="welcome-name">Welcome</h2>
+          <p id="welcome-sub">Track how many drinks you bought with bar and pie charts.</p>
+        </section>
 
-  <!-- ══════════════ HERO ══════════════ -->
-  <div class="page-hero-teal">
-    <div class="hero-eyebrow">
-      <span class="mi" style="font-size:13px">delivery_dining</span>
-      Ho Chi Minh City
-    </div>
-    <h1>Delivery Zones</h1>
-    <p>We deliver across Ho Chi Minh City, Monday to Saturday, 7am–7pm. Cold-pressed fresh, delivered cold.</p>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="hero-stat-num">4</div>
-        <div class="hero-stat-lbl">Active zones</div>
+        <section class="kpi-grid">
+          <article class="kpi"><div class="lbl" id="kpi-lbl-orders">Total Orders</div><div class="val" id="kpi-orders">0</div></article>
+          <article class="kpi"><div class="lbl" id="kpi-lbl-qty">Total Drinks</div><div class="val" id="kpi-qty">0</div></article>
+          <article class="kpi"><div class="lbl" id="kpi-lbl-spent">Total Spent</div><div class="val" id="kpi-spent">0</div></article>
+        </section>
+
+        <section id="chart-section" class="chart-grid">
+          <article class="chart-card">
+            <h3 class="chart-title" id="bar-title">Bar Chart - Quantity by Drink</h3>
+            <div class="canvas-wrap"><canvas id="barChart"></canvas></div>
+          </article>
+          <article class="chart-card">
+            <h3 class="chart-title" id="pie-title">Pie Chart - Purchase Ratio</h3>
+            <div class="canvas-wrap"><canvas id="pieChart"></canvas></div>
+          </article>
+        </section>
+
+        <section id="empty-data" class="empty" style="display:none;">
+          You have no purchased drink data yet. Place an order to see charts.
+        </section>
+
+        <section class="quick-links" style="margin-top:14px;">
+          <a href="/components/customer/products-customer.html" id="ql-menu">Menu</a>
+          <a href="/components/customer/voucher-customer.html" id="ql-vouchers">Vouchers</a>
+          <a href="/components/customer/orders-customer.html" id="ql-others">Others</a>
+          <a href="/components/customer/setting-customer.html" id="ql-profile">My Profile</a>
+        </section>
       </div>
-      <div class="hero-stat-div"></div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">2hr</div>
-        <div class="hero-stat-lbl">Average delivery</div>
-      </div>
-      <div class="hero-stat-div"></div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">Free</div>
-        <div class="hero-stat-lbl">First order</div>
-      </div>
-      <div class="hero-stat-div"></div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">7am–7pm</div>
-        <div class="hero-stat-lbl">Mon – Sat</div>
-      </div>
-    </div>
+    </main>
   </div>
 
-  <!-- ══════════════ ZONES ══════════════ -->
-  <div class="container" style="padding-top:3.5rem">
+  <div id="footer-slot"></div>
 
-    <div class="section-label">Coverage areas</div>
-    <div class="section-title">Where we deliver</div>
-    <div class="section-sub">Click any zone for more info. Available zones accept same-day orders placed before noon.</div>
-
-    <div class="zones-grid">
-      <!-- Available -->
-      <div class="zone-card available" onclick="showToast('District 1 — same-day delivery if ordered before noon!')">
-        <div class="zone-pop">Most Popular</div>
-        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
-        <div class="zone-name">District 1</div>
-        <div class="zone-time">Same-day · 2hr avg</div>
-        <div class="zone-tag avail">Available</div>
-      </div>
-      <div class="zone-card available" onclick="showToast('District 3 — same-day delivery available!')">
-        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
-        <div class="zone-name">District 3</div>
-        <div class="zone-time">Same-day · 2hr avg</div>
-        <div class="zone-tag avail">Available</div>
-      </div>
-      <div class="zone-card available" onclick="showToast('Bình Thạnh — same-day delivery available!')">
-        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
-        <div class="zone-name">Bình Thạnh</div>
-        <div class="zone-time">Same-day · 2.5hr avg</div>
-        <div class="zone-tag avail">Available</div>
-      </div>
-      <div class="zone-card available" onclick="showToast('Thủ Đức — same-day delivery available!')">
-        <div class="zone-ico g"><span class="mi" style="font-size:28px">location_on</span></div>
-        <div class="zone-name">Thủ Đức</div>
-        <div class="zone-time">Same-day · 3hr avg</div>
-        <div class="zone-tag avail">Available</div>
-      </div>
-      <!-- Coming soon -->
-      <div class="zone-card" onclick="showToast('District 7 — Launching Q3 2026. Stay tuned!')">
-        <div class="zone-ico a"><span class="mi" style="font-size:28px">schedule</span></div>
-        <div class="zone-name">District 7</div>
-        <div class="zone-time">Launching Q3 2026</div>
-        <div class="zone-tag soon">Coming soon</div>
-      </div>
-      <div class="zone-card" onclick="showToast('Nhà Bè — Launching Q4 2026. Stay tuned!')">
-        <div class="zone-ico a"><span class="mi" style="font-size:28px">schedule</span></div>
-        <div class="zone-name">Nhà Bè</div>
-        <div class="zone-time">Launching Q4 2026</div>
-        <div class="zone-tag soon">Coming soon</div>
-      </div>
-    </div>
-
-    <!-- ══════════════ PRICING ══════════════ -->
-    <div class="section-label">Pricing</div>
-    <div class="section-title">Delivery fees</div>
-    <div class="section-sub">Simple, transparent pricing — no surprise charges at checkout.</div>
-    <div class="pricing-strip">
-      <div class="price-tile">
-        <div class="pt-icon"><span class="mi" style="font-size:22px">star</span></div>
-        <div class="pt-label">First order</div>
-        <div class="pt-val">Free</div>
-        <div class="pt-sub">Use code FRESHMARKET</div>
-      </div>
-      <div class="price-tile">
-        <div class="pt-icon"><span class="mi" style="font-size:22px">local_shipping</span></div>
-        <div class="pt-label">Standard delivery</div>
-        <div class="pt-val">₫25,000</div>
-        <div class="pt-sub">All active zones</div>
-      </div>
-      <div class="price-tile">
-        <div class="pt-icon"><span class="mi" style="font-size:22px">recycling</span></div>
-        <div class="pt-label">Bottle return discount</div>
-        <div class="pt-val">10% off</div>
-        <div class="pt-sub">Return empties to the rider</div>
-      </div>
-    </div>
-
-    <!-- ══════════════ HOW IT WORKS ══════════════ -->
-    <div class="how-card">
-      <div class="section-label">Process</div>
-      <div class="section-title" style="margin-bottom:0">How it works</div>
-      <div class="how-steps">
-        <div class="del-row">
-          <div class="del-ico"><span class="mi" style="font-size:20px">shopping_cart</span></div>
-          <div>
-            <strong>Order before noon</strong>
-            <span>Place your order any time before 12:00pm for same-day delivery. Late orders are scheduled for the next morning.</span>
-          </div>
-        </div>
-        <div class="del-row">
-          <div class="del-ico"><span class="mi" style="font-size:20px">blender</span></div>
-          <div>
-            <strong>We cold-press your order</strong>
-            <span>Your drinks are pressed fresh right after your order is confirmed — never pre-made or stored. Zero preservatives.</span>
-          </div>
-        </div>
-        <div class="del-row">
-          <div class="del-ico"><span class="mi" style="font-size:20px">inventory_2</span></div>
-          <div>
-            <strong>Bottled & sealed</strong>
-            <span>Each bottle is sealed and labelled with the press time. If it's more than 4 hours old we won't send it.</span>
-          </div>
-        </div>
-        <div class="del-row">
-          <div class="del-ico"><span class="mi" style="font-size:20px">delivery_dining</span></div>
-          <div>
-            <strong>Fast delivery to your door</strong>
-            <span>Our riders use insulated refrigerated bags so your drinks arrive perfectly cold, every single time.</span>
-          </div>
-        </div>
-        <div class="del-row">
-          <div class="del-ico"><span class="mi" style="font-size:20px">recycling</span></div>
-          <div>
-            <strong>Return your bottles, earn rewards</strong>
-            <span>Hand empty glass bottles back to the rider and get 10% off your next order — automatically applied at checkout.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════════ FAQ ══════════════ -->
-    <div class="section-label">FAQ</div>
-    <div class="section-title" style="margin-bottom:1.25rem">Common questions</div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          What time do I need to order by for same-day delivery?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">Orders placed before 12:00pm receive same-day delivery, typically within 2–3 hours. Orders placed after noon are scheduled for the following morning, delivered between 7am and 10am.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          How are the drinks kept cold during delivery?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">All our riders carry professional-grade insulated cooler bags that maintain temperature for up to 4 hours. Your drinks will arrive cold — guaranteed. If they don't, we'll refund your order in full.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          Can I schedule a delivery for a specific time?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">Not yet, but this feature is coming soon! Currently, same-day orders are dispatched as soon as they are ready (usually within 60–90 minutes of placing your order). We'll notify you by SMS when your rider is on the way.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          What happens if I'm not home?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">Your rider will wait up to 5 minutes and attempt to contact you. If there's no answer, they can leave the order with a guard or neighbour if you have provided those instructions in the order notes. Otherwise the order is returned and refunded.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          How does the bottle return programme work?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">Simply rinse your empty glass bottles and hand them to the rider on your next delivery. They'll scan a QR code and the 10% discount is instantly applied to your next order — no voucher needed.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          Is my area covered?
-          <span class="mi">expand_more</span>
-        </button>
-        <div class="faq-a">We currently deliver to District 1, District 3, Bình Thạnh and Thủ Đức. District 7 launches Q3 2026 and Nhà Bè launches Q4 2026. If your area isn't listed yet, drop us a message — high demand can accelerate our expansion.</div>
-      </div>
-    </div>
-
-    <!-- ══════════════ CTA ══════════════ -->
-    <div class="cta-band">
-      <h2>Ready to order?</h2>
-      <p>Free delivery on your first order with code FRESHMARKET.<br>Fresh-pressed and at your door in under 3 hours.</p>
-      <a class="btn-white" href="/">
-        <span class="mi" style="font-size:17px;color:var(--green-dark)">menu_book</span>
-        Browse Menu
-      </a>
-    </div>
-
-  </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ FOOTER ══════════════ -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand">
-          <div class="footer-brand-mark">
-            <span class="mi" style="font-size:16px;color:#fff">storefront</span>
-          </div>
-          Fresh Market
-        </div>
-        <div class="footer-desc">Farm-fresh cold-pressed juices, herbal teas and smoothies delivered across Ho Chi Minh City every morning.</div>
-        <div class="footer-socials">
-          <div class="social-btn" onclick="showToast('Follow us @freshmarket on Instagram!')">
-            <span class="mi" style="font-size:18px">photo_camera</span>
-          </div>
-          <div class="social-btn" onclick="showToast('Like us on Facebook!')">
-            <span class="mi" style="font-size:18px">thumb_up</span>
-          </div>
-          <div class="social-btn" onclick="showToast('Chat with us on WhatsApp!')">
-            <span class="mi" style="font-size:18px">chat</span>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h4>Shop</h4>
-        <a class="footer-link" href="/">All drinks</a>
-        <a class="footer-link" href="/">Cold-pressed juices</a>
-        <a class="footer-link" href="/">Smoothies</a>
-        <a class="footer-link" href="/">Herbal teas</a>
-      </div>
-      <div>
-        <h4>Company</h4>
-        <a class="footer-link" href="/">About us</a>
-        <a class="footer-link" href="/components/delivery.html">Delivery</a>
-        <a class="footer-link" href="#" onclick="showToast('Blog coming soon!')">Blog</a>
-        <a class="footer-link" href="#" onclick="showToast('Careers page coming soon!')">Careers</a>
-      </div>
-      <div>
-        <h4>Help</h4>
-        <a class="footer-link" href="#" onclick="showToast('Team available 8am–8pm daily.')">Contact us</a>
-        <a class="footer-link" href="#" onclick="showToast('Full refund within 24 hours if unsatisfied.')">Returns</a>
-        <a class="footer-link" href="#" onclick="showToast('We never share your data.')">Privacy</a>
-        <a class="footer-link" href="#" onclick="showToast('Terms available on request.')">Terms</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Fresh Market. All rights reserved.</span>
-      <span>Made with <span class="mi" style="font-size:14px;color:var(--green)">favorite</span> in Ho Chi Minh City</span>
-    </div>
-  </div>
-</footer>
-
-<script>
-// Toast
-let toastTmr;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// FAQ accordion
-function toggleFaq(btn) {
-  const answer = btn.nextElementSibling;
-  const isOpen = answer.classList.contains('open');
-  document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
-  document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
-  if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
-}
-
-// Auth helpers
-const AUTH_SESSION_KEY = 'fm_session';
-function getSession() { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || 'null'); }
-function logout() { localStorage.removeItem(AUTH_SESSION_KEY); location.reload(); }
-function confirmLogout() { if (confirm('Sign out of Fresh Market?')) logout(); }
-
-// Avatar
-const NAV_COLORS = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316'];
-function navColor(e) { let h=0; for(const c of e) h=(h*31+c.charCodeAt(0))%NAV_COLORS.length; return NAV_COLORS[h]; }
-function navInit(n)  { return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-
-// Dropdown toggles
-function toggleDashMenu() {
-  // close user menu
-  document.getElementById('user-menu-guest')?.classList.remove('open');
-  document.getElementById('user-menu-loggedin')?.classList.remove('open');
-  const uc = document.getElementById('user-chevron');
-  if (uc) uc.style.transform = '';
-
-  const menu = document.getElementById('dash-menu');
-  const chev = document.getElementById('dash-chevron');
-  const open = menu.classList.toggle('open');
-  chev.style.transform = open ? 'rotate(180deg)' : '';
-}
-
-function toggleUserMenu() {
-  // close dash menu
-  document.getElementById('dash-menu')?.classList.remove('open');
-  const dc = document.getElementById('dash-chevron');
-  if (dc) dc.style.transform = '';
-
-  const s   = getSession();
-  const mid = s ? 'user-menu-loggedin' : 'user-menu-guest';
-  const menu = document.getElementById(mid);
-  const chev = document.getElementById('user-chevron');
-  const open = menu.classList.toggle('open');
-  chev.style.transform = open ? 'rotate(180deg)' : '';
-}
-
-document.addEventListener('click', e => {
-  const dw = document.getElementById('nav-dashboard-wrap');
-  const uw = document.getElementById('nav-user-wrap');
-  if (dw && !dw.contains(e.target)) {
-    document.getElementById('dash-menu')?.classList.remove('open');
-    const c = document.getElementById('dash-chevron'); if (c) c.style.transform='';
-  }
-  if (uw && !uw.contains(e.target)) {
-    document.getElementById('user-menu-guest')?.classList.remove('open');
-    document.getElementById('user-menu-loggedin')?.classList.remove('open');
-    const c = document.getElementById('user-chevron'); if (c) c.style.transform='';
-  }
-}, { capture: true });
-
-window.addEventListener('DOMContentLoaded', () => {
-  const s = getSession();
-  document.getElementById('nav-login-label').textContent = s ? s.name.split(' ')[0] : 'Login';
-
-  const guest    = document.getElementById('user-menu-guest');
-  const loggedin = document.getElementById('user-menu-loggedin');
-  if (s) {
-    guest.style.display    = 'none';
-    loggedin.style.display = 'flex';
-    const av = document.getElementById('user-menu-avatar');
-    av.textContent = navInit(s.name); av.style.background = navColor(s.email);
-    document.getElementById('user-menu-name').textContent  = s.name;
-    document.getElementById('user-menu-email').textContent = s.email;
-    const badge = document.getElementById('user-menu-badge');
-    badge.textContent = s.role || 'customer';
-    badge.className   = 'user-menu-badge ' + (s.role || 'customer');
-    if (s.role === 'admin' || s.role === 'staff') {
-      document.getElementById('nav-dashboard-wrap').style.display = 'block';
-      document.getElementById('user-menu-admin-links').style.display = 'block';
-    }
-  }
-});
-</script>
-
-<style>
-.nav-actions { display:flex; align-items:center; gap:8px; }
-.nav-pill { display:flex; align-items:center; gap:5px; font-size:13px; padding:7px 14px; border-radius:var(--radius-sm); font-family:var(--sans); font-weight:500; cursor:pointer; transition:all .18s; }
-.nav-pill-green  { color:var(--green-dark); border:1.5px solid var(--green); background:var(--green-light); }
-.nav-pill-green:hover  { background:var(--green); color:#fff; }
-.nav-pill-outline { color:var(--green); border:1.5px solid var(--green); background:none; }
-.nav-pill-outline:hover { background:var(--green); color:#fff; }
-.nav-dropdown { position:relative; }
-.nav-dropdown-menu { position:absolute; top:calc(100% + 8px); right:0; background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 12px 40px rgba(0,0,0,.13); min-width:240px; padding:6px; display:none; flex-direction:column; gap:2px; z-index:999; animation:dropIn .18s ease; }
-.nav-dropdown-menu.open { display:flex; }
-@keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-.nav-dropdown-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; text-decoration:none; transition:background .13s; cursor:pointer; border:none; background:none; width:100%; text-align:left; font-family:var(--sans); }
-.nav-dropdown-item:hover { background:var(--bg2); }
-.nav-di-title { font-size:13px; font-weight:500; color:var(--text); }
-.nav-di-sub   { font-size:11px; color:var(--text-light); margin-top:1px; }
-.nav-dropdown-divider { height:1px; background:var(--border); margin:4px 0; }
-.user-menu-header { display:flex; align-items:center; gap:12px; padding:12px 14px 10px; }
-.user-menu-avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; flex-shrink:0; }
-.user-menu-name  { font-size:13px; font-weight:600; color:var(--text); }
-.user-menu-email { font-size:11px; color:var(--text-light); margin-top:1px; }
-.user-menu-badge { display:inline-block; margin-top:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:99px; text-transform:capitalize; }
-.user-menu-badge.admin    { background:#ffeaea; color:#c0392b; }
-.user-menu-badge.staff    { background:#eaf1ff; color:#2e6fd6; }
-.user-menu-badge.customer { background:var(--green-light); color:var(--green-dark); }
-.nav-signout-btn:hover { background:#fff5f5 !important; }
-</style>
-
-<!-- Load customer sidebar into the page with fallback for Tauri -->
-<script>
-  window.addEventListener('DOMContentLoaded', async ()=>{
-    const sidebarSlot = document.getElementById('sidebar-slot');
-    let sidebarLoaded = false;
-    try{
-      const res = await fetch('/components/layout/sidebar-customer.html');
-      if(res.ok){
-        const content = await res.text();
-        if(content.trim()){
-          sidebarSlot.innerHTML = content;
-          sidebarLoaded = true;
-        }
+  <script>
+    const I18N = {
+      en: {
+        pageTitle: 'Customer Dashboard', welcome: 'Welcome',
+        welcomeSub: 'Track how many drinks you bought with bar and pie charts.',
+        totalOrders: 'Total Orders', totalDrinks: 'Total Drinks', totalSpent: 'Total Spent',
+        barTitle: 'Bar Chart - Quantity by Drink', pieTitle: 'Pie Chart - Purchase Ratio',
+        emptyData: 'You have no purchased drink data yet. Place an order to see charts.',
+        menu: 'Menu', vouchers: 'Vouchers', others: 'Others', profile: 'My Profile',
+        centerTotal: 'Total', currency: 'VND'
+      },
+      vi: {
+        pageTitle: 'Bảng điều khiển khách hàng', welcome: 'Xin chào',
+        welcomeSub: 'Theo dõi số lượng đồ uống đã mua bằng biểu đồ cột và biểu đồ tròn.',
+        totalOrders: 'Tổng đơn hàng', totalDrinks: 'Tổng số ly', totalSpent: 'Tổng chi tiêu',
+        barTitle: 'Biểu đồ cột - Số lượng theo đồ uống', pieTitle: 'Biểu đồ tròn - Tỷ lệ mua',
+        emptyData: 'Bạn chưa có dữ liệu mua hàng. Hãy đặt đơn để xem biểu đồ.',
+        menu: 'Thực đơn', vouchers: 'Ưu đãi', others: 'Khác', profile: 'Hồ sơ của tôi',
+        centerTotal: 'Tổng', currency: 'VND'
       }
-    }catch(e){
-      console.warn('Sidebar fetch failed, using fallback');
+    };
+    let currentLang = localStorage.getItem('fm_lang') || ((navigator.language || '').toLowerCase().startsWith('vi') ? 'vi' : 'en');
+    function tr(k) { return (I18N[currentLang] && I18N[currentLang][k]) || I18N.en[k] || k; }
+
+    function getSession() {
+      return JSON.parse(localStorage.getItem('fm_session') || 'null');
     }
 
-    // If fetch failed or returned nothing, use fallback
-    if(!sidebarLoaded || !sidebarSlot.innerHTML.trim()){
-      sidebarSlot.innerHTML = `<aside class="sidebar" style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;padding:0">
-        <div style="padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">
-          <span class="mi" style="font-size:16px;color:#1d9e75;margin-right:8px">local_drink</span>Fresh Market
-        </div>
-        <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">Overview</div>
-        <a href="/components/customer/dashboard-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:#1d9e75;text-decoration:none;cursor:pointer;font-weight:500"><span class="mi">dashboard</span> Dashboard</a>
-        <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Shop</div>
-        <a href="/components/customer/products-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">inventory_2</span> Menu</a>
-        <a href="/components/customer/voucher-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">local_offer</span> Vouchers</a>
-        <a href="/components/customer/orders-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">receipt_long</span> Orders</a>
-        <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Account</div>
-        <a href="/components/customer/user-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">person</span> My Profile</a>
-        <a href="/components/customer/setting-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">settings</span> Settings</a>
-        <div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">
-          <div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:#1d9e75;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600">—</div>
-          <div style="flex:1;min-width:0">
-            <div id="sb-name" style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
-            <div id="sb-role" style="font-size:10px;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">customer</div>
-          </div>
-        </div>
-      </aside>`;
+    function getOrders() {
+      return JSON.parse(localStorage.getItem('fm_orders') || '[]');
     }
 
-    const s = JSON.parse(localStorage.getItem('fm_session')||'null');
-    if(s){
-      const nameEl = document.getElementById('sb-name');
-      const roleEl = document.getElementById('sb-role');
-      const avatar = document.getElementById('sb-avatar');
-      if(nameEl) nameEl.textContent = s.name;
-      if(roleEl) roleEl.textContent = s.role||'customer';
-      if(avatar) avatar.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    function money(v) {
+      const locale = currentLang === 'vi' ? 'vi-VN' : 'en-US';
+      return new Intl.NumberFormat(locale).format(Math.round(v || 0));
     }
-  });
-</script>
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLang;
+      document.getElementById('lang-select').value = currentLang;
+      document.getElementById('page-title').textContent = tr('pageTitle');
+      document.getElementById('welcome-sub').textContent = tr('welcomeSub');
+      document.getElementById('kpi-lbl-orders').textContent = tr('totalOrders');
+      document.getElementById('kpi-lbl-qty').textContent = tr('totalDrinks');
+      document.getElementById('kpi-lbl-spent').textContent = tr('totalSpent');
+      document.getElementById('bar-title').textContent = tr('barTitle');
+      document.getElementById('pie-title').textContent = tr('pieTitle');
+      document.getElementById('empty-data').textContent = tr('emptyData');
+      document.getElementById('ql-menu').textContent = tr('menu');
+      document.getElementById('ql-vouchers').textContent = tr('vouchers');
+      document.getElementById('ql-others').textContent = tr('others');
+      document.getElementById('ql-profile').textContent = tr('profile');
+    }
+
+    function setLanguage(lang) {
+      currentLang = (lang === 'vi') ? 'vi' : 'en';
+      localStorage.setItem('fm_lang', currentLang);
+      applyLanguage();
+      renderDashboard();
+    }
+
+    function loadSidebarFallback() {
+      const slot = document.getElementById('sidebar-slot');
+      slot.innerHTML = '<aside style="width:220px;background:#fff;border-right:1px solid var(--border);padding:14px;">'
+        + '<div style="font-weight:700;margin-bottom:10px;">Fresh Market</div>'
+        + '<a href="/components/customer/dashboard-customer.html" style="display:block;margin:8px 0;color:var(--green-dark);text-decoration:none;">Dashboard</a>'
+        + '<a href="/components/customer/products-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Menu</a>'
+        + '<a href="/components/customer/voucher-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Vouchers</a>'
+        + '<a href="/components/customer/orders-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Others</a>'
+        + '<a href="/components/customer/setting-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">My Profile</a>'
+        + '</aside>';
+    }
+
+    async function loadLayouts() {
+      try {
+        const sb = await fetch('/components/layout/sidebar-customer.html');
+        if (sb.ok) {
+          document.getElementById('sidebar-slot').innerHTML = await sb.text();
+        } else {
+          loadSidebarFallback();
+        }
+      } catch (e) {
+        loadSidebarFallback();
+      }
+
+      try {
+        const ft = await fetch('/components/layout/footer.html');
+        if (ft.ok) {
+          document.getElementById('footer-slot').innerHTML = await ft.text();
+        }
+      } catch (e) {}
+    }
+
+    function collectUserDrinkData(session) {
+      const orders = getOrders();
+      const myOrders = orders.filter(o => o && (o.customerEmail === session.email || o.customer === session.name));
+      const totals = {};
+      let totalQty = 0;
+      let totalSpent = 0;
+
+      myOrders.forEach(order => {
+        totalSpent += Number(order.total || 0);
+        (order.items || []).forEach(item => {
+          const name = item.name || item.cat || 'Other';
+          const qty = Number(item.qty || 1);
+          totals[name] = (totals[name] || 0) + qty;
+          totalQty += qty;
+        });
+      });
+
+      return {
+        myOrders,
+        entries: Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 8),
+        totalQty,
+        totalSpent
+      };
+    }
+
+    function drawBar(canvas, entries) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth;
+      const h = canvas.height = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { t: 16, r: 12, b: 42, l: 40 };
+      const cw = w - pad.l - pad.r;
+      const ch = h - pad.t - pad.b;
+      const max = Math.max(...entries.map(e => e[1]), 1);
+      const bw = cw / entries.length;
+
+      ctx.strokeStyle = '#e8ece9';
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (ch * i / 4);
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+      }
+
+      entries.forEach((e, i) => {
+        const x = pad.l + i * bw + 8;
+        const barW = Math.max(18, bw - 16);
+        const barH = (e[1] / max) * (ch - 8);
+        const y = pad.t + ch - barH;
+
+        ctx.fillStyle = '#1d9e75';
+        ctx.fillRect(x, y, barW, barH);
+
+        ctx.fillStyle = '#234';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(e[1]), x + barW / 2, y - 6);
+
+        const name = e[0].length > 8 ? e[0].slice(0, 8) + '...' : e[0];
+        ctx.fillStyle = '#667';
+        ctx.fillText(name, x + barW / 2, h - 16);
+      });
+    }
+
+    function drawPie(canvas, entries) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth;
+      const h = canvas.height = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const total = entries.reduce((s, e) => s + e[1], 0) || 1;
+      const cx = Math.min(w * 0.35, 160);
+      const cy = h * 0.5;
+      const r = Math.min(110, h * 0.34);
+      const colors = ['#1d9e75', '#3ab58f', '#0f7c5d', '#87d7be', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
+
+      let angle = -Math.PI / 2;
+      entries.forEach((e, i) => {
+        const slice = (e[1] / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, angle, angle + slice);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        angle += slice;
+      });
+
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 0.48, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#334';
+      ctx.textAlign = 'center';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(tr('centerTotal'), cx, cy - 4);
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(String(total), cx, cy + 18);
+
+      let ly = 42;
+      entries.forEach((e, i) => {
+        const color = colors[i % colors.length];
+        const pct = Math.round((e[1] / total) * 100);
+        ctx.fillStyle = color;
+        ctx.fillRect(w * 0.62, ly - 9, 10, 10);
+        ctx.fillStyle = '#334';
+        ctx.textAlign = 'left';
+        ctx.font = '12px sans-serif';
+        const label = (e[0].length > 16 ? e[0].slice(0, 16) + '...' : e[0]) + ' - ' + pct + '%';
+        ctx.fillText(label, w * 0.62 + 16, ly);
+        ly += 20;
+      });
+    }
+
+    function renderDashboard() {
+      const s = getSession();
+      if (!s) {
+        location.href = '/components/auth/login.html';
+        return;
+      }
+
+      document.getElementById('welcome-name').textContent = tr('welcome') + ', ' + (s.name || 'Customer');
+
+      const result = collectUserDrinkData(s);
+      document.getElementById('kpi-orders').textContent = String(result.myOrders.length);
+      document.getElementById('kpi-qty').textContent = String(result.totalQty);
+      document.getElementById('kpi-spent').textContent = money(result.totalSpent) + ' ' + tr('currency');
+
+      const hasData = result.entries.length > 0;
+      document.getElementById('chart-section').style.display = hasData ? 'grid' : 'none';
+      document.getElementById('empty-data').style.display = hasData ? 'none' : 'block';
+
+      if (hasData) {
+        drawBar(document.getElementById('barChart'), result.entries);
+        drawPie(document.getElementById('pieChart'), result.entries);
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      const s = getSession();
+      if (!s) return;
+      const result = collectUserDrinkData(s);
+      if (result.entries.length) {
+        drawBar(document.getElementById('barChart'), result.entries);
+        drawPie(document.getElementById('pieChart'), result.entries);
+      }
+    });
+
+    (async function init() {
+      await loadLayouts();
+      applyLanguage();
+      renderDashboard();
+      document.getElementById('lang-select').addEventListener('change', (e) => setLanguage(e.target.value));
+    })();
+  </script>
 </body>
 </html>

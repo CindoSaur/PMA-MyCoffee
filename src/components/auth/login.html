@@ -329,7 +329,12 @@
                 </button>
               </div>
             </div>
-            <button class="forgot-link" onclick="showToast('Password reset link sent to your email!')">Forgot password?</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:-2px;margin-bottom:6px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-mid);cursor:pointer">
+                <input type="checkbox" id="remember-me" /> Remember me
+              </label>
+              <button class="forgot-link" type="button" onclick="window.location.href='ForgetPassword.html'">Forgot password?</button>
+            </div>
             <button class="btn-login" onclick="handleLogin()">
               <span class="mi" style="font-size:17px;color:#fff">login</span>
               Sign In

@@ -1,60 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<title>Menu — Fresh Market</title>
-	<link rel="stylesheet" href="/style/style.css" />
-	<style>
-		.container{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
-		.sec-title{font-family:var(--serif);font-size:28px;margin-bottom:6px}
-		.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-		.prod-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-		.prod-img{height:140px;background:#eee;display:flex;align-items:center;justify-content:center}
-		.prod-body{padding:12px}
-		.prod-name{font-weight:600;color:var(--text)}
-		.prod-price{font-weight:700;color:var(--green-dark);margin-top:8px}
-	</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu - Customer</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    .page { display: flex; min-height: 100vh; background: var(--bg); }
+    .main { flex: 1; min-width: 0; }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .topbar h1 { margin: 0; font-family: var(--serif); font-size: 26px; }
+    .lang-switch {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .content { padding: 24px; max-width: 1160px; }
+
+    .tools { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 10px; }
+    .search { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .meta { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-mid); }
+
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tab {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text-mid);
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .tab.active { border-color: var(--green); color: var(--green-dark); background: #e9fbf3; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .thumb { height: 140px; background: #f0f3f2; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .body { padding: 12px; }
+    .name { margin: 0; font-size: 16px; color: var(--text); }
+    .cat { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+    .desc { font-size: 13px; color: var(--text-mid); margin-top: 8px; min-height: 38px; }
+    .row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .price { color: var(--green-dark); font-weight: 700; }
+
+    .actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn.primary { border-color: var(--green); background: #1d9e75; color: #fff; }
+    .btn.saved { border-color: #f59e0b; color: #b45309; background: #fff7ed; }
+
+    .empty { background: #fff; border: 1px dashed var(--border); border-radius: var(--radius); padding: 20px; color: var(--text-mid); }
+  </style>
 </head>
 <body>
+  <div class="page">
+    <div id="sidebar-slot"></div>
+    <main class="main">
+      <div class="topbar">
+        <h1 id="page-title">Menu</h1>
+        <select id="lang-select" class="lang-switch" aria-label="Language">
+          <option value="en">English</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </div>
+      <div class="content">
+        <div class="tools">
+          <input id="search" class="search" placeholder="Search drink name..." />
+          <div class="meta" id="meta">0 items</div>
+        </div>
+        <div id="tabs" class="tabs"></div>
+        <div id="grid" class="grid"></div>
+        <div id="empty" class="empty" style="display:none;">No menu item found.</div>
+      </div>
+    </main>
+  </div>
 
-<div style="display:flex;min-height:100vh">
-	<div id="sidebar-slot"></div>
-	<div class="dash-main">
-		<div class="dash-topbar"><div class="dash-title">Menu</div></div>
-		<div class="dash-content">
+  <div id="footer-slot"></div>
 
-			<div class="container">
-	<div class="section-label">Menu</div>
-	<div class="sec-title">All Drinks</div>
-	<div class="sec-sub">Browse our cold-pressed juices, smoothies and herbal teas.</div>
+  <script>
+    const I18N = {
+      en: {
+        pageTitle: 'Menu',
+        searchPlaceholder: 'Search drink name...',
+        noDesc: 'No description',
+        inStock: 'In stock',
+        outStock: 'Out of stock',
+        save: 'Save',
+        saved: 'Saved',
+        add: 'Add',
+        empty: 'No menu item found.',
+        items: 'items',
+        favorite: 'favorite(s)',
+        draft: 'draft item(s)',
+        currency: 'VND'
+      },
+      vi: {
+        pageTitle: 'Thực đơn',
+        searchPlaceholder: 'Tìm tên đồ uống...',
+        noDesc: 'Chưa có mô tả',
+        inStock: 'Còn hàng',
+        outStock: 'Hết hàng',
+        save: 'Lưu',
+        saved: 'Đã lưu',
+        add: 'Thêm',
+        empty: 'Không tìm thấy món phù hợp.',
+        items: 'sản phẩm',
+        favorite: 'yêu thích',
+        draft: 'tạm tính',
+        currency: 'VND'
+      }
+    };
 
-	<div id="products" class="products-grid" style="margin-top:18px"></div>
-			</div>
+    const SAMPLE_MENU = [
+      { id: 9001, name: 'Orange Juice', cat: 'Juice', price: 35000, inStock: true, desc: 'Fresh orange pressed daily.', img: 'https://images.unsplash.com/photo-1600271886742-f049cd5bba3f?w=800' },
+      { id: 9002, name: 'Green Detox', cat: 'Detox', price: 42000, inStock: true, desc: 'Kale, cucumber, apple mix.', img: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=800' },
+      { id: 9003, name: 'Berry Smoothie', cat: 'Smoothie', price: 45000, inStock: true, desc: 'Blueberry and yogurt.', img: 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800' },
+      { id: 9004, name: 'Peach Tea', cat: 'Tea', price: 30000, inStock: true, desc: 'Cold peach black tea.', img: 'https://images.unsplash.com/photo-1497534446932-c925b458314e?w=800' }
+    ];
 
-		</div>
-	</div>
-</div>
+    function getSession() { return JSON.parse(localStorage.getItem('fm_session') || 'null'); }
+    function getProducts() {
+      const data = JSON.parse(localStorage.getItem('fm_products') || '[]');
+      if (Array.isArray(data) && data.length) return data;
+      localStorage.setItem('fm_products', JSON.stringify(SAMPLE_MENU));
+      return SAMPLE_MENU;
+    }
 
-<div id="footer-slot"></div>
+    function getPrefKey(email) { return 'fm_menu_pref_' + String(email || 'guest'); }
+    function getMenuPref(email) {
+      return JSON.parse(localStorage.getItem(getPrefKey(email)) || '{"favoriteIds":[],"draft":[]}');
+    }
+    function saveMenuPref(email, pref) { localStorage.setItem(getPrefKey(email), JSON.stringify(pref)); }
 
-<script>
-async function loadComponent(slot, url){ try{ const r=await fetch(url); if(!r.ok) throw 0; document.getElementById(slot).innerHTML=await r.text(); }catch(e){console.warn('load failed',url);} }
-loadComponent('footer-slot','/components/layout/footer.html');
+    let allProducts = [];
+    let currentLang = localStorage.getItem('fm_lang') || ((navigator.language || '').toLowerCase().startsWith('vi') ? 'vi' : 'en');
+    let activeCat = 'All';
+    let searchText = '';
 
-// load the customer sidebar and set session name
-(async function(){
-	try{
-		const res = await fetch('/components/layout/sidebar-customer.html');
-		if(res.ok){ document.getElementById('sidebar-slot').innerHTML = await res.text(); }
-	}catch(e){console.warn('sidebar load failed',e)}
-	try{ const s = JSON.parse(localStorage.getItem('fm_session')||'null'); if(s){ document.getElementById('sb-name')?.textContent = s.name; document.getElementById('sb-role')?.textContent = s.role||'customer'; } }catch(e){}
-	try{ render(); }catch(e){ console.warn('render error',e); }
-})();
+    function tr(k) {
+      const langPack = I18N[currentLang] || I18N.en;
+      return langPack[k] || k;
+    }
 
-function getProducts(){ return JSON.parse(localStorage.getItem('fm_products')||'[]'); }
-function render(){ const prods = getProducts(); const wrap=document.getElementById('products'); if(!prods.length){ wrap.innerHTML='<div style="padding:3rem;color:var(--text-light);text-align:center">No products yet.</div>'; return;} wrap.innerHTML = prods.map(p=>`<div class="prod-card"><div class="prod-img"><img src="${p.img||'https://via.placeholder.com/300x140'}" style="width:100%;height:100%;object-fit:cover"/></div><div class="prod-body"><div class="prod-name">${p.name}</div><div class="prod-desc" style="font-size:13px;color:var(--text-mid);margin-top:6px">${p.desc||''}</div><div class="prod-price">₫${p.price}</div></div></div>`).join(''); }
-window.addEventListener('DOMContentLoaded', render);
-</script>
+    function setLanguage(lang) {
+      currentLang = (lang === 'vi') ? 'vi' : 'en';
+      localStorage.setItem('fm_lang', currentLang);
+      document.documentElement.lang = currentLang;
+      document.getElementById('lang-select').value = currentLang;
+      document.getElementById('page-title').textContent = tr('pageTitle');
+      document.getElementById('search').placeholder = tr('searchPlaceholder');
+      document.getElementById('empty').textContent = tr('empty');
+      render();
+    }
+
+    function loadSidebarFallback() {
+      document.getElementById('sidebar-slot').innerHTML = '<aside style="width:220px;background:#fff;border-right:1px solid var(--border);padding:14px;">'
+        + '<div style="font-weight:700;margin-bottom:10px;">Fresh Market</div>'
+        + '<a href="/components/customer/dashboard-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Dashboard</a>'
+        + '<a href="/components/customer/products-customer.html" style="display:block;margin:8px 0;color:var(--green-dark);text-decoration:none;">Menu</a>'
+        + '<a href="/components/customer/voucher-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Vouchers</a>'
+        + '<a href="/components/customer/orders-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Others</a>'
+        + '<a href="/components/customer/setting-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">My Profile</a>'
+        + '</aside>';
+    }
+
+    async function loadLayouts() {
+      try {
+        const sb = await fetch('/components/layout/sidebar-customer.html');
+        if (sb.ok) document.getElementById('sidebar-slot').innerHTML = await sb.text();
+        else loadSidebarFallback();
+      } catch (e) { loadSidebarFallback(); }
+
+      try {
+        const ft = await fetch('/components/layout/footer.html');
+        if (ft.ok) document.getElementById('footer-slot').innerHTML = await ft.text();
+      } catch (e) {}
+    }
+
+    function filtered() {
+      return allProducts.filter(p => {
+        const okCat = activeCat === 'All' || (p.cat || 'Other') === activeCat;
+        const okText = !searchText || String(p.name || '').toLowerCase().includes(searchText);
+        return okCat && okText;
+      });
+    }
+
+    function renderTabs() {
+      const cats = ['All'].concat(Array.from(new Set(allProducts.map(p => p.cat || 'Other'))));
+      const wrap = document.getElementById('tabs');
+      wrap.innerHTML = cats.map(c => '<button class="tab ' + (c === activeCat ? 'active' : '') + '" data-cat="' + c + '">' + c + '</button>').join('');
+      wrap.querySelectorAll('.tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeCat = btn.getAttribute('data-cat') || 'All';
+          render();
+        });
+      });
+    }
+
+    function money(v) {
+      const locale = currentLang === 'vi' ? 'vi-VN' : 'en-US';
+      return new Intl.NumberFormat(locale).format(Math.round(v || 0)) + ' ' + tr('currency');
+    }
+
+    function toggleFav(id) {
+      const s = getSession();
+      const pref = getMenuPref(s ? s.email : 'guest');
+      const idx = pref.favoriteIds.indexOf(id);
+      if (idx >= 0) pref.favoriteIds.splice(idx, 1);
+      else pref.favoriteIds.push(id);
+      saveMenuPref(s ? s.email : 'guest', pref);
+      render();
+    }
+
+    function addDraft(id) {
+      const s = getSession();
+      const pref = getMenuPref(s ? s.email : 'guest');
+      pref.draft.push({ id: id, ts: Date.now() });
+      saveMenuPref(s ? s.email : 'guest', pref);
+      render();
+    }
+
+    function render() {
+      const s = getSession();
+      const email = s ? s.email : 'guest';
+      const pref = getMenuPref(email);
+      const list = filtered();
+
+      document.getElementById('meta').textContent = list.length + ' ' + tr('items') + ' | ' + pref.favoriteIds.length + ' ' + tr('favorite') + ' | ' + pref.draft.length + ' ' + tr('draft');
+
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      if (!list.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      grid.innerHTML = list.map(p => {
+        const id = Number(p.id || 0);
+        const isFav = pref.favoriteIds.includes(id);
+        return '<article class="card">'
+          + '<div class="thumb"><img src="' + (p.img || 'https://via.placeholder.com/640x360') + '" alt="' + (p.name || 'Drink') + '" /></div>'
+          + '<div class="body">'
+          + '<h3 class="name">' + (p.name || 'Drink') + '</h3>'
+          + '<div class="cat">' + (p.cat || 'Other') + '</div>'
+          + '<div class="desc">' + (p.desc || tr('noDesc')) + '</div>'
+          + '<div class="row"><div class="price">' + money(Number(p.price || 0)) + '</div><div style="font-size:12px;color:' + (p.inStock === false ? '#b91c1c' : '#0f7c5d') + ';">' + (p.inStock === false ? tr('outStock') : tr('inStock')) + '</div></div>'
+          + '<div class="actions">'
+          + '<button class="btn ' + (isFav ? 'saved' : '') + '" onclick="toggleFav(' + id + ')">' + (isFav ? tr('saved') : tr('save')) + '</button>'
+          + '<button class="btn primary" onclick="addDraft(' + id + ')">' + tr('add') + '</button>'
+          + '</div></div></article>';
+      }).join('');
+    }
+
+    window.toggleFav = toggleFav;
+    window.addDraft = addDraft;
+
+    (async function init() {
+      await loadLayouts();
+      allProducts = getProducts();
+      renderTabs();
+      setLanguage(currentLang === 'vi' ? 'vi' : 'en');
+
+      document.getElementById('search').addEventListener('input', (e) => {
+        searchText = String(e.target.value || '').trim().toLowerCase();
+        render();
+      });
+
+      document.getElementById('lang-select').addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+      });
+    })();
+  </script>
 </body>
 </html>
