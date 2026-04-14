@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store Reviews — MyCoffee</title>
+  <link rel="stylesheet" href="/style/style.css" />
+  <style>
+    .page { display:flex; min-height:100vh; background:var(--bg); }
+    .main { flex:1; min-width:0; }
+    .topbar { background:#fff; border-bottom:1px solid var(--border); padding:16px 24px; position:sticky; top:0; z-index:50; }
+    .topbar h1 { margin:0; font-family:var(--serif); font-size:26px; }
+    .content { padding:24px; max-width:1200px; margin:0 auto; }
+
+    /* Store Header */
+    .store-header { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:2rem; margin-bottom:2rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center; }
+    @media(max-width:768px){ .store-header { grid-template-columns:1fr; } }
+    .store-hero-img { width:100%; height:240px; object-fit:cover; border-radius:var(--radius); background:var(--bg2); }
+    .store-info h2 { margin:0 0 1rem; font-family:var(--serif); font-size:1.8rem; color:var(--text); }
+    .store-rating { display:flex; align-items:center; gap:12px; margin-bottom:1rem; }
+    .star-rating { display:flex; gap:2px; }
+    .star { font-size:1.4rem; color:#f59e0b; }
+    .rating-text { font-size:1.1rem; font-weight:600; color:var(--text); }
+    .rating-count { font-size:13px; color:var(--text-light); }
+    .store-desc { color:var(--text-mid); font-size:14px; line-height:1.6; margin-bottom:1rem; }
+    .store-contact { display:flex; flex-direction:column; gap:8px; font-size:13px; }
+    .store-contact-item { display:flex; align-items:center; gap:10px; }
+    .store-contact-item .mi { color:var(--green); }
+
+    /* Rating Summary */
+    .rating-summary { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:2rem; }
+    .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    @media(max-width:768px){ .summary-grid { grid-template-columns:1fr; } }
+    
+    .rating-bars { display:flex; flex-direction:column; gap:12px; }
+    .bar-item { display:flex; align-items:center; gap:10px; }
+    .bar-label { width:60px; font-size:13px; color:var(--text-mid); }
+    .bar-container { flex:1; height:6px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+    .bar-fill { height:100%; background:var(--green); border-radius:99px; }
+    .bar-count { width:40px; text-align:right; font-size:12px; color:var(--text-light); }
+
+    .write-review { padding:1.5rem; background:var(--bg2); border-radius:var(--radius); }
+    .write-title { font-size:1.1rem; font-weight:600; color:var(--text); margin-bottom:1rem; }
+    
+    .form-group { margin-bottom:1rem; }
+    .form-label { font-size:13px; font-weight:500; color:var(--text); margin-bottom:6px; display:block; }
+    .star-input { display:flex; gap:4px; margin-bottom:0.5rem; }
+    .star-input .mi { font-size:24px; color:#d1d5db; cursor:pointer; transition:.15s; }
+    .star-input .mi:hover { color:#f59e0b; }
+    .star-input .mi.active { color:#f59e0b; }
+    
+    textarea { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; resize:vertical; min-height:100px; }
+    textarea:focus { border-color:var(--green); }
+    
+    .btn-submit { padding:11px 24px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-size:13px; font-weight:500; cursor:pointer; transition:.15s; }
+    .btn-submit:hover { background:var(--green-dark); }
+
+    /* Reviews List */
+    .reviews-section { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; }
+    .reviews-title { font-size:1.15rem; font-weight:600; color:var(--text); margin-bottom:1.5rem; }
+    .review-item { padding:1.5rem 0; border-bottom:1px solid var(--border); }
+    .review-item:last-child { border-bottom:none; }
+    .review-header { display:flex; justify-content:space-between; align-items:start; margin-bottom:8px; }
+    .review-author { font-weight:600; color:var(--text); font-size:14px; }
+    .review-date { font-size:12px; color:var(--text-light); }
+    .review-rating { display:flex; gap:2px; margin-bottom:8px; }
+    .review-rating .mi { font-size:16px; color:#f59e0b; }
+    .review-text { font-size:13px; color:var(--text); line-height:1.6; }
+    .review-helpful { margin-top:10px; font-size:12px; }
+    .review-helpful button { background:none; border:none; color:var(--text-light); cursor:pointer; margin-right:1rem; transition:.15s; }
+    .review-helpful button:hover { color:var(--green); }
+
+    .empty-reviews { text-align:center; padding:2rem; color:var(--text-light); }
+    .empty-reviews .mi { font-size:48px; margin-bottom:1rem; display:block; }
+
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<div class="page">
+  <div id="sidebar-slot"></div>
+  <main class="main">
+    <div class="topbar">
+      <h1>Store Reviews</h1>
+    </div>
+
+    <div class="content">
+      <!-- Store Header -->
+      <div class="store-header">
+        <div>
+          <img src="https://images.unsplash.com/photo-1442512595331-e89e90e299c9?w=500&q=80" alt="MyCoffee Store" class="store-hero-img" />
+        </div>
+        <div class="store-info">
+          <h2>MyCoffee</h2>
+          <div class="store-rating">
+            <div class="star-rating" id="store-stars"></div>
+            <div>
+              <div class="rating-text" id="store-avg">4.8</div>
+              <div class="rating-count" id="review-count">(124 reviews)</div>
+            </div>
+          </div>
+          <p class="store-desc">🌿 Premium specialty coffee & herbal teas brewed fresh daily. Delivered hot to your doorstep in Ho Chi Minh City. Supporting local farmers & sustainable practices.</p>
+          <div class="store-contact">
+            <div class="store-contact-item">
+              <span class="mi">phone</span>
+              <span>+84 90 123 4567</span>
+            </div>
+            <div class="store-contact-item">
+              <span class="mi">location_on</span>
+              <span>123 Nguyen Hue, District 1, HCMC</span>
+            </div>
+            <div class="store-contact-item">
+              <span class="mi">schedule</span>
+              <span>Mon-Sun, 7:00 AM - 9:00 PM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Summary & Write Review -->
+      <div class="rating-summary">
+        <div class="summary-grid">
+          <!-- Rating Bars -->
+          <div class="rating-bars" id="rating-bars"></div>
+
+          <!-- Write Review Form -->
+          <div class="write-review">
+            <div class="write-title">Share your experience</div>
+            <div class="form-group">
+              <label class="form-label">Your Rating</label>
+              <div class="star-input" id="star-input">
+                <span class="mi" data-rating="1">star_rate</span>
+                <span class="mi" data-rating="2">star_rate</span>
+                <span class="mi" data-rating="3">star_rate</span>
+                <span class="mi" data-rating="4">star_rate</span>
+                <span class="mi" data-rating="5">star_rate</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-light)" id="rating-feedback">Click to rate</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Review</label>
+              <textarea id="review-text" placeholder="Share what you loved about MyCoffee…"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Name (optional)</label>
+              <input type="text" id="reviewer-name" placeholder="Your name" style="width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13px;">
+            </div>
+            <button class="btn-submit" onclick="submitReview()">Submit Review</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews List -->
+      <div class="reviews-section">
+        <div class="reviews-title">Customer Reviews</div>
+        <div id="reviews-list"></div>
+        <div id="empty-reviews" class="empty-reviews" style="display:none">
+          <span class="mi">rate_review</span>
+          <p>No reviews yet. Be the first to share!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="footer-slot"></div>
+
+<script>
+const REVIEWS_KEY = 'mc_store_reviews';
+const SESSION_KEY = 'mc_session';
+let selectedRating = 0;
+let toastTmr;
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function getReviews() { return JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]'); }
+function saveReviews(r) { localStorage.setItem(REVIEWS_KEY, JSON.stringify(r)); }
+
+function getAverageRating(reviews) {
+  if(reviews.length === 0) return 0;
+  const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+  return (sum / reviews.length).toFixed(1);
+}
+
+function renderStars(rating, containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = Array.from({length: 5}, (_, i) => 
+    `<span class="mi" style="color: ${i < Math.round(rating) ? '#f59e0b' : '#d1d5db'}">star_rate</span>`
+  ).join('');
+}
+
+function renderRatingSummary() {
+  const reviews = getReviews();
+  const avg = getAverageRating(reviews);
+  
+  renderStars(avg, 'store-stars');
+  document.getElementById('store-avg').textContent = avg;
+  document.getElementById('review-count').textContent = `(${reviews.length} review${reviews.length !== 1 ? 's' : ''})`;
+
+  // Distribution bars
+  const counts = [0, 0, 0, 0, 0];
+  reviews.forEach(r => counts[r.rating - 1]++);
+  
+  const barsHtml = Array.from({length: 5}, (_, i) => {
+    const rating = 5 - i;
+    const count = counts[rating - 1] || 0;
+    const percent = reviews.length > 0 ? (count / reviews.length * 100) : 0;
+    return `
+      <div class="bar-item">
+        <div class="bar-label">${rating} <span class="mi" style="font-size:12px;color:#f59e0b">star_rate</span></div>
+        <div class="bar-container"><div class="bar-fill" style="width:${percent}%"></div></div>
+        <div class="bar-count">${count}</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('rating-bars').innerHTML = barsHtml;
+}
+
+function renderReviews() {
+  const reviews = getReviews().sort((a, b) => new Date(b.date) - new Date(a.date));
+  const reviewsList = document.getElementById('reviews-list');
+  const emptyState = document.getElementById('empty-reviews');
+
+  if(reviews.length === 0) {
+    reviewsList.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  reviewsList.innerHTML = reviews.map(r => {
+    const date = new Date(r.date).toLocaleDateString('en-GB', {day: 'short', month: 'short', year: 'numeric'});
+    const stars = Array.from({length: 5}, (_, i) => 
+      `<span class="mi" style="color: ${i < r.rating ? '#f59e0b' : '#d1d5db'}">star_rate</span>`
+    ).join('');
+    return `
+      <div class="review-item">
+        <div class="review-header">
+          <div>
+            <div class="review-author">${r.name || 'Anonymous'}</div>
+            <div class="review-date">${date}</div>
+          </div>
+        </div>
+        <div class="review-rating">${stars}</div>
+        <div class="review-text">${r.text}</div>
+        <div class="review-helpful">
+          <button onclick="toggleHelpful(${r.id}, 'helpful')" title="Helpful">
+            <span class="mi" style="font-size:14px">thumb_up</span>
+            <span id="helpful-${r.id}">${r.helpfulCount || 0}</span>
+          </button>
+          <button onclick="toggleHelpful(${r.id}, 'unhelpful')" title="Not helpful">
+            <span class="mi" style="font-size:14px">thumb_down</span>
+            <span id="unhelpful-${r.id}">${r.unhelpfulCount || 0}</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleHelpful(id, type) {
+  const reviews = getReviews();
+  const review = reviews.find(r => r.id === id);
+  if(!review) return;
+  
+  if(type === 'helpful') {
+    review.helpfulCount = (review.helpfulCount || 0) + 1;
+  } else {
+    review.unhelpfulCount = (review.unhelpfulCount || 0) + 1;
+  }
+  
+  saveReviews(reviews);
+  renderReviews();
+}
+
+function submitReview() {
+  if(selectedRating === 0) {
+    showToast('Please select a rating');
+    return;
+  }
+  
+  const text = document.getElementById('review-text').value.trim();
+  if(!text) {
+    showToast('Please write a review');
+    return;
+  }
+  
+  const name = document.getElementById('reviewer-name').value.trim() || 'Anonymous';
+  
+  const reviews = getReviews();
+  reviews.push({
+    id: Date.now(),
+    rating: selectedRating,
+    text: text,
+    name: name,
+    date: new Date().toISOString(),
+    helpfulCount: 0,
+    unhelpfulCount: 0
+  });
+  
+  saveReviews(reviews);
+  
+  // Clear form
+  selectedRating = 0;
+  document.getElementById('review-text').value = '';
+  document.getElementById('reviewer-name').value = '';
+  document.querySelectorAll('#star-input .mi').forEach(el => el.classList.remove('active'));
+  document.getElementById('rating-feedback').textContent = 'Click to rate';
+  
+  renderRatingSummary();
+  renderReviews();
+  showToast('Thank you for your review! ✓');
+}
+
+// Initialize star input
+document.addEventListener('DOMContentLoaded', () => {
+  const starInputs = document.querySelectorAll('#star-input .mi');
+  starInputs.forEach(star => {
+    star.addEventListener('click', () => {
+      selectedRating = parseInt(star.dataset.rating);
+      starInputs.forEach((s, i) => {
+        s.classList.toggle('active', i < selectedRating);
+      });
+      document.getElementById('rating-feedback').textContent = selectedRating + ' out of 5 stars';
+    });
+    star.addEventListener('mouseenter', () => {
+      const rating = parseInt(star.dataset.rating);
+      starInputs.forEach((s, i) => {
+        s.style.color = i < rating ? '#f59e0b' : '#d1d5db';
+      });
+    });
+  });
+  
+  document.getElementById('star-input').addEventListener('mouseleave', () => {
+    starInputs.forEach((s, i) => {
+      s.style.color = i < selectedRating ? '#f59e0b' : '#d1d5db';
+    });
+  });
+
+  seedReviews();
+  renderRatingSummary();
+  renderReviews();
+});
+
+function seedReviews() {
+  const existing = getReviews();
+  if(existing.length > 0) return;
+  
+  const now = new Date();
+  const demo = [
+    { id:1, rating:5, text:'Excellent coffee! Fresh, delicious, and delivered on time every morning. The cold brew is my favorite. Highly recommended!', name:'Linh Nguyen', date:new Date(now.getTime() - 86400000).toISOString(), helpfulCount:23, unhelpfulCount:0 },
+    { id:2, rating:5, text:'Best herbal teas in HCMC. Love the flavor variety and quality. Customer service is super friendly too!', name:'Minh Hung', date:new Date(now.getTime() - 172800000).toISOString(), helpfulCount:18, unhelpfulCount:1 },
+    { id:3, rating:4, text:'Great selection and nice presentation. Delivery was a bit late once but overall very good experience.', name:'Sara', date:new Date(now.getTime() - 259200000).toISOString(), helpfulCount:12, unhelpfulCount:2 },
+    { id:4, rating:5, text:'I order every week now. Premium quality, eco-friendly packaging, and fair prices. This is what I\'ve been looking for!', name:'Khoa', date:new Date(now.getTime() - 345600000).toISOString(), helpfulCount:31, unhelpfulCount:0 },
+    { id:5, rating:4, text:'Good coffee but a bit pricey. Still worth it for the quality and fresh brewing. Five stars if delivery was faster.', name:'An', date:new Date(now.getTime() - 432000000).toISOString(), helpfulCount:8, unhelpfulCount:3 },
+  ];
+  
+  localStorage.setItem(REVIEWS_KEY, JSON.stringify(demo));
+}
+</script>
+</body>
+</html>

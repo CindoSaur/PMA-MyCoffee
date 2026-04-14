@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════
-//  auth.js — Fresh Market authentication
+//  auth.js — MyCoffee authentication
 //  Uses localStorage to persist users & session
 // ════════════════════════════════════════════
 
