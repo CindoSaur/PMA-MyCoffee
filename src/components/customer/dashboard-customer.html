@@ -3,402 +3,220 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Customer</title>
+  <title>Dashboard — PolyCoffee</title>
   <link rel="stylesheet" href="/style/style.css" />
   <style>
-    .page { display: flex; min-height: 100vh; background: var(--bg); }
-    .main { flex: 1; min-width: 0; }
-    .topbar {
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .topbar h1 { margin: 0; font-family: var(--serif); font-size: 26px; color: var(--text); }
-    .lang-switch {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #fff;
-      padding: 7px 10px;
-      font-size: 13px;
-      color: var(--text);
-    }
-    .content { padding: 24px; max-width: 1120px; }
+    body { background:var(--bg); }
+    .portal-shell { display:flex; min-height:100vh; }
+    .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
+    .dash-content { padding:1.75rem 2rem; flex:1; }
+    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
+    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
+    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .section-body { padding:1.5rem; }
+    .page-hd { margin-bottom:1.75rem; }
+    .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
+    .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
+    .form-label { font-size:13px; font-weight:500; color:var(--text); }
+    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
+    .form-input:focus { border-color:var(--green); }
+    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
+    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
+    .btn-save:hover { background:var(--green-dark); }
+    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
+    .btn-outline:hover { border-color:var(--text); }
+    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
+    .badge-delivered  { background:#dcfce7; color:#15803d; }
+    .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
+    .badge-customer { background:var(--green-light); color:var(--green-dark); }
+    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
+    .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
 
-    .welcome {
-      border-radius: var(--radius);
-      padding: 20px;
-      background: linear-gradient(135deg, #0f3f33, #1d9e75);
-      color: #fff;
-      margin-bottom: 18px;
-    }
-    .welcome h2 { margin: 0 0 6px; font-size: 24px; }
-    .welcome p { margin: 0; color: rgba(255,255,255,.85); }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    .kpi {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-    }
-    .kpi .lbl { color: var(--text-light); font-size: 12px; }
-    .kpi .val { color: var(--text); font-size: 28px; font-weight: 700; margin-top: 4px; }
-
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    .chart-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-    }
-    .chart-title { margin: 0 0 10px; font-weight: 600; color: var(--text); }
-    .canvas-wrap { position: relative; height: 320px; }
-    canvas { width: 100%; height: 100%; display: block; }
-
-    .quick-links {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-    .quick-links a {
-      text-decoration: none;
-      color: var(--text);
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      font-weight: 600;
-      transition: .15s;
-    }
-    .quick-links a:hover { border-color: var(--green); color: var(--green-dark); }
-
-    .empty {
-      background: #fff;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      color: var(--text-mid);
-    }
-
-    @media (max-width: 900px) {
-      .chart-grid { grid-template-columns: 1fr; }
-      .canvas-wrap { height: 260px; }
-    }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div id="sidebar-slot"></div>
 
-    <main class="main">
-      <div class="topbar">
-        <h1 id="page-title">Customer Dashboard</h1>
-        <select id="lang-select" class="lang-switch" aria-label="Language">
-          <option value="en">English</option>
-          <option value="vi">Tiếng Việt</option>
-        </select>
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<div class="portal-shell">
+  <div id="sidebar-slot"></div>
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title">Dashboard</div>
+      <div id="topbar-right"></div>
+    </div>
+    <div class="dash-content">
+
+      <!-- Overview cards -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem" id="ov-grid">
+        <div class="section-card" style="margin:0">
+          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
+            <div style="width:44px;height:44px;border-radius:12px;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">receipt_long</span></div>
+            <div><div id="ov-orders" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">0</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Total orders</div></div>
+          </div>
+        </div>
+        <div class="section-card" style="margin:0">
+          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
+            <div style="width:44px;height:44px;border-radius:12px;background:#fff8ec;color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">payments</span></div>
+            <div><div id="ov-spent" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">₫0</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Total spent</div></div>
+          </div>
+        </div>
+        <div class="section-card" style="margin:0">
+          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
+            <div style="width:44px;height:44px;border-radius:12px;background:#eaf1ff;color:#3a7bd5;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">favorite</span></div>
+            <div><div id="ov-fav" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">—</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Favourite drink</div></div>
+          </div>
+        </div>
       </div>
 
-      <div class="content">
-        <section class="welcome">
-          <h2 id="welcome-name">Welcome</h2>
-          <p id="welcome-sub">Track how many drinks you bought with bar and pie charts.</p>
-        </section>
-
-        <section class="kpi-grid">
-          <article class="kpi"><div class="lbl" id="kpi-lbl-orders">Total Orders</div><div class="val" id="kpi-orders">0</div></article>
-          <article class="kpi"><div class="lbl" id="kpi-lbl-qty">Total Drinks</div><div class="val" id="kpi-qty">0</div></article>
-          <article class="kpi"><div class="lbl" id="kpi-lbl-spent">Total Spent</div><div class="val" id="kpi-spent">0</div></article>
-        </section>
-
-        <section id="chart-section" class="chart-grid">
-          <article class="chart-card">
-            <h3 class="chart-title" id="bar-title">Bar Chart - Quantity by Drink</h3>
-            <div class="canvas-wrap"><canvas id="barChart"></canvas></div>
-          </article>
-          <article class="chart-card">
-            <h3 class="chart-title" id="pie-title">Pie Chart - Purchase Ratio</h3>
-            <div class="canvas-wrap"><canvas id="pieChart"></canvas></div>
-          </article>
-        </section>
-
-        <section id="empty-data" class="empty" style="display:none;">
-          You have no purchased drink data yet. Place an order to see charts.
-        </section>
-
-        <section class="quick-links" style="margin-top:14px;">
-          <a href="/components/customer/products-customer.html" id="ql-menu">Menu</a>
-          <a href="/components/customer/voucher-customer.html" id="ql-vouchers">Vouchers</a>
-          <a href="/components/customer/orders-customer.html" id="ql-others">Others</a>
-          <a href="/components/customer/setting-customer.html" id="ql-profile">My Profile</a>
-        </section>
+      <!-- Recent orders -->
+      <div class="section-card">
+        <div class="section-hd">
+          <div class="section-title">Recent Orders</div>
+          <a href="/components/customer/orders-customer.html" class="btn-outline" style="font-size:12px;padding:6px 14px">View all</a>
+        </div>
+        <div class="section-body" id="recent-orders"></div>
       </div>
-    </main>
+
+      <!-- Quick links -->
+      <div class="section-card">
+        <div class="section-hd"><div class="section-title">Quick Actions</div></div>
+        <div class="section-body" style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="/" class="btn-save"><span class="mi" style="font-size:15px;color:#fff">storefront</span> Browse Menu</a>
+          <a href="/components/customer/voucher-customer.html" class="btn-outline"><span class="mi" style="font-size:15px">local_offer</span> My Vouchers</a>
+          <a href="/components/customer/delivery-customer.html" class="btn-outline"><span class="mi" style="font-size:15px">delivery_dining</span> Delivery Info</a>
+        </div>
+      </div>
+
+    </div>
   </div>
+</div>
 
-  <div id="footer-slot"></div>
+<script>
+const FM_SESSION = 'fm_session';
+const FM_USERS   = 'fm_users';
+const FM_ORDERS  = 'fm_orders';
+function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
+function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
+function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
+function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
+function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
+function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
 
-  <script>
-    const I18N = {
-      en: {
-        pageTitle: 'Customer Dashboard', welcome: 'Welcome',
-        welcomeSub: 'Track how many drinks you bought with bar and pie charts.',
-        totalOrders: 'Total Orders', totalDrinks: 'Total Drinks', totalSpent: 'Total Spent',
-        barTitle: 'Bar Chart - Quantity by Drink', pieTitle: 'Pie Chart - Purchase Ratio',
-        emptyData: 'You have no purchased drink data yet. Place an order to see charts.',
-        menu: 'Menu', vouchers: 'Vouchers', others: 'Others', profile: 'My Profile',
-        centerTotal: 'Total', currency: 'VND'
-      },
-      vi: {
-        pageTitle: 'Bảng điều khiển khách hàng', welcome: 'Xin chào',
-        welcomeSub: 'Theo dõi số lượng đồ uống đã mua bằng biểu đồ cột và biểu đồ tròn.',
-        totalOrders: 'Tổng đơn hàng', totalDrinks: 'Tổng số ly', totalSpent: 'Tổng chi tiêu',
-        barTitle: 'Biểu đồ cột - Số lượng theo đồ uống', pieTitle: 'Biểu đồ tròn - Tỷ lệ mua',
-        emptyData: 'Bạn chưa có dữ liệu mua hàng. Hãy đặt đơn để xem biểu đồ.',
-        menu: 'Thực đơn', vouchers: 'Ưu đãi', others: 'Khác', profile: 'Hồ sơ của tôi',
-        centerTotal: 'Tổng', currency: 'VND'
-      }
-    };
-    let currentLang = localStorage.getItem('fm_lang') || ((navigator.language || '').toLowerCase().startsWith('vi') ? 'vi' : 'en');
-    function tr(k) { return (I18N[currentLang] && I18N[currentLang][k]) || I18N.en[k] || k; }
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
+}
 
-    function getSession() {
-      return JSON.parse(localStorage.getItem('fm_session') || 'null');
+
+// ── Sidebar loader ──────────────────────────
+async function loadSidebar() {
+  const slot = document.getElementById('sidebar-slot');
+  if (!slot) return;
+  try {
+    const res = await fetch('/components/layout/sidebar-customer.html');
+    if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
+  } catch(e) {}
+  // Fallback inline sidebar
+  slot.innerHTML = buildFallbackSidebar();
+}
+
+function buildFallbackSidebar() {
+  const path = window.location.pathname;
+  const links = [
+    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',       label:'Dashboard',  section:'Overview' },
+    { href:'/components/customer/products-customer.html',  icon:'inventory_2',      label:'Menu',       section:'Shop' },
+    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',      label:'Vouchers',   section:null },
+    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',     label:'Orders',     section:null },
+    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',  label:'Delivery',   section:null },
+    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',  label:'My Profile', section:'Account' },
+    { href:'/components/customer/setting-customer.html',   icon:'settings',         label:'Settings',   section:null },
+  ];
+  let html = '<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
+    + '<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
+    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
+    + '</a>';
+  let lastSection = null;
+  links.forEach(l => {
+    if (l.section && l.section !== lastSection) {
+      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">' + l.section + '</div>';
+      lastSection = l.section;
     }
+    const active = path.includes(l.href.split('/').pop());
+    html += '<a href="' + l.href + '" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:' + (active ? 'var(--green-dark)' : 'var(--text-mid)') + ';text-decoration:none;font-weight:' + (active ? '500' : '400') + ';background:' + (active ? 'var(--green-light)' : 'none') + '"><span class="mi">' + l.icon + '</span> ' + l.label + '</a>';
+  });
+  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
+    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
+    + '</div>'
+    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
+    + '<span class="mi" style="font-size:15px">logout</span> Sign out'
+    + '</button>'
+    + '</div></aside>';
+  return html;
+}
 
-    function getOrders() {
-      return JSON.parse(localStorage.getItem('fm_orders') || '[]');
-    }
 
-    function money(v) {
-      const locale = currentLang === 'vi' ? 'vi-VN' : 'en-US';
-      return new Intl.NumberFormat(locale).format(Math.round(v || 0));
-    }
 
-    function applyLanguage() {
-      document.documentElement.lang = currentLang;
-      document.getElementById('lang-select').value = currentLang;
-      document.getElementById('page-title').textContent = tr('pageTitle');
-      document.getElementById('welcome-sub').textContent = tr('welcomeSub');
-      document.getElementById('kpi-lbl-orders').textContent = tr('totalOrders');
-      document.getElementById('kpi-lbl-qty').textContent = tr('totalDrinks');
-      document.getElementById('kpi-lbl-spent').textContent = tr('totalSpent');
-      document.getElementById('bar-title').textContent = tr('barTitle');
-      document.getElementById('pie-title').textContent = tr('pieTitle');
-      document.getElementById('empty-data').textContent = tr('emptyData');
-      document.getElementById('ql-menu').textContent = tr('menu');
-      document.getElementById('ql-vouchers').textContent = tr('vouchers');
-      document.getElementById('ql-others').textContent = tr('others');
-      document.getElementById('ql-profile').textContent = tr('profile');
-    }
+function pageInit(s) {
+  document.querySelector('.dash-title').textContent = 'Welcome back, ' + s.name.split(' ')[0] + '!';
+  const orders = getOrders().filter(o => o.email === s.email || o.customer === s.name);
+  document.getElementById('ov-orders').textContent = orders.length;
+  const spent = orders.reduce((t,o)=>t+(o.total||0),0);
+  document.getElementById('ov-spent').textContent = fmtMoney(spent);
+  const drinkMap = {};
+  orders.forEach(o=>(o.items||[]).forEach(i=>{ drinkMap[i.name]=(drinkMap[i.name]||0)+i.qty; }));
+  const fav = Object.entries(drinkMap).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('ov-fav').textContent = fav ? fav[0].split(' ')[0] : '—';
+  const recent = [...orders].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+  const tbody = document.getElementById('recent-orders');
+  if (!recent.length) { tbody.innerHTML = '<div class="empty-state"><span class="mi">receipt_long</span>No orders yet. <a href="/" style="color:var(--green)">Start shopping →</a></div>'; return; }
+  tbody.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
+    '<thead><tr style="background:var(--bg2)">' +
+    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Order</th>' +
+    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Items</th>' +
+    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Total</th>' +
+    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Status</th>' +
+    '</tr></thead><tbody>' +
+    recent.map(o => {
+      const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ');
+      const STATUS_COLORS = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled' };
+      const st = o.status||'delivered';
+      return '<tr style="border-top:1px solid var(--border)">' +
+        '<td style="padding:12px;font-weight:600;color:var(--text);font-size:13px">#'+o.id+'</td>' +
+        '<td style="padding:12px;font-size:13px;color:var(--text-mid);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+items+'</td>' +
+        '<td style="padding:12px;font-size:13px;font-weight:600;color:var(--text)">'+fmtMoney(o.total)+'</td>' +
+        '<td style="padding:12px"><span class="badge '+(STATUS_COLORS[st]||'')+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>' +
+        '</tr>';
+    }).join('') + '</tbody></table>';
+}
 
-    function setLanguage(lang) {
-      currentLang = (lang === 'vi') ? 'vi' : 'en';
-      localStorage.setItem('fm_lang', currentLang);
-      applyLanguage();
-      renderDashboard();
-    }
 
-    function loadSidebarFallback() {
-      const slot = document.getElementById('sidebar-slot');
-      slot.innerHTML = '<aside style="width:220px;background:#fff;border-right:1px solid var(--border);padding:14px;">'
-        + '<div style="font-weight:700;margin-bottom:10px;">MyCoffee</div>'
-        + '<a href="/components/customer/dashboard-customer.html" style="display:block;margin:8px 0;color:var(--green-dark);text-decoration:none;">Dashboard</a>'
-        + '<a href="/components/customer/products-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Menu</a>'
-        + '<a href="/components/customer/voucher-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Vouchers</a>'
-        + '<a href="/components/customer/orders-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">Others</a>'
-        + '<a href="/components/customer/setting-customer.html" style="display:block;margin:8px 0;text-decoration:none;color:var(--text-mid);">My Profile</a>'
-        + '</aside>';
-    }
-
-    async function loadLayouts() {
-      try {
-        const sb = await fetch('/components/layout/sidebar-customer.html');
-        if (sb.ok) {
-          document.getElementById('sidebar-slot').innerHTML = await sb.text();
-        } else {
-          loadSidebarFallback();
-        }
-      } catch (e) {
-        loadSidebarFallback();
-      }
-
-      try {
-        const ft = await fetch('/components/layout/footer.html');
-        if (ft.ok) {
-          document.getElementById('footer-slot').innerHTML = await ft.text();
-        }
-      } catch (e) {}
-    }
-
-    function collectUserDrinkData(session) {
-      const orders = getOrders();
-      const myOrders = orders.filter(o => o && (o.customerEmail === session.email || o.customer === session.name));
-      const totals = {};
-      let totalQty = 0;
-      let totalSpent = 0;
-
-      myOrders.forEach(order => {
-        totalSpent += Number(order.total || 0);
-        (order.items || []).forEach(item => {
-          const name = item.name || item.cat || 'Other';
-          const qty = Number(item.qty || 1);
-          totals[name] = (totals[name] || 0) + qty;
-          totalQty += qty;
-        });
-      });
-
-      return {
-        myOrders,
-        entries: Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 8),
-        totalQty,
-        totalSpent
-      };
-    }
-
-    function drawBar(canvas, entries) {
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width = canvas.clientWidth;
-      const h = canvas.height = canvas.clientHeight;
-      ctx.clearRect(0, 0, w, h);
-
-      const pad = { t: 16, r: 12, b: 42, l: 40 };
-      const cw = w - pad.l - pad.r;
-      const ch = h - pad.t - pad.b;
-      const max = Math.max(...entries.map(e => e[1]), 1);
-      const bw = cw / entries.length;
-
-      ctx.strokeStyle = '#e8ece9';
-      for (let i = 0; i <= 4; i++) {
-        const y = pad.t + (ch * i / 4);
-        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
-      }
-
-      entries.forEach((e, i) => {
-        const x = pad.l + i * bw + 8;
-        const barW = Math.max(18, bw - 16);
-        const barH = (e[1] / max) * (ch - 8);
-        const y = pad.t + ch - barH;
-
-        ctx.fillStyle = '#1d9e75';
-        ctx.fillRect(x, y, barW, barH);
-
-        ctx.fillStyle = '#234';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(String(e[1]), x + barW / 2, y - 6);
-
-        const name = e[0].length > 8 ? e[0].slice(0, 8) + '...' : e[0];
-        ctx.fillStyle = '#667';
-        ctx.fillText(name, x + barW / 2, h - 16);
-      });
-    }
-
-    function drawPie(canvas, entries) {
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width = canvas.clientWidth;
-      const h = canvas.height = canvas.clientHeight;
-      ctx.clearRect(0, 0, w, h);
-
-      const total = entries.reduce((s, e) => s + e[1], 0) || 1;
-      const cx = Math.min(w * 0.35, 160);
-      const cy = h * 0.5;
-      const r = Math.min(110, h * 0.34);
-      const colors = ['#1d9e75', '#3ab58f', '#0f7c5d', '#87d7be', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
-
-      let angle = -Math.PI / 2;
-      entries.forEach((e, i) => {
-        const slice = (e[1] / total) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, angle, angle + slice);
-        ctx.closePath();
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fill();
-        angle += slice;
-      });
-
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 0.48, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#334';
-      ctx.textAlign = 'center';
-      ctx.font = '12px sans-serif';
-      ctx.fillText(tr('centerTotal'), cx, cy - 4);
-      ctx.font = 'bold 18px sans-serif';
-      ctx.fillText(String(total), cx, cy + 18);
-
-      let ly = 42;
-      entries.forEach((e, i) => {
-        const color = colors[i % colors.length];
-        const pct = Math.round((e[1] / total) * 100);
-        ctx.fillStyle = color;
-        ctx.fillRect(w * 0.62, ly - 9, 10, 10);
-        ctx.fillStyle = '#334';
-        ctx.textAlign = 'left';
-        ctx.font = '12px sans-serif';
-        const label = (e[0].length > 16 ? e[0].slice(0, 16) + '...' : e[0]) + ' - ' + pct + '%';
-        ctx.fillText(label, w * 0.62 + 16, ly);
-        ly += 20;
-      });
-    }
-
-    function renderDashboard() {
-      const s = getSession();
-      if (!s) {
-        location.href = '/components/auth/login.html';
-        return;
-      }
-
-      document.getElementById('welcome-name').textContent = tr('welcome') + ', ' + (s.name || 'Customer');
-
-      const result = collectUserDrinkData(s);
-      document.getElementById('kpi-orders').textContent = String(result.myOrders.length);
-      document.getElementById('kpi-qty').textContent = String(result.totalQty);
-      document.getElementById('kpi-spent').textContent = money(result.totalSpent) + ' ' + tr('currency');
-
-      const hasData = result.entries.length > 0;
-      document.getElementById('chart-section').style.display = hasData ? 'grid' : 'none';
-      document.getElementById('empty-data').style.display = hasData ? 'none' : 'block';
-
-      if (hasData) {
-        drawBar(document.getElementById('barChart'), result.entries);
-        drawPie(document.getElementById('pieChart'), result.entries);
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      const s = getSession();
-      if (!s) return;
-      const result = collectUserDrinkData(s);
-      if (result.entries.length) {
-        drawBar(document.getElementById('barChart'), result.entries);
-        drawPie(document.getElementById('pieChart'), result.entries);
-      }
-    });
-
-    (async function init() {
-      await loadLayouts();
-      applyLanguage();
-      renderDashboard();
-      document.getElementById('lang-select').addEventListener('change', (e) => setLanguage(e.target.value));
-    })();
-  </script>
+window.addEventListener('DOMContentLoaded', async () => {
+  const s = getSession();
+  if (!s) { window.location.href = '/components/auth/login.html'; return; }
+  if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+  await loadSidebar();
+  // Populate sidebar session info
+  const av = document.getElementById('sb-avatar');
+  const nm = document.getElementById('sb-name');
+  const rl = document.getElementById('sb-role');
+  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+  if (nm) nm.textContent = s.name;
+  if (rl) rl.textContent = s.role || 'customer';
+  if (typeof pageInit === 'function') pageInit(s);
+});
+</script>
 </body>
 </html>

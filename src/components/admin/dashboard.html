@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — MyCoffee Admin</title>
+  <title>Dashboard — PolyCoffee Admin</title>
   <link rel="stylesheet" href="/style/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
@@ -60,7 +60,7 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="logo-mark"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>
-      MyCoffee
+      PolyCoffee
     </div>
     <div class="sidebar-section">Overview</div>
     <a class="sidebar-link active" href="dashboard.html"><span class="mi">dashboard</span> Dashboard</a>
@@ -68,8 +68,6 @@
     <a class="sidebar-link" href="user.html"><span class="mi">group</span> Users</a>
     <a class="sidebar-link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
     <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
-    <a class="sidebar-link" href="voucher.html"><span class="mi">local_offer</span> Vouchers</a>
-    <a class="sidebar-link" href="topping.html"><span class="mi">bubble_chart</span> Toppings</a>
     <a class="sidebar-link" href="delivery.html"><span class="mi">delivery_dining</span> Delivery</a>
     <div class="sidebar-section">Settings</div>
     <a class="sidebar-link" href="setting.html"><span class="mi">settings</span> Settings</a>
@@ -226,26 +224,45 @@ function renderPieChart(orders){
     return;
   }
 
+  const COLORS = ['#3b82f6','#8b5cf6','#f59e0b','#ec4899','#1d9e75','#f97316','#14b8a6'];
+  const assignedColors = cat.labels.map((_,i)=>COLORS[i%COLORS.length]);
+
   pieInst = new Chart(ctx.getContext('2d'), {
     type:'doughnut',
     data:{
       labels: cat.labels,
-      datasets:[{ data:cat.values, backgroundColor:cat.colors, borderWidth:0, hoverOffset:8 }]
+      datasets:[{
+        data: cat.values,
+        backgroundColor: assignedColors,
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverOffset: 10
+      }]
     },
     options:{
       responsive:true, maintainAspectRatio:true,
-      cutout:'68%',
-      plugins:{ legend:{display:false} }
+      cutout:'64%',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label: ctx => ' ' + ctx.label + ': ' + ctx.parsed.toLocaleString('vi-VN') + String.fromCharCode(8363)
+          }
+        }
+      }
     }
   });
 
   const leg = document.getElementById('pieLegend');
-  if(leg) leg.innerHTML = cat.labels.map((lbl,i)=>`
-    <div class="pie-legend-item">
-      <div class="pie-dot" style="background:${cat.colors[i]}"></div>
-      <span class="pie-name">${lbl}</span>
-      <span class="pie-pct">${cat.pcts[i]}%</span>
-    </div>`).join('');
+  if(leg) leg.innerHTML = cat.labels.map((lbl,i)=>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0">'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<div style="width:10px;height:10px;border-radius:50%;background:' + assignedColors[i] + ';flex-shrink:0"></div>'
+    + '<span style="font-size:12px;color:var(--text-mid)">' + lbl + '</span>'
+    + '</div>'
+    + '<span style="font-size:12px;font-weight:600;color:var(--text)">' + cat.pcts[i] + '%</span>'
+    + '</div>'
+  ).join('');
 }
 
 function renderOrdersTable(orders){
@@ -308,14 +325,14 @@ function buildDashboard(){
         </div>
         <div style="position:relative;height:260px"><canvas id="barChart"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-card-hd">
+      <div class="chart-card" style="justify-content:space-between">
+        <div class="chart-card-hd" style="margin-bottom:.5rem">
           <div class="chart-card-title">Sales by Category</div>
         </div>
-        <div style="height:190px;display:flex;align-items:center;justify-content:center">
-          <canvas id="pieChart" style="max-height:190px"></canvas>
+        <div style="display:flex;align-items:center;justify-content:center;padding:.25rem 0">
+          <canvas id="pieChart" style="max-height:180px;max-width:180px"></canvas>
         </div>
-        <div class="pie-legend" id="pieLegend"></div>
+        <div id="pieLegend" style="margin-top:.75rem;display:flex;flex-direction:column;gap:5px"></div>
       </div>
     </div>
 

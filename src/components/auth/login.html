@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login — MyCoffee</title>
+    <title>Login — Fresh Market</title>
 
 
     <link rel="stylesheet" href="/style/style.css" />
@@ -284,16 +284,16 @@
 
       <!-- ── LEFT DECORATIVE PANEL ── -->
       <div class="login-left">
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=85&fit=crop&crop=center" alt="MyCoffee" />
+        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=85&fit=crop&crop=center" alt="Fresh Market" />
         <div class="login-left-overlay">
           <div class="login-left-logo">
             <div class="logo-mark">
               <span class="mi" style="font-size:18px;color:#fff">local_drink</span>
             </div>
-            MyCoffee
+            Fresh Market
           </div>
-          <div class="login-left-quote">"Cà phê nguyên chất,<br><em>hương vị</em> thật."</div>
-          <div class="login-left-sub">Cà phê cold brew & trà thảo mộc, giao tươi tận cửa mỗi sáng.</div>
+          <div class="login-left-quote">"Fresh food,<br><em>real</em> flavour."</div>
+          <div class="login-left-sub">Cold-pressed juices & artisan smoothies, delivered fresh every morning.</div>
         </div>
       </div>
 
@@ -305,7 +305,7 @@
         </button>
 
         <div class="login-heading">Welcome back</div>
-        <div class="login-sub">Sign in to your MyCoffee account</div>
+        <div class="login-sub">Sign in to your Fresh Market account</div>
 
         <!-- Tabs -->
         <div class="login-tabs">
@@ -329,12 +329,7 @@
                 </button>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:-2px;margin-bottom:6px">
-              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-mid);cursor:pointer">
-                <input type="checkbox" id="remember-me" /> Remember me
-              </label>
-              <button class="forgot-link" type="button" onclick="window.location.href='ForgetPassword.html'">Forgot password?</button>
-            </div>
+            <button class="forgot-link" onclick="showToast('Password reset link sent to your email!')">Forgot password?</button>
             <button class="btn-login" onclick="handleLogin()">
               <span class="mi" style="font-size:17px;color:#fff">login</span>
               Sign In

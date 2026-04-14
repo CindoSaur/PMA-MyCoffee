@@ -3,172 +3,237 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Account — MyCoffee</title>
+  <title>My Profile — PolyCoffee</title>
   <link rel="stylesheet" href="/style/style.css" />
   <style>
-    .account-shell { min-height:100vh; display:flex; flex-direction:column; }
-    main { flex:1; }
-    .container { width:100%; max-width:1100px; margin:0 auto; padding:3rem 2.5rem; }
-    .acct-grid { display:grid; grid-template-columns:320px 1fr; gap:20px; }
-    .card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
-    .profile-avatar { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; margin-bottom:10px; }
-    .profile-name { font-family:var(--serif); font-size:20px; font-weight:600; color:var(--text); }
-    .profile-email { font-size:13px; color:var(--text-mid); }
-    table { width:100%; border-collapse:collapse; }
-    thead th{ text-align:left; font-size:11px; padding:10px; color:var(--text-light); border-bottom:1px solid var(--border); }
-    tbody td{ padding:10px; font-size:13px; border-bottom:1px solid rgba(0,0,0,.04); }
-    .empty { text-align:center; color:var(--text-light); padding:2rem; }
+    body { background:var(--bg); }
+    .portal-shell { display:flex; min-height:100vh; }
+    .dash-main { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
+    .dash-content { padding:1.75rem 2rem; flex:1; }
+    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
+    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
+    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .section-body { padding:1.5rem; }
+    .page-hd { margin-bottom:1.75rem; }
+    .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
+    .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
+    .form-label { font-size:13px; font-weight:500; color:var(--text); }
+    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
+    .form-input:focus { border-color:var(--green); }
+    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
+    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
+    .btn-save:hover { background:var(--green-dark); }
+    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
+    .btn-outline:hover { border-color:var(--text); }
+    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
+    .badge-delivered  { background:#dcfce7; color:#15803d; }
+    .badge-processing { background:#fef9c3; color:#854d0e; }
+    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
+    .badge-customer { background:var(--green-light); color:var(--green-dark); }
+    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
+    .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
+
   </style>
 </head>
 <body>
 
-<div style="display:flex;min-height:100vh">
+<div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<div class="portal-shell">
   <div id="sidebar-slot"></div>
   <div class="dash-main">
-    <div class="dash-topbar"><div class="dash-title">My Profile</div></div>
+    <div class="dash-topbar">
+      <div class="dash-title">My Profile</div>
+      <div id="topbar-right"></div>
+    </div>
     <div class="dash-content">
 
-      <div class="container">
-        <div class="section-label">Account</div>
-        <div class="section-title">My Profile</div>
-        <div class="acct-grid">
-          <div class="card">
-            <div id="prof-avatar" class="profile-avatar">—</div>
-            <div class="profile-name" id="prof-name">—</div>
-            <div class="profile-email" id="prof-email">—</div>
-            <div style="margin-top:12px">
-              <button class="btn-white" id="edit-profile-btn" onclick="openEdit()">Edit profile</button>
-              <button style="margin-left:8px" class="btn-white" onclick="logout()">Sign out</button>
+      <div class="page-hd"><h2>My Profile</h2><p>Update your personal information and account settings.</p></div>
+
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:1.5rem;align-items:start">
+
+        <!-- Left: avatar card -->
+        <div class="section-card" style="text-align:center;padding:2rem 1.5rem">
+          <div id="p-avatar" style="width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin:0 auto 1rem"></div>
+          <div id="p-name-disp" style="font-family:var(--serif);font-size:1.2rem;font-weight:600;color:var(--text)">—</div>
+          <div id="p-email-disp" style="font-size:13px;color:var(--text-mid);margin-top:4px">—</div>
+          <span class="badge badge-customer" style="margin-top:10px;display:inline-flex">Customer</span>
+          <div style="margin-top:1.25rem;font-size:12px;color:var(--text-light)" id="p-joined"></div>
+        </div>
+
+        <!-- Right: edit form -->
+        <div>
+          <div class="section-card">
+            <div class="section-hd"><div class="section-title">Personal Information</div></div>
+            <div class="section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="f-name" /></div>
+                <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-phone" placeholder="+84 901 234 567" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="f-email" disabled /><span style="font-size:11px;color:var(--text-light);margin-top:4px">Email cannot be changed.</span></div>
+              <button class="btn-save" onclick="saveProfile()"><span class="mi" style="font-size:15px;color:#fff">save</span> Save Changes</button>
             </div>
           </div>
 
-          <div>
-            <div class="card" style="margin-bottom:16px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                <div style="font-weight:600">Recent Orders</div>
-                <div style="font-size:13px;color:var(--text-light)" id="orders-count">0 orders</div>
-              </div>
-              <div id="orders-wrap"></div>
+          <div class="section-card">
+            <div class="section-hd"><div class="section-title">Change Password</div></div>
+            <div class="section-body">
+              <div class="form-group"><label class="form-label">New password</label><input class="form-input" type="password" id="f-pw" placeholder="Min. 8 characters" /></div>
+              <div class="form-group"><label class="form-label">Confirm new password</label><input class="form-input" type="password" id="f-pw2" placeholder="Re-enter password" /></div>
+              <button class="btn-save" onclick="savePassword()"><span class="mi" style="font-size:15px;color:#fff">lock</span> Update Password</button>
             </div>
+          </div>
 
-            <div class="card">
-              <div style="font-weight:600;margin-bottom:8px">Addresses</div>
-              <div style="font-size:13px;color:var(--text-light)">Manage delivery addresses in your profile (simple demo mode).</div>
+          <div class="section-card" style="border-color:#fca5a5">
+            <div class="section-hd" style="background:#fff5f5"><div class="section-title" style="color:#b91c1c">Sign Out</div></div>
+            <div class="section-body">
+              <p style="font-size:13px;color:var(--text-mid);margin-bottom:1rem">Sign out from all devices on this browser.</p>
+              <button onclick="if(confirm('Sign out?')){logout()}" style="padding:9px 20px;background:#ef4444;color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer">
+                <span class="mi" style="font-size:14px;color:#fff;vertical-align:middle">logout</span> Sign Out
+              </button>
             </div>
           </div>
         </div>
       </div>
 
     </div>
-  </div>
-</div>
-
-<!-- Edit modal -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-hd"><div class="modal-title">Edit Profile</div><button class="modal-close" onclick="closeEdit()"><span class="mi">close</span></button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="m-name" /></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="m-email" disabled /></div>
-      <div class="form-group"><label class="form-label">New password (optional)</label><input class="form-input" id="m-pw" type="password" /></div>
-    </div>
-    <div class="modal-footer"><button class="btn-cancel" onclick="closeEdit()">Cancel</button><button class="btn-save" onclick="saveProfile()">Save</button></div>
   </div>
 </div>
 
 <script>
-  async function loadComponent(slot, url){ try{ const r=await fetch(url); if(!r.ok) throw 0; document.getElementById(slot).innerHTML=await r.text(); }catch(e){console.warn('load failed',url);} }
-  // ensure footer slot exists for injection
-  if(!document.getElementById('footer-slot')){ const f=document.createElement('div'); f.id='footer-slot'; document.body.appendChild(f); }
-const AUTH_SESSION_KEY = 'fm_session';
-const ORDERS_KEY = 'fm_orders';
-function getSession(){ return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)||'null'); }
-function getOrders(){ return JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]'); }
-function logout(){ localStorage.removeItem(AUTH_SESSION_KEY); location.href='/'; }
+const FM_SESSION = 'fm_session';
+const FM_USERS   = 'fm_users';
+const FM_ORDERS  = 'fm_orders';
+function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
+function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
+function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
+function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
+function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
+function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
 
-function fmtMoney(v){ return '₫'+(v||0); }
-
-function renderProfile(){
-  const s = getSession();
-  if(!s){ alert('Please sign in'); location.href='/'; return; }
-  document.getElementById('prof-name').textContent = s.name;
-  document.getElementById('prof-email').textContent = s.email;
-  const av = document.getElementById('prof-avatar'); av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); av.style.background = '#1d9e75';
-  renderOrders();
+let toastTmr;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-function renderOrders(){
-  const s = getSession();
-  const all = getOrders().filter(o=>o.customerEmail===s.email || o.customer===s.name);
-  document.getElementById('orders-count').textContent = `${all.length} order${all.length!==1?'s':''}`;
-  const wrap = document.getElementById('orders-wrap');
-  if(!all.length){ wrap.innerHTML='<div class="empty">You have no orders yet.</div>'; return; }
-  wrap.innerHTML = `<table><thead><tr><th>Order</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>${all.slice().reverse().map(o=>{
-    const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')) .join(', ');
-    const d = new Date(o.date||'');
-    const date = isNaN(d)?'–':d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    return `<tr><td>#${o.id}</td><td>${items}</td><td style="font-weight:600">${fmtMoney(o.total)}</td><td>${o.status||'—'}</td><td>${date}</td></tr>`;
-  }).join('')}</tbody></table>`;
-}
 
-function openEdit(){ const s=getSession(); document.getElementById('m-name').value=s.name; document.getElementById('m-email').value=s.email; document.getElementById('editModal').classList.add('open'); }
-function closeEdit(){ document.getElementById('editModal').classList.remove('open'); }
-function saveProfile(){ const s=getSession(); const n=document.getElementById('m-name').value.trim(); const pw=document.getElementById('m-pw').value; if(!n){ alert('Enter name'); return; } const users = JSON.parse(localStorage.getItem('fm_users')||'[]'); const idx = users.findIndex(u=>u.email===s.email); if(idx!==-1){ users[idx].name=n; if(pw) users[idx].password=pw; localStorage.setItem('fm_users',JSON.stringify(users)); }
-  const next = Object.assign({}, s, { name:n }); if(pw) next.password=pw; localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(next)); closeEdit(); renderProfile(); alert('Profile saved'); }
-
-// load sidebar and init when DOM ready
-window.addEventListener('DOMContentLoaded', async ()=>{
-  const sidebarSlot = document.getElementById('sidebar-slot');
-
-  // Try to fetch sidebar from file
-  let sidebarLoaded = false;
-  try{
+// ── Sidebar loader ──────────────────────────
+async function loadSidebar() {
+  const slot = document.getElementById('sidebar-slot');
+  if (!slot) return;
+  try {
     const res = await fetch('/components/layout/sidebar-customer.html');
-    if(res.ok){
-      sidebarSlot.innerHTML = await res.text();
-      sidebarLoaded = true;
+    if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
+  } catch(e) {}
+  // Fallback inline sidebar
+  slot.innerHTML = buildFallbackSidebar();
+}
+
+function buildFallbackSidebar() {
+  const path = window.location.pathname;
+  const links = [
+    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',       label:'Dashboard',  section:'Overview' },
+    { href:'/components/customer/products-customer.html',  icon:'inventory_2',      label:'Menu',       section:'Shop' },
+    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',      label:'Vouchers',   section:null },
+    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',     label:'Orders',     section:null },
+    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',  label:'Delivery',   section:null },
+    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',  label:'My Profile', section:'Account' },
+    { href:'/components/customer/setting-customer.html',   icon:'settings',         label:'Settings',   section:null },
+  ];
+  let html = '<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
+    + '<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
+    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
+    + '</a>';
+  let lastSection = null;
+  links.forEach(l => {
+    if (l.section && l.section !== lastSection) {
+      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">' + l.section + '</div>';
+      lastSection = l.section;
     }
-  }catch(e){
-    console.warn('Sidebar fetch failed, using fallback');
-  }
+    const active = path.includes(l.href.split('/').pop());
+    html += '<a href="' + l.href + '" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:' + (active ? 'var(--green-dark)' : 'var(--text-mid)') + ';text-decoration:none;font-weight:' + (active ? '500' : '400') + ';background:' + (active ? 'var(--green-light)' : 'none') + '"><span class="mi">' + l.icon + '</span> ' + l.label + '</a>';
+  });
+  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
+    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
+    + '</div>'
+    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
+    + '<span class="mi" style="font-size:15px">logout</span> Sign out'
+    + '</button>'
+    + '</div></aside>';
+  return html;
+}
 
-  // If fetch failed or returned nothing, use fallback
-  if(!sidebarLoaded || !sidebarSlot.innerHTML.trim()){
-    sidebarSlot.innerHTML = `<aside class="sidebar" style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;padding:0">
-      <div style="padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">
-        <span class="mi" style="font-size:16px;color:#1d9e75;margin-right:8px">local_drink</span>MyCoffee
-      </div>
-      <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">Overview</div>
-      <a href="/components/customer/dashboard-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">dashboard</span> Dashboard</a>
-      <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Shop</div>
-      <a href="/components/customer/products-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">inventory_2</span> Menu</a>
-      <a href="/components/customer/voucher-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">local_offer</span> Vouchers</a>
-      <a href="/components/customer/orders-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">receipt_long</span> Orders</a>
-      <div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-top:1rem">Account</div>
-      <a href="/components/customer/user-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:#1d9e75;text-decoration:none;cursor:pointer;font-weight:500"><span class="mi">person</span> My Profile</a>
-      <a href="/components/customer/setting-customer.html" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:var(--text-mid);text-decoration:none;cursor:pointer"><span class="mi">settings</span> Settings</a>
-      <div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">
-        <div style="width:34px;height:34px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:18px;color:#1d9e75">person</span></div>
-        <div>
-          <div style="font-size:13px;font-weight:500;color:var(--text)" id="sb-name">—</div>
-          <div style="font-size:11px;color:var(--text-light)" id="sb-role">customer</div>
-        </div>
-      </div>
-    </aside>`;
-  }
 
-  // Populate session info
-  const s = JSON.parse(localStorage.getItem('fm_session')||'null');
-  if(s){
-    const nameEl = document.getElementById('sb-name');
-    const roleEl = document.getElementById('sb-role');
-    if(nameEl) nameEl.textContent = s.name;
-    if(roleEl) roleEl.textContent = s.role||'customer';
-  }
 
-  renderProfile();
+function pageInit(s) {
+  const users = getUsers();
+  const user  = users.find(u=>u.email===s.email)||{};
+  document.getElementById('f-name').value  = s.name;
+  document.getElementById('f-email').value = s.email;
+  document.getElementById('f-phone').value = user.phone||'';
+  const av = document.getElementById('p-avatar');
+  av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('p-name-disp').textContent  = s.name;
+  document.getElementById('p-email-disp').textContent = s.email;
+  const joined = document.getElementById('p-joined');
+  if (user.joined) joined.textContent = 'Member since ' + new Date(user.joined).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+}
+
+function saveProfile() {
+  const s    = getSession();
+  const name = document.getElementById('f-name').value.trim();
+  const phone= document.getElementById('f-phone').value.trim();
+  if (!name) { showToast('Name cannot be empty'); return; }
+  const users = getUsers();
+  const idx   = users.findIndex(u=>u.email===s.email);
+  if (idx!==-1) { users[idx].name=name; users[idx].phone=phone; saveUsers(users); }
+  const updated = {...s, name};
+  localStorage.setItem(FM_SESSION, JSON.stringify(updated));
+  document.getElementById('p-name-disp').textContent = name;
+  document.getElementById('sb-name') && (document.getElementById('sb-name').textContent=name);
+  showToast('Profile updated ✓');
+}
+
+function savePassword() {
+  const s   = getSession();
+  const pw  = document.getElementById('f-pw').value;
+  const pw2 = document.getElementById('f-pw2').value;
+  if (pw.length < 8) { showToast('Password must be at least 8 characters'); return; }
+  if (pw !== pw2)    { showToast('Passwords do not match'); return; }
+  const users = getUsers();
+  const idx   = users.findIndex(u=>u.email===s.email);
+  if (idx!==-1) { users[idx].password=pw; saveUsers(users); }
+  document.getElementById('f-pw').value  = '';
+  document.getElementById('f-pw2').value = '';
+  showToast('Password updated ✓');
+}
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const s = getSession();
+  if (!s) { window.location.href = '/components/auth/login.html'; return; }
+  if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+  await loadSidebar();
+  // Populate sidebar session info
+  const av = document.getElementById('sb-avatar');
+  const nm = document.getElementById('sb-name');
+  const rl = document.getElementById('sb-role');
+  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+  if (nm) nm.textContent = s.name;
+  if (rl) rl.textContent = s.role || 'customer';
+  if (typeof pageInit === 'function') pageInit(s);
 });
 </script>
-
 </body>
 </html>
