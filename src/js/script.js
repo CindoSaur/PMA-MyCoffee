@@ -249,19 +249,19 @@ const featData = {
     title: "Organic sourcing",
     img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80",
     p1: "Every ingredient is sourced from certified organic farms within 50km of Ho Chi Minh City. We visit every farm personally before partnering, and conduct quarterly audits.",
-    p2: "Our farmers use zero pesticides and are paid above market rates. We believe extraordinary drinks start with extraordinary growing.",
+    p2: "Our suppliers use zero pesticides and are paid above-market rates. We believe extraordinary coffee starts with extraordinary sourcing.",
   },
   coldpress: {
-    title: "Cold-pressed process",
+    title: "Premium brewing",
     img: "https://images.unsplash.com/photo-1600718374662-0483d2b9da44?w=600&q=80",
-    p1: "Cold-pressing uses a hydraulic press rather than spinning blades or heat. This preserves up to 5× more nutrients than centrifugal juicing, which destroys enzymes through oxidation.",
-    p2: "No heat means enzymes, vitamins and minerals stay intact. The result is a juice that is genuinely good for you — not just marketed that way.",
+    p1: "Cold-brew and herbal teas are freshly crafted without heat. This preserves up to 5x more nutrients than traditional espresso machines, protecting enzymes through oxidation prevention.",
+    p2: "No heat means enzymes, vitamins and minerals stay intact. The result is a beverage that is genuinely good for you - not just advertised that way.",
   },
   eco: {
     title: "Eco packaging",
     img: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
-    p1: "All our bottles are 100% recyclable glass. Our bottle return program is simple — hand empties to the delivery rider and get 10% off your next order automatically.",
-    p2: "Our packaging insulation uses recycled cork and is fully compostable. We are committed to zero-waste operations by 2027.",
+    p1: "All our cups are 100% recyclable or compostable. Our cup return program is simple — hand empties to the delivery rider and get 10% off your next order automatically.",
+    p2: "Our packaging insulation uses recycled cork and is fully compostable. We are committed to zero-waste coffee delivery by 2027.",
   },
 };
 
@@ -608,7 +608,7 @@ function renderCoStep() {
   const content = document.getElementById("co-content"),
     nav = document.getElementById("co-nav");
   if (checkoutStep === 1) {
-    content.innerHTML = `<div class="co-content"><div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" placeholder="Nguyen Van A"></div><div class="form-row"><div class="form-group"><label class="form-label">Phone</label><input class="form-input" type="tel" placeholder="0901 234 567"></div><div class="form-group"><label class="form-label">District</label><select class="form-input"><option>District 1</option><option>District 3</option><option>Bình Thạnh</option><option>Thủ Đức</option></select></div></div><div class="form-group"><label class="form-label">Street address</label><input class="form-input" type="text" placeholder="123 Đường ABC, Phường XYZ"></div><div class="form-group"><label class="form-label">Promo code</label><input class="form-input" type="text" placeholder="e.g. FRESHMARKET"></div></div>`;
+    content.innerHTML = `<div class="co-content"><div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" placeholder="Nguyen Van A"></div><div class="form-row"><div class="form-group"><label class="form-label">Phone</label><input class="form-input" type="tel" placeholder="0901 234 567"></div><div class="form-group"><label class="form-label">District</label><select class="form-input"><option>District 1</option><option>District 3</option><option>Bình Thạnh</option><option>Thủ Đức</option></select></div></div><div class="form-group"><label class="form-label">Street address</label><input class="form-input" type="text" placeholder="123 Đường ABC, Phường XYZ"></div><div class="form-group"><label class="form-label">Promo code</label><input class="form-input" type="text" placeholder="e.g. MYCOFFEE"></div></div>`;
     nav.innerHTML = `<span></span><button class="btn-next" onclick="goNext()">Payment <span class="mi" style="font-size:16px;color:#fff">arrow_forward</span></button>`;
   } else if (checkoutStep === 2) {
     content.innerHTML = `<div class="co-content"><p style="font-size:13px;color:var(--text-mid);margin-bottom:1rem">Select your payment method</p><div class="pay-grid"><div class="pay-opt${
@@ -798,7 +798,7 @@ function applySessionToNav() {
   };
 
   window.confirmLogout = function () {
-    if (confirm('Sign out of Fresh Market?')) logout();
+    if (confirm('Sign out of MyCoffee?')) logout();
   };
 
   // Close both dropdowns when clicking outside
