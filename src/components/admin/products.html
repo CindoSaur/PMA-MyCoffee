@@ -87,6 +87,29 @@
     .img-preview { width:100%; height:140px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--border); display:none; margin-top:6px; background:var(--bg2); }
     .img-preview.show { display:block; }
 
+
+    /* Reviews panel */
+    .rev-panel-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:600; display:none; align-items:center; justify-content:center; }
+    .rev-panel-overlay.open { display:flex; }
+    .rev-panel { background:#fff; border-radius:var(--radius); width:560px; max-width:95vw; max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); animation:revUp .25s cubic-bezier(.34,1.3,.64,1); }
+    @keyframes revUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .rev-panel-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+    .rev-panel-title { font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); }
+    .rev-panel-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .rev-panel-close:hover { background:var(--bg2); }
+    .rev-panel-body { padding:1.5rem; display:flex; flex-direction:column; gap:14px; }
+    .rev-item { background:var(--bg2); border-radius:var(--radius-sm); padding:1rem; }
+    .rev-item-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+    .rev-author { font-size:13px; font-weight:600; color:var(--text); }
+    .rev-meta { font-size:11px; color:var(--text-light); }
+    .rev-stars { color:#f59e0b; font-size:13px; letter-spacing:1px; margin-bottom:4px; }
+    .rev-comment { font-size:13px; color:var(--text-mid); line-height:1.6; }
+    .rev-delete { font-size:11px; color:#dc2626; background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; }
+    .rev-delete:hover { background:#fee2e2; }
+    .prod-rating { display:flex; align-items:center; gap:4px; margin-top:3px; }
+    .prod-rating .stars { color:#f59e0b; font-size:12px; }
+    .prod-rating .count { font-size:11px; color:var(--text-light); }
+
     /* Toast */
     .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -179,6 +202,7 @@
     <a class="sidebar-link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
     <a class="sidebar-link active" href="products.html"><span class="mi">inventory_2</span> Products</a>
     <a class="sidebar-link" href="delivery.html"><span class="mi">delivery_dining</span> Delivery</a>
+    <a class="sidebar-link" href="voucher.html"><span class="mi">local_offer</span> Vouchers</a>
     <div class="sidebar-section">Settings</div>
     <a class="sidebar-link" href="setting.html"><span class="mi">settings</span> Settings</a>
     <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
@@ -316,6 +340,7 @@ function renderGrid(){
           ${p.feat ? '<span class="feat-badge"><span class="mi" style="font-size:11px">star</span> Featured</span>' : ''}
         </div>
         <div class="prod-name">${p.name}</div>
+        <div data-rev-id="${p.id}" style="display:flex;align-items:center;gap:3px;margin-top:3px;min-height:16px">${getRevBadge(p.id)}</div>
         <div class="prod-desc">${p.desc}</div>
         <div class="prod-tags">${(p.tags||[]).map(t=>`<span class="prod-tag">${t}</span>`).join('')}</div>
       </div>
@@ -328,6 +353,9 @@ function renderGrid(){
           </div>
         </div>
         <div class="prod-actions">
+          <button class="act-btn" title="Reviews" onclick="openRevPanel(${p.id},'${p.name.replace(/'/g,"\'")}')">
+            <span class="mi" style="font-size:16px;color:#f59e0b">star</span>
+          </button>
           <button class="act-btn" title="Edit" onclick="openEditModal(${realIdx})">
             <span class="mi" style="font-size:16px;color:var(--text-mid)">edit</span>
           </button>
@@ -434,6 +462,62 @@ document.getElementById('prodModal').addEventListener('click', function(e){
   if(e.target===this) closeModal();
 });
 
+
+// ── Reviews (admin) ───────────────────────────
+function getReviews() { return JSON.parse(localStorage.getItem('fm_reviews')||'[]'); }
+function saveReviews(r) { localStorage.setItem('fm_reviews', JSON.stringify(r)); }
+
+function starsHtml(n, size) {
+  const full = Math.round(parseFloat(n));
+  return Array.from({length:5},(_,i)=>
+    '<span style="color:'+(i<full?'#f59e0b':'#d1d5db')+';font-size:'+(size||13)+'px">&#9733;</span>'
+  ).join('');
+}
+
+function getRevBadge(productId) {
+  const revs = getReviews().filter(r=>r.productId===productId);
+  if (!revs.length) return '<span style="font-size:11px;color:var(--text-light)">No reviews</span>';
+  const avg = (revs.reduce((s,r)=>s+r.stars,0)/revs.length).toFixed(1);
+  return starsHtml(avg,12)+'<span style="font-size:11px;color:var(--text-light);margin-left:3px">'+avg+' ('+revs.length+')</span>';
+}
+
+function openRevPanel(productId, productName) {
+  document.getElementById('rev-panel-title').textContent = 'Reviews — ' + productName;
+  const revs = getReviews().filter(r=>r.productId===productId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const body = document.getElementById('rev-panel-body');
+  if (!revs.length) {
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-light);font-size:13px">No reviews yet for this product.</div>';
+  } else {
+    body.innerHTML = revs.map(r => {
+      const d = new Date(r.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      return '<div class="rev-item">'
+        + '<div class="rev-item-hd"><span class="rev-author">'+r.name+'</span>'
+        + '<div style="display:flex;align-items:center;gap:8px"><span class="rev-meta">'+d+'</span>'
+        + '<button class="rev-delete" onclick="deleteAdminReview('+productId+',\''+r.email.replace(/'/g,"\\'")+'',''+productName.replace(/'/g,"\\'")+'\')">Delete</button>'
+        + '</div></div>'
+        + '<div class="rev-stars">'+starsHtml(r.stars,14)+'</div>'
+        + '<div class="rev-comment">'+r.comment+'</div>'
+        + '</div>';
+    }).join('<hr style="border:none;border-top:1px solid var(--border);margin:4px 0">');
+  }
+  document.getElementById('rev-panel-overlay').classList.add('open');
+}
+function closeRevPanel() {
+  document.getElementById('rev-panel-overlay').classList.remove('open');
+}
+
+function deleteAdminReview(productId, email, productName) {
+  if (!confirm('Delete this review?')) return;
+  let revs = getReviews().filter(r=>!(r.productId===productId && r.email===email));
+  saveReviews(revs);
+  showToast('Review deleted');
+  openRevPanel(productId, productName);
+  // Refresh star badges on visible cards
+  document.querySelectorAll('[data-rev-id]').forEach(el=>{
+    el.innerHTML = getRevBadge(parseInt(el.dataset.revId));
+  });
+}
+
 window.addEventListener('DOMContentLoaded', ()=>{
   const s = getSession();
   if(!s || (s.role!=='admin' && s.role!=='staff')){ alert('Access denied.'); window.location.href='/'; return; }
@@ -443,5 +527,17 @@ window.addEventListener('DOMContentLoaded', ()=>{
   renderGrid();
 });
 </script>
+
+<!-- Admin reviews panel -->
+<div class="rev-panel-overlay" id="rev-panel-overlay" onclick="if(event.target===this)closeRevPanel()">
+  <div class="rev-panel">
+    <div class="rev-panel-hd">
+      <div class="rev-panel-title" id="rev-panel-title">Reviews</div>
+      <button class="rev-panel-close" onclick="closeRevPanel()"><span class="mi" style="font-size:18px">close</span></button>
+    </div>
+    <div class="rev-panel-body" id="rev-panel-body"></div>
+  </div>
+</div>
+
 </body>
 </html>

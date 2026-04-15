@@ -12,37 +12,89 @@
     .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
     .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
     .dash-content { padding:1.75rem 2rem; flex:1; }
-    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
-    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
-    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
-    .section-body { padding:1.5rem; }
     .page-hd { margin-bottom:1.75rem; }
     .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
     .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
-    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
-    .form-label { font-size:13px; font-weight:500; color:var(--text); }
-    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
-    .form-input:focus { border-color:var(--green); }
-    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
-    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
-    .btn-save:hover { background:var(--green-dark); }
-    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
-    .btn-outline:hover { border-color:var(--text); }
+    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
     .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
     .badge-delivered  { background:#dcfce7; color:#15803d; }
     .badge-processing { background:#fef9c3; color:#854d0e; }
     .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
-    .badge-customer { background:var(--green-light); color:var(--green-dark); }
+    .badge-shipping   { background:#dbeafe; color:#1d4ed8; }
     .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
     .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
-    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
+
+    /* ── Filter tabs ── */
+    .filter-row { display:flex; background:var(--bg2); border-radius:var(--radius-sm); padding:3px; gap:3px; width:fit-content; margin-bottom:1.25rem; }
+    .ftab { padding:7px 16px; border:none; background:none; border-radius:8px; font-size:12px; font-weight:500; color:var(--text-mid); cursor:pointer; font-family:var(--sans); transition:.15s; }
+    .ftab.active { background:#fff; color:var(--green-dark); box-shadow:0 1px 4px rgba(0,0,0,.09); }
+
+    /* ── Order row card ── */
+    .order-row { border-bottom:1px solid var(--border); }
+    .order-row:last-child { border-bottom:none; }
+    .order-hd { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; cursor:pointer; transition:background .12s; }
+    .order-hd:hover { background:var(--bg2); }
+    .order-id-txt { font-weight:700; color:var(--text); font-family:var(--serif); font-size:14px; }
+    .order-meta { font-size:12px; color:var(--text-light); margin-top:2px; }
+    .order-right { display:flex; align-items:center; gap:12px; }
+    .order-total { font-weight:600; color:var(--text); font-size:14px; }
+    .expand-icon { color:var(--text-light); transition:transform .2s; font-size:18px; }
+    .expand-icon.open { transform:rotate(180deg); }
+
+    /* ── Order detail panel ── */
+    .order-detail { display:none; padding:1.25rem 1.5rem; border-top:1px solid var(--border); background:var(--bg); }
+    .order-detail.open { display:block; }
+    .detail-items { display:flex; flex-direction:column; gap:6px; margin-bottom:1.25rem; }
+    .detail-item { display:flex; justify-content:space-between; background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; font-size:13px; }
+    .detail-item-name { font-weight:500; color:var(--text); }
+    .detail-item-cat  { font-size:11px; color:var(--text-light); }
+    .detail-item-price { font-weight:600; color:var(--green-dark); }
+
+    /* ── Stars rating ── */
+    .stars-row { display:flex; align-items:center; gap:4px; }
+    .star { font-size:24px; cursor:pointer; color:#d1d5db; transition:color .15s, transform .1s; line-height:1; }
+    .star.filled { color:#f59e0b; }
+    .star.hovered { color:#fbbf24; transform:scale(1.15); }
+    .star.sm { font-size:16px; cursor:default; }
+
+    /* ── Review box ── */
+    .review-box { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.4rem; margin-top:.75rem; }
+    .review-box-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:.75rem; display:flex; align-items:center; gap:7px; }
+    .review-textarea { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); resize:vertical; min-height:72px; outline:none; transition:border-color .2s; }
+    .review-textarea:focus { border-color:var(--green); }
+    .btn-submit-review { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; margin-top:.75rem; }
+    .btn-submit-review:hover { background:var(--green-dark); }
+    .review-submitted { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--green-dark); background:var(--green-light); padding:10px 14px; border-radius:var(--radius-sm); margin-top:.75rem; }
+
+    /* ── Existing review display ── */
+    .existing-review { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-top:.75rem; }
+    .er-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .er-comment { font-size:13px; color:var(--text-mid); line-height:1.6; }
+    .er-date { font-size:11px; color:var(--text-light); margin-top:4px; }
+    .btn-edit-review { background:none; border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text-mid); cursor:pointer; font-family:var(--sans); transition:.15s; }
+    .btn-edit-review:hover { border-color:var(--green); color:var(--green); }
+
+    /* ── Comment to shipper ── */
+    .comment-section { margin-top:1rem; }
+    .comment-box { background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:var(--radius); padding:1.25rem 1.4rem; }
+    .comment-box-title { font-size:13px; font-weight:600; color:#0369a1; margin-bottom:.75rem; display:flex; align-items:center; gap:7px; }
+    .comment-textarea { width:100%; padding:10px 13px; border:1.5px solid #bae6fd; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); resize:vertical; min-height:72px; outline:none; transition:border-color .2s; background:#fff; }
+    .comment-textarea:focus { border-color:#0369a1; }
+    .btn-submit-comment { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; background:#0369a1; color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; margin-top:.75rem; }
+    .btn-submit-comment:hover { background:#075985; }
+    .comment-sent { display:flex; align-items:flex-start; gap:10px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:var(--radius-sm); padding:12px 14px; margin-top:.75rem; }
+    .comment-sent-icon { color:#0369a1; font-size:18px; flex-shrink:0; margin-top:1px; }
+    .comment-sent-text { font-size:13px; color:var(--text-mid); line-height:1.6; }
+    .comment-sent-date { font-size:11px; color:var(--text-light); margin-top:3px; }
+    .shipper-info { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:3px 9px; border-radius:99px; background:#e0f2fe; color:#0369a1; font-weight:500; margin-bottom:.5rem; }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
-
   </style>
 </head>
 <body>
-
 <div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
 
 <div class="portal-shell">
@@ -50,38 +102,38 @@
   <div class="dash-main">
     <div class="dash-topbar">
       <div class="dash-title">My Orders</div>
-      <div id="topbar-right"></div>
     </div>
     <div class="dash-content">
 
-      <div class="page-hd"><h2>My Orders</h2><p>Full history of all your orders.</p></div>
-
-      <!-- Filter tabs -->
-      <div style="display:flex;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;gap:3px;width:fit-content;margin-bottom:1.25rem" id="order-filters">
-        <button onclick="filterOrders('all',this)" style="padding:7px 16px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:500;color:var(--green-dark);cursor:pointer;font-family:var(--sans);box-shadow:0 1px 4px rgba(0,0,0,.09)">All</button>
-        <button onclick="filterOrders('processing',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Processing</button>
-        <button onclick="filterOrders('delivered',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Delivered</button>
-        <button onclick="filterOrders('cancelled',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Cancelled</button>
+      <div class="page-hd">
+        <h2>My Orders</h2>
+        <p>Full history of all your orders. Tap any order to see details, rate and leave a review.</p>
       </div>
 
-      <div class="section-card">
-        <div class="section-body" id="orders-list" style="padding:0"></div>
+      <div class="filter-row" id="order-filters">
+        <button class="ftab active" onclick="filterOrders('all',this)">All</button>
+        <button class="ftab" onclick="filterOrders('processing',this)">Processing</button>
+        <button class="ftab" onclick="filterOrders('shipping',this)">Shipping</button>
+        <button class="ftab" onclick="filterOrders('delivered',this)">Delivered</button>
+        <button class="ftab" onclick="filterOrders('cancelled',this)">Cancelled</button>
       </div>
+
+      <div class="section-card" id="orders-wrap"></div>
 
     </div>
   </div>
 </div>
 
 <script>
-const FM_SESSION = 'fm_session';
-const FM_USERS   = 'fm_users';
-const FM_ORDERS  = 'fm_orders';
-function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
-function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
-function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
-function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
-function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
-function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
+const FM_SESSION  = 'fm_session';
+const FM_ORDERS   = 'fm_orders';
+const FM_REVIEWS  = 'fm_reviews';
+
+function getSession()  { return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
+function getOrders()   { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
+function getReviews()  { return JSON.parse(localStorage.getItem(FM_REVIEWS)||'{}'); }
+function saveReviews(r){ localStorage.setItem(FM_REVIEWS, JSON.stringify(r)); }
+function fmtMoney(v)   { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
 
 let toastTmr;
 function showToast(msg){
@@ -91,8 +143,7 @@ function showToast(msg){
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-
-// ── Sidebar loader ──────────────────────────
+// ── Sidebar ───────────────────────────────────
 async function loadSidebar() {
   const slot = document.getElementById('sidebar-slot');
   if (!slot) return;
@@ -100,109 +151,316 @@ async function loadSidebar() {
     const res = await fetch('/components/layout/sidebar-customer.html');
     if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
   } catch(e) {}
-  // Fallback inline sidebar
   slot.innerHTML = buildFallbackSidebar();
 }
-
 function buildFallbackSidebar() {
   const path = window.location.pathname;
   const links = [
-    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',       label:'Dashboard',  section:'Overview' },
-    { href:'/components/customer/products-customer.html',  icon:'inventory_2',      label:'Menu',       section:'Shop' },
-    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',      label:'Vouchers',   section:null },
-    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',     label:'Orders',     section:null },
-    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',  label:'Delivery',   section:null },
-    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',  label:'My Profile', section:'Account' },
-    { href:'/components/customer/setting-customer.html',   icon:'settings',         label:'Settings',   section:null },
+    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',      label:'Dashboard', section:'Overview' },
+    { href:'/components/customer/products-customer.html',  icon:'inventory_2',    label:'Menu',      section:'Shop' },
+    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',    label:'Vouchers',  section:null },
+    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',   label:'Orders',    section:null },
+    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',label:'Delivery',  section:null },
+    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',label:'My Profile',section:'Account' },
+    { href:'/components/customer/setting-customer.html',   icon:'settings',       label:'Settings',  section:null },
   ];
   let html = '<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
     + '<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
-    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
-    + '</a>';
+    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee</a>';
   let lastSection = null;
   links.forEach(l => {
     if (l.section && l.section !== lastSection) {
-      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">' + l.section + '</div>';
+      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">'+l.section+'</div>';
       lastSection = l.section;
     }
     const active = path.includes(l.href.split('/').pop());
-    html += '<a href="' + l.href + '" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:' + (active ? 'var(--green-dark)' : 'var(--text-mid)') + ';text-decoration:none;font-weight:' + (active ? '500' : '400') + ';background:' + (active ? 'var(--green-light)' : 'none') + '"><span class="mi">' + l.icon + '</span> ' + l.label + '</a>';
+    html += '<a href="'+l.href+'" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:'+(active?'var(--green-dark)':'var(--text-mid)')+';text-decoration:none;font-weight:'+(active?'500':'400')+';background:'+(active?'var(--green-light)':'none')+'"><span class="mi">'+l.icon+'</span> '+l.label+'</a>';
   });
-  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
+  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border)">'
     + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
-    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
+    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">—</div>'
+    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">—</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
     + '</div>'
-    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
-    + '<span class="mi" style="font-size:15px">logout</span> Sign out'
-    + '</button>'
+    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer"><span class="mi" style="font-size:15px">logout</span> Sign out</button>'
     + '</div></aside>';
   return html;
 }
 
-
-
+// ── State ─────────────────────────────────────
 let allMyOrders = [];
 let currentFilter = 'all';
+let currentSession = null;
+let hoverRating = {}; // orderId -> hovered star
 
+// ── Filters ───────────────────────────────────
 function filterOrders(f, btn) {
   currentFilter = f;
-  document.querySelectorAll('#order-filters button').forEach(b => {
-    b.style.background = 'none'; b.style.color = 'var(--text-mid)'; b.style.boxShadow = 'none';
-  });
-  btn.style.background = '#fff'; btn.style.color = 'var(--green-dark)'; btn.style.boxShadow = '0 1px 4px rgba(0,0,0,.09)';
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   renderOrders();
 }
 
+// ── Stars helpers ──────────────────────────────
+function starsHtml(orderId, currentRating, editable) {
+  if (!editable) {
+    // Read-only stars
+    let html = '<div class="stars-row">';
+    for (let i=1;i<=5;i++) html += `<span class="mi star sm ${i<=currentRating?'filled':''}">${i<=currentRating?'star':'star_border'}</span>`;
+    html += '</div>';
+    return html;
+  }
+  let html = `<div class="stars-row" id="stars-${orderId}">`;
+  for (let i=1;i<=5;i++) {
+    html += `<span class="mi star ${i<=currentRating?'filled':''}"
+      onmouseenter="hoverStars('${orderId}',${i})"
+      onmouseleave="unhoverStars('${orderId}',${currentRating})"
+      onclick="setRating('${orderId}',${i})"
+    >${i<=currentRating?'star':'star_border'}</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function hoverStars(orderId, val) {
+  const wrap = document.getElementById('stars-'+orderId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.star').forEach((s,i) => {
+    s.classList.toggle('hovered', i < val);
+    s.classList.toggle('filled', false);
+    s.textContent = i < val ? 'star' : 'star_border';
+  });
+}
+function unhoverStars(orderId, current) {
+  const wrap = document.getElementById('stars-'+orderId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.star').forEach((s,i) => {
+    s.classList.remove('hovered');
+    s.classList.toggle('filled', i < current);
+    s.textContent = i < current ? 'star' : 'star_border';
+  });
+}
+function setRating(orderId, val) {
+  // Save to pending state in the form
+  const ratingInput = document.getElementById('rating-val-'+orderId);
+  if (ratingInput) ratingInput.value = val;
+  // Persist stars visually
+  const wrap = document.getElementById('stars-'+orderId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.star').forEach((s,i) => {
+    s.classList.toggle('filled', i < val);
+    s.textContent = i < val ? 'star' : 'star_border';
+    // Update hover handlers with new current
+    s.setAttribute('onmouseleave', `unhoverStars('${orderId}',${val})`);
+  });
+}
+
+// ── Submit comment to shipper ─────────────────
+function submitComment(orderId) {
+  const text = (document.getElementById('cmt-'+orderId)?.value||'').trim();
+  if (!text) { showToast('Please write a comment first'); return; }
+
+  const orders = JSON.parse(localStorage.getItem(FM_ORDERS)||'[]');
+  const idx = orders.findIndex(o => o.id === orderId);
+  if (idx === -1) { showToast('Order not found'); return; }
+
+  orders[idx].customerComment     = text;
+  orders[idx].customerCommentDate = new Date().toISOString();
+  orders[idx].customerEmail       = currentSession.email;
+  // Mark order as delivered
+  orders[idx].status = 'delivered';
+
+  localStorage.setItem(FM_ORDERS, JSON.stringify(orders));
+
+  // Update local list
+  const localIdx = allMyOrders.findIndex(o => o.id === orderId);
+  if (localIdx !== -1) {
+    allMyOrders[localIdx].customerComment     = text;
+    allMyOrders[localIdx].customerCommentDate = orders[idx].customerCommentDate;
+    allMyOrders[localIdx].status              = 'delivered';
+  }
+
+  showToast('Comment sent! Order marked as Delivered ✓');
+  renderOrders();
+}
+
+// ── Submit review ──────────────────────────────
+function submitReview(orderId) {
+  const ratingVal = parseInt(document.getElementById('rating-val-'+orderId).value||'0');
+  const comment   = (document.getElementById('comment-'+orderId).value||'').trim();
+  if (!ratingVal) { showToast('Please select a star rating first'); return; }
+
+  const reviews = getReviews();
+  reviews[orderId] = {
+    rating: ratingVal,
+    comment,
+    author: currentSession.name,
+    email:  currentSession.email,
+    date:   new Date().toISOString()
+  };
+  saveReviews(reviews);
+  showToast('Review saved — thank you! ⭐');
+  renderOrders();
+}
+
+function editReview(orderId) {
+  // Remove the review so the form shows again
+  const reviews = getReviews();
+  delete reviews[orderId];
+  saveReviews(reviews);
+  renderOrders();
+}
+
+// ── Render ────────────────────────────────────
 function renderOrders() {
-  const list = currentFilter === 'all' ? allMyOrders : allMyOrders.filter(o=>(o.status||'delivered')===currentFilter);
-  const wrap = document.getElementById('orders-list');
+  const list = currentFilter === 'all'
+    ? allMyOrders
+    : allMyOrders.filter(o => (o.status||'delivered') === currentFilter);
+  const wrap = document.getElementById('orders-wrap');
+
   if (!list.length) {
-    wrap.innerHTML = '<div class="empty-state" style="padding:3rem"><span class="mi">receipt_long</span>No orders found.</div>';
+    wrap.innerHTML = '<div class="empty-state"><span class="mi">receipt_long</span>No orders found.</div>';
     return;
   }
-  wrap.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
-    '<thead><tr style="background:var(--bg2)">' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Order ID</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Items</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Total</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Status</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Date</th>' +
-    '</tr></thead><tbody>' +
-    list.map(o => {
-      const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ');
-      const d = new Date(o.date||''); const date = isNaN(d)?'—':d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-      const st = o.status||'delivered';
-      const SC = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled' };
-      return '<tr style="border-top:1px solid var(--border)">' +
-        '<td style="padding:13px 1.25rem;font-weight:600;color:var(--text);font-size:13px">#'+o.id+'</td>' +
-        '<td style="padding:13px 1.25rem;font-size:13px;color:var(--text-mid);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+items+'</td>' +
-        '<td style="padding:13px 1.25rem;font-weight:600;color:var(--text);font-size:13px">'+fmtMoney(o.total)+'</td>' +
-        '<td style="padding:13px 1.25rem"><span class="badge '+(SC[st]||'')+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>' +
-        '<td style="padding:13px 1.25rem;font-size:13px;color:var(--text-mid)">'+date+'</td>' +
-        '</tr>';
-    }).join('') + '</tbody></table>';
+
+  const reviews = getReviews();
+  wrap.innerHTML = list.map(o => {
+    const st      = o.status || 'delivered';
+    const SC      = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled' };
+    const d       = new Date(o.date||'');
+    const dateStr = isNaN(d) ? '—' : d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const itemSummary = (o.items||[]).map(i=>i.name+(i.qty>1?' ×'+i.qty:'')).join(', ');
+    const review  = reviews[o.id];
+    const canReview = st === 'delivered';
+
+    // ── Detail panel ──
+    const itemsHtml = (o.items||[]).map(i => `
+      <div class="detail-item">
+        <div>
+          <div class="detail-item-name">${i.name}</div>
+          <div class="detail-item-cat">${(i.cat||'').charAt(0).toUpperCase()+(i.cat||'').slice(1)} · ×${i.qty}</div>
+        </div>
+        <div class="detail-item-price">${fmtMoney(i.price*i.qty)}</div>
+      </div>`).join('');
+
+    // ── Comment to shipper section ──
+    const existingComment = o.customerComment;
+    const canComment = st !== 'cancelled'; // can comment on any non-cancelled order
+
+    const commentSection = !canComment ? '' :
+      existingComment
+      ? `<div class="comment-sent">
+          <span class="mi comment-sent-icon">mark_chat_read</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#0369a1;margin-bottom:4px">
+              <span class="mi" style="font-size:14px;vertical-align:middle">delivery_dining</span>
+              Comment sent to shipper ${o.shipper ? '· <span class=\"shipper-info\"><span class=\"mi\" style=\"font-size:12px\">person_pin</span>'+o.shipper+'</span>' : ''}
+            </div>
+            <div class="comment-sent-text">"${existingComment}"</div>
+            <div class="comment-sent-date">${new Date(o.customerCommentDate||'').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+          </div>
+        </div>`
+      : `<div class="comment-box">
+          <div class="comment-box-title">
+            <span class="mi" style="font-size:16px">delivery_dining</span>
+            Send a comment to your shipper
+            ${o.shipper ? '<span class=\"shipper-info\"><span class=\"mi\" style=\"font-size:12px\">person_pin</span>'+o.shipper+'</span>' : ''}
+          </div>
+          <p style="font-size:12px;color:var(--text-mid);margin-bottom:10px">
+            Let your shipper know how the delivery went. Submitting this will also mark your order as <strong>Delivered</strong>.
+          </p>
+          <textarea class="comment-textarea" id="cmt-${o.id}" placeholder="e.g. Delivered on time, drinks were cold and perfectly packed!"></textarea>
+          <button class="btn-submit-comment" onclick="submitComment('${o.id}')">
+            <span class="mi" style="font-size:15px;color:#fff">send</span> Send &amp; Mark Delivered
+          </button>
+        </div>`;
+
+    // ── Rating section (only for delivered orders) ──
+    const reviewSection = st !== 'delivered' ? '' :
+      review
+      ? `<div class="existing-review">
+          <div class="er-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              ${starsHtml(o.id, review.rating, false)}
+              <span style="font-size:12px;font-weight:600;color:var(--green-dark)">${review.rating}/5</span>
+            </div>
+            <button class="btn-edit-review" onclick="editReview('${o.id}')">
+              <span class="mi" style="font-size:13px;vertical-align:middle">edit</span> Edit
+            </button>
+          </div>
+          ${review.comment ? '<div class="er-comment">"'+review.comment+'"</div>' : '<div class="er-comment" style="color:var(--text-light);font-style:italic">No comment left.</div>'}
+          <div class="er-date">${new Date(review.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>`
+      : `<div class="review-box">
+          <div class="review-box-title">
+            <span class="mi" style="font-size:16px;color:var(--amber)">star</span>
+            Rate this order
+          </div>
+          <input type="hidden" id="rating-val-${o.id}" value="0" />
+          ${starsHtml(o.id, 0, true)}
+          <textarea class="review-textarea" id="comment-${o.id}" placeholder="Tell us about your experience — what did you love? (optional)" style="margin-top:10px"></textarea>
+          <button class="btn-submit-review" onclick="submitReview('${o.id}')">
+            <span class="mi" style="font-size:15px;color:#fff">send</span> Submit Review
+          </button>
+        </div>`;
+
+    return `
+    <div class="order-row">
+      <div class="order-hd" onclick="toggleOrder('${o.id}')">
+        <div>
+          <div class="order-id-txt">#${o.id}</div>
+          <div class="order-meta">${dateStr} · ${(o.items||[]).length} item(s) · ${o.payment==='momo'?'MoMo':'Cash'}</div>
+        </div>
+        <div class="order-right">
+          ${review ? '<span class="mi" style="font-size:16px;color:var(--amber)" title="You reviewed this order">star</span>' : ''}
+          <span class="badge ${SC[st]||''}">${st.charAt(0).toUpperCase()+st.slice(1)}</span>
+          <span class="order-total">${fmtMoney(o.total)}</span>
+          <span class="mi expand-icon" id="icon-${o.id}">expand_more</span>
+        </div>
+      </div>
+      <div class="order-detail" id="detail-${o.id}">
+        <div class="detail-items">${itemsHtml}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:2px solid var(--border);margin-bottom:${canReview?'1rem':'0'}">
+          <span style="font-size:13px;font-weight:600;color:var(--text)">Total</span>
+          <span style="font-size:14px;font-weight:700;color:var(--green-dark)">${fmtMoney(o.total)}</span>
+        </div>
+        <div class="comment-section">${commentSection}</div>
+        ${reviewSection}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function pageInit(s) {
-  allMyOrders = getOrders().filter(o=>o.email===s.email||o.customer===s.name).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  renderOrders();
+function toggleOrder(orderId) {
+  const detail = document.getElementById('detail-'+orderId);
+  const icon   = document.getElementById('icon-'+orderId);
+  const isOpen = detail.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.order-detail').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.expand-icon').forEach(i => i.classList.remove('open'));
+  // Open clicked if was closed
+  if (!isOpen) { detail.classList.add('open'); icon.classList.add('open'); }
 }
 
-
+// ── Init ──────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   const s = getSession();
   if (!s) { window.location.href = '/components/auth/login.html'; return; }
   if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+  currentSession = s;
+
   await loadSidebar();
-  // Populate sidebar session info
   const av = document.getElementById('sb-avatar');
   const nm = document.getElementById('sb-name');
   const rl = document.getElementById('sb-role');
-  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+  if (av) av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
   if (nm) nm.textContent = s.name;
   if (rl) rl.textContent = s.role || 'customer';
-  if (typeof pageInit === 'function') pageInit(s);
+
+  allMyOrders = getOrders()
+    .filter(o => o.email === s.email || o.customer === s.name)
+    .sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  renderOrders();
 });
 </script>
 </body>

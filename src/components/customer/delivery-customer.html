@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Orders — PolyCoffee</title>
+  <title>Delivery — PolyCoffee</title>
   <link rel="stylesheet" href="/style/style.css" />
   <style>
     body { background:var(--bg); }
@@ -12,60 +12,188 @@
     .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
     .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
     .dash-content { padding:1.75rem 2rem; flex:1; }
-    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
-    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
-    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
-    .section-body { padding:1.5rem; }
     .page-hd { margin-bottom:1.75rem; }
     .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
     .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
-    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
-    .form-label { font-size:13px; font-weight:500; color:var(--text); }
-    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
-    .form-input:focus { border-color:var(--green); }
-    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
-    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
-    .btn-save:hover { background:var(--green-dark); }
-    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
-    .btn-outline:hover { border-color:var(--text); }
-    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
-    .badge-delivered  { background:#dcfce7; color:#15803d; }
-    .badge-processing { background:#fef9c3; color:#854d0e; }
-    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
-    .badge-customer { background:var(--green-light); color:var(--green-dark); }
-    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
-    .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
-    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
+    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); margin-bottom:1.5rem; overflow:hidden; }
+    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
+    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .section-body { padding:1.5rem; }
+
+    /* ── Zone cards ── */
+    .zones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+    .zone-card { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); padding:1.25rem 1rem; text-align:center; }
+    .zone-card.avail { border-color:var(--green-mid); }
+    .zone-ico { width:48px; height:48px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; }
+    .zone-ico.g { background:var(--green-light); color:var(--green-dark); }
+    .zone-ico.a { background:#fef3c7; color:#92400e; }
+    .zone-name { font-family:var(--serif); font-size:15px; font-weight:600; margin-bottom:4px; }
+    .zone-time { font-size:11px; color:var(--text-mid); margin-bottom:8px; }
+    .zone-tag { font-size:10px; padding:3px 10px; border-radius:99px; display:inline-block; font-weight:500; }
+    .zone-tag.yes { background:var(--green-light); color:var(--green-dark); }
+    .zone-tag.no  { background:#fef3c7; color:#92400e; }
+
+    /* ── How it works ── */
+    .how-row { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .how-row:last-child { border:none; }
+    .how-num { width:28px; height:28px; border-radius:50%; background:var(--green); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .how-ico { width:42px; height:42px; border-radius:var(--radius-sm); background:var(--green-light); display:flex; align-items:center; justify-content:center; color:var(--green-dark); flex-shrink:0; }
+    .how-text strong { font-size:13px; font-weight:600; color:var(--text); display:block; margin-bottom:2px; }
+    .how-text span { font-size:12px; color:var(--text-mid); line-height:1.5; }
+
+    /* ── Stars ── */
+    .stars-row { display:flex; gap:4px; align-items:center; }
+    .star { font-size:28px; cursor:pointer; color:#d1d5db; transition:color .12s,transform .1s; line-height:1; }
+    .star.filled  { color:#f59e0b; }
+    .star.hovered { color:#fbbf24; transform:scale(1.18); }
+    .star.sm { font-size:16px; cursor:default; }
+
+    /* ── Rating categories ── */
+    .rating-cats { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:1rem 0; }
+    .cat-row { background:var(--bg2); border-radius:var(--radius-sm); padding:10px 14px; }
+    .cat-label { font-size:11px; font-weight:600; color:var(--text-mid); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .star-sm-row { display:flex; gap:3px; }
+    .star-sm-el { font-size:20px; cursor:pointer; color:#d1d5db; transition:color .12s; line-height:1; }
+    .star-sm-el.filled { color:#f59e0b; }
+    .star-sm-el.hovered { color:#fbbf24; }
+
+    /* ── Review form ── */
+    .review-box { background:var(--bg2); border-radius:var(--radius); padding:1.5rem; }
+    .review-box-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:1rem; display:flex; align-items:center; gap:7px; }
+    .review-textarea { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); resize:vertical; min-height:80px; outline:none; background:#fff; transition:border-color .2s; }
+    .review-textarea:focus { border-color:var(--green); }
+    .btn-submit { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.2s; margin-top:.75rem; }
+    .btn-submit:hover { background:var(--green-dark); }
+
+    /* ── Past reviews ── */
+    .review-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem 1.25rem; margin-bottom:10px; }
+    .rc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .rc-name { font-size:13px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
+    .rc-avatar { width:28px; height:28px; border-radius:50%; background:var(--green); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rc-date { font-size:11px; color:var(--text-light); }
+    .rc-comment { font-size:13px; color:var(--text-mid); line-height:1.6; font-style:italic; }
+    .rc-cats { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .rc-cat { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-mid); background:var(--bg2); padding:3px 8px; border-radius:99px; }
+
+    /* ── Summary bar ── */
+    .summary-bar { display:grid; grid-template-columns:auto 1fr; gap:1.5rem; align-items:center; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
+    .summary-score { text-align:center; }
+    .summary-num { font-family:var(--serif); font-size:3rem; font-weight:700; color:var(--text); line-height:1; }
+    .summary-sub { font-size:12px; color:var(--text-light); margin-top:4px; }
+    .bar-rows { display:flex; flex-direction:column; gap:5px; }
+    .bar-row { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-mid); }
+    .bar-track { flex:1; height:6px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+    .bar-fill { height:100%; background:var(--amber); border-radius:99px; transition:width .5s; }
+    .bar-count { width:20px; text-align:right; color:var(--text-light); font-size:11px; }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.1); }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
-
   </style>
 </head>
 <body>
-
 <div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
 
 <div class="portal-shell">
   <div id="sidebar-slot"></div>
   <div class="dash-main">
     <div class="dash-topbar">
-      <div class="dash-title">My Orders</div>
-      <div id="topbar-right"></div>
+      <div class="dash-title">Delivery</div>
     </div>
     <div class="dash-content">
 
-      <div class="page-hd"><h2>My Orders</h2><p>Full history of all your orders.</p></div>
-
-      <!-- Filter tabs -->
-      <div style="display:flex;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;gap:3px;width:fit-content;margin-bottom:1.25rem" id="order-filters">
-        <button onclick="filterOrders('all',this)" style="padding:7px 16px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:500;color:var(--green-dark);cursor:pointer;font-family:var(--sans);box-shadow:0 1px 4px rgba(0,0,0,.09)">All</button>
-        <button onclick="filterOrders('processing',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Processing</button>
-        <button onclick="filterOrders('delivered',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Delivered</button>
-        <button onclick="filterOrders('cancelled',this)" style="padding:7px 16px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Cancelled</button>
+      <div class="page-hd">
+        <h2>Delivery Info</h2>
+        <p>Coverage zones, how it works — and rate your last delivery experience.</p>
       </div>
 
+      <!-- ── Zones ── -->
       <div class="section-card">
-        <div class="section-body" id="orders-list" style="padding:0"></div>
+        <div class="section-hd"><div class="section-title">Delivery Zones</div></div>
+        <div class="section-body">
+          <div class="zones-grid">
+            <div class="zone-card avail">
+              <div class="zone-ico g"><span class="mi" style="font-size:22px">location_on</span></div>
+              <div class="zone-name">District 1</div>
+              <div class="zone-time">Same-day · ~2hr</div>
+              <div class="zone-tag yes">Available</div>
+            </div>
+            <div class="zone-card avail">
+              <div class="zone-ico g"><span class="mi" style="font-size:22px">location_on</span></div>
+              <div class="zone-name">District 3</div>
+              <div class="zone-time">Same-day · ~2hr</div>
+              <div class="zone-tag yes">Available</div>
+            </div>
+            <div class="zone-card avail">
+              <div class="zone-ico g"><span class="mi" style="font-size:22px">location_on</span></div>
+              <div class="zone-name">Bình Thạnh</div>
+              <div class="zone-time">Same-day · ~2.5hr</div>
+              <div class="zone-tag yes">Available</div>
+            </div>
+            <div class="zone-card avail">
+              <div class="zone-ico g"><span class="mi" style="font-size:22px">location_on</span></div>
+              <div class="zone-name">Thủ Đức</div>
+              <div class="zone-time">Same-day · ~3hr</div>
+              <div class="zone-tag yes">Available</div>
+            </div>
+            <div class="zone-card">
+              <div class="zone-ico a"><span class="mi" style="font-size:22px">schedule</span></div>
+              <div class="zone-name">District 7</div>
+              <div class="zone-time">Q3 2026</div>
+              <div class="zone-tag no">Coming soon</div>
+            </div>
+            <div class="zone-card">
+              <div class="zone-ico a"><span class="mi" style="font-size:22px">schedule</span></div>
+              <div class="zone-name">Nhà Bè</div>
+              <div class="zone-time">Q4 2026</div>
+              <div class="zone-tag no">Coming soon</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── How it works ── -->
+      <div class="section-card">
+        <div class="section-hd"><div class="section-title">How it works</div></div>
+        <div class="section-body" style="padding:0 1.5rem">
+          <div class="how-row">
+            <div class="how-ico"><span class="mi" style="font-size:20px">shopping_cart</span></div>
+            <div class="how-text"><strong>Order before noon</strong><span>Place your order before 12:00pm for same-day delivery. Late orders go out next morning.</span></div>
+          </div>
+          <div class="how-row">
+            <div class="how-ico"><span class="mi" style="font-size:20px">blender</span></div>
+            <div class="how-text"><strong>Fresh cold-pressed</strong><span>Your drinks are pressed right after your order — never pre-made. Zero preservatives.</span></div>
+          </div>
+          <div class="how-row">
+            <div class="how-ico"><span class="mi" style="font-size:20px">delivery_dining</span></div>
+            <div class="how-text"><strong>Delivered cold to your door</strong><span>Our riders use insulated refrigerated bags. Drinks arrive cold, every time.</span></div>
+          </div>
+          <div class="how-row">
+            <div class="how-ico"><span class="mi" style="font-size:20px">recycling</span></div>
+            <div class="how-text"><strong>Return bottles for 10% off</strong><span>Hand empty glass bottles to your rider and get 10% off your next order automatically.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Rate delivery ── -->
+      <div class="section-card" id="rate-section">
+        <div class="section-hd">
+          <div class="section-title">Rate Your Last Delivery</div>
+          <span id="already-rated-badge" style="display:none;font-size:12px;background:var(--green-light);color:var(--green-dark);padding:3px 10px;border-radius:99px;font-weight:500">✓ Reviewed</span>
+        </div>
+        <div class="section-body" id="rate-body">
+          <p style="font-size:13px;color:var(--text-light);padding:1rem;text-align:center">Loading...</p>
+        </div>
+      </div>
+
+      <!-- ── All delivery reviews ── -->
+      <div class="section-card">
+        <div class="section-hd"><div class="section-title">What customers say</div></div>
+        <div id="reviews-summary" class="summary-bar"></div>
+        <div class="section-body" id="all-reviews-wrap">
+          <p style="font-size:13px;color:var(--text-light);text-align:center;padding:1rem">No reviews yet.</p>
+        </div>
       </div>
 
     </div>
@@ -73,15 +201,14 @@
 </div>
 
 <script>
-const FM_SESSION = 'fm_session';
-const FM_USERS   = 'fm_users';
-const FM_ORDERS  = 'fm_orders';
+const FM_SESSION  = 'fm_session';
+const FM_ORDERS   = 'fm_orders';
+const FM_DEL_REVIEWS = 'fm_delivery_reviews';
+
 function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
-function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
-function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
 function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
-function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
-function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
+function getDelReviews(){ return JSON.parse(localStorage.getItem(FM_DEL_REVIEWS)||'[]'); }
+function saveDelReviews(r){ localStorage.setItem(FM_DEL_REVIEWS, JSON.stringify(r)); }
 
 let toastTmr;
 function showToast(msg){
@@ -91,8 +218,7 @@ function showToast(msg){
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-
-// ── Sidebar loader ──────────────────────────
+// ── Sidebar ───────────────────────────────────
 async function loadSidebar() {
   const slot = document.getElementById('sidebar-slot');
   if (!slot) return;
@@ -100,109 +226,311 @@ async function loadSidebar() {
     const res = await fetch('/components/layout/sidebar-customer.html');
     if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
   } catch(e) {}
-  // Fallback inline sidebar
   slot.innerHTML = buildFallbackSidebar();
 }
-
 function buildFallbackSidebar() {
   const path = window.location.pathname;
   const links = [
-    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',       label:'Dashboard',  section:'Overview' },
-    { href:'/components/customer/products-customer.html',  icon:'inventory_2',      label:'Menu',       section:'Shop' },
-    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',      label:'Vouchers',   section:null },
-    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',     label:'Orders',     section:null },
-    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',  label:'Delivery',   section:null },
-    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',  label:'My Profile', section:'Account' },
-    { href:'/components/customer/setting-customer.html',   icon:'settings',         label:'Settings',   section:null },
+    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',      label:'Dashboard', section:'Overview' },
+    { href:'/components/customer/products-customer.html',  icon:'inventory_2',    label:'Menu',      section:'Shop' },
+    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',    label:'Vouchers',  section:null },
+    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',   label:'Orders',    section:null },
+    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',label:'Delivery',  section:null },
+    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',label:'My Profile',section:'Account' },
+    { href:'/components/customer/setting-customer.html',   icon:'settings',       label:'Settings',  section:null },
   ];
   let html = '<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
     + '<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
-    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
-    + '</a>';
+    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee</a>';
   let lastSection = null;
   links.forEach(l => {
     if (l.section && l.section !== lastSection) {
-      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">' + l.section + '</div>';
+      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">'+l.section+'</div>';
       lastSection = l.section;
     }
     const active = path.includes(l.href.split('/').pop());
-    html += '<a href="' + l.href + '" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:' + (active ? 'var(--green-dark)' : 'var(--text-mid)') + ';text-decoration:none;font-weight:' + (active ? '500' : '400') + ';background:' + (active ? 'var(--green-light)' : 'none') + '"><span class="mi">' + l.icon + '</span> ' + l.label + '</a>';
+    html += '<a href="'+l.href+'" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:'+(active?'var(--green-dark)':'var(--text-mid)')+';text-decoration:none;font-weight:'+(active?'500':'400')+';background:'+(active?'var(--green-light)':'none')+'"><span class="mi">'+l.icon+'</span> '+l.label+'</a>';
   });
-  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
+  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border)">'
     + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
-    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
+    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">—</div>'
+    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">—</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
     + '</div>'
-    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
-    + '<span class="mi" style="font-size:15px">logout</span> Sign out'
-    + '</button>'
+    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer"><span class="mi" style="font-size:15px">logout</span> Sign out</button>'
     + '</div></aside>';
   return html;
 }
 
+// ── Stars ─────────────────────────────────────
+const CATS = ['speed','temperature','packaging','rider'];
+const CAT_LABELS = { speed:'Speed', temperature:'Temperature', packaging:'Packaging', rider:'Rider' };
+const catRatings = { speed:0, temperature:0, packaging:0, rider:0 };
+let overallRating = 0;
 
-
-let allMyOrders = [];
-let currentFilter = 'all';
-
-function filterOrders(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('#order-filters button').forEach(b => {
-    b.style.background = 'none'; b.style.color = 'var(--text-mid)'; b.style.boxShadow = 'none';
+function hoverStar(val) {
+  document.querySelectorAll('.overall-star').forEach((s,i) => {
+    s.classList.toggle('hovered', i < val);
+    s.classList.toggle('filled', false);
+    s.textContent = i < val ? 'star' : 'star_border';
   });
-  btn.style.background = '#fff'; btn.style.color = 'var(--green-dark)'; btn.style.boxShadow = '0 1px 4px rgba(0,0,0,.09)';
-  renderOrders();
+}
+function unhoverStar() {
+  document.querySelectorAll('.overall-star').forEach((s,i) => {
+    s.classList.remove('hovered');
+    s.classList.toggle('filled', i < overallRating);
+    s.textContent = i < overallRating ? 'star' : 'star_border';
+  });
+}
+function setOverallStar(val) {
+  overallRating = val;
+  document.querySelectorAll('.overall-star').forEach((s,i) => {
+    s.classList.toggle('filled', i < val);
+    s.textContent = i < val ? 'star' : 'star_border';
+  });
 }
 
-function renderOrders() {
-  const list = currentFilter === 'all' ? allMyOrders : allMyOrders.filter(o=>(o.status||'delivered')===currentFilter);
-  const wrap = document.getElementById('orders-list');
-  if (!list.length) {
-    wrap.innerHTML = '<div class="empty-state" style="padding:3rem"><span class="mi">receipt_long</span>No orders found.</div>';
+function hoverCatStar(cat, val) {
+  document.querySelectorAll(`.cat-star-${cat}`).forEach((s,i) => {
+    s.classList.toggle('hovered', i < val);
+    s.textContent = i < val ? 'star' : 'star_border';
+  });
+}
+function unhoverCatStar(cat) {
+  const cur = catRatings[cat]||0;
+  document.querySelectorAll(`.cat-star-${cat}`).forEach((s,i) => {
+    s.classList.remove('hovered');
+    s.classList.toggle('filled', i < cur);
+    s.textContent = i < cur ? 'star' : 'star_border';
+  });
+}
+function setCatStar(cat, val) {
+  catRatings[cat] = val;
+  document.querySelectorAll(`.cat-star-${cat}`).forEach((s,i) => {
+    s.classList.toggle('filled', i < val);
+    s.textContent = i < val ? 'star' : 'star_border';
+  });
+}
+
+function buildRatingForm(lastOrder) {
+  const body = document.getElementById('rate-body');
+
+  const overallStars = Array.from({length:5},(_,i) =>
+    `<span class="mi star overall-star"
+      onmouseenter="hoverStar(${i+1})" onmouseleave="unhoverStar()"
+      onclick="setOverallStar(${i+1})">star_border</span>`
+  ).join('');
+
+  const catGrid = CATS.map(cat =>
+    `<div class="cat-row">
+      <div class="cat-label">${CAT_LABELS[cat]}</div>
+      <div class="star-sm-row">
+        ${Array.from({length:5},(_,i) =>
+          `<span class="mi star-sm-el cat-star-${cat}"
+            onmouseenter="hoverCatStar('${cat}',${i+1})"
+            onmouseleave="unhoverCatStar('${cat}')"
+            onclick="setCatStar('${cat}',${i+1})">star_border</span>`
+        ).join('')}
+      </div>
+    </div>`
+  ).join('');
+
+  body.innerHTML = `
+    <div class="review-box">
+      <div class="review-box-title">
+        <span class="mi" style="color:var(--amber);font-size:18px">local_shipping</span>
+        How was your last delivery?
+        ${lastOrder ? `<span style="font-size:11px;color:var(--text-light);font-weight:400">Order #${lastOrder.id}</span>` : ''}
+      </div>
+
+      <div style="margin-bottom:1.25rem">
+        <div style="font-size:12px;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Overall experience</div>
+        <div class="stars-row">${overallStars}</div>
+      </div>
+
+      <div class="rating-cats">${catGrid}</div>
+
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:6px">Comments (optional)</div>
+        <textarea class="review-textarea" id="del-comment" placeholder="Was the rider on time? Was the packaging good? Tell us anything!"></textarea>
+      </div>
+
+      <button class="btn-submit" onclick="submitDeliveryReview()">
+        <span class="mi" style="font-size:15px;color:#fff">send</span> Submit Review
+      </button>
+    </div>`;
+}
+
+function submitDeliveryReview() {
+  if (!overallRating) { showToast('Please give an overall star rating'); return; }
+  const s = getSession();
+  const comment = document.getElementById('del-comment').value.trim();
+  const reviews = getDelReviews();
+
+  const myOrders = getOrders()
+    .filter(o => (o.email===s.email||o.customer===s.name) && o.status==='delivered')
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const lastOrder = myOrders[0];
+
+  reviews.push({
+    id: 'dr-'+Date.now(),
+    author: s.name,
+    email:  s.email,
+    orderId: lastOrder?.id || null,
+    overall: overallRating,
+    cats: {...catRatings},
+    comment,
+    date: new Date().toISOString()
+  });
+  saveDelReviews(reviews);
+  showToast('Delivery review saved — thank you! 🚴');
+
+  // Show submitted state
+  document.getElementById('rate-body').innerHTML =
+    `<div style="display:flex;align-items:center;gap:12px;background:var(--green-light);border-radius:var(--radius-sm);padding:1rem 1.25rem">
+      <span class="mi" style="font-size:28px;color:var(--green)">check_circle</span>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--green-dark)">Thanks for your feedback!</div>
+        <div style="font-size:12px;color:var(--green-dark);opacity:.8;margin-top:2px">Your review helps us improve our delivery service.</div>
+      </div>
+    </div>`;
+  document.getElementById('already-rated-badge').style.display = 'inline-flex';
+  renderAllReviews();
+}
+
+function renderRatingSection(s) {
+  const myOrders = getOrders()
+    .filter(o => (o.email===s.email||o.customer===s.name) && o.status==='delivered')
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const existingReview = getDelReviews().find(r => r.email===s.email);
+
+  if (existingReview) {
+    document.getElementById('already-rated-badge').style.display = 'inline-flex';
+    const starsHtml = Array.from({length:5},(_,i) =>
+      `<span class="mi star sm ${i<existingReview.overall?'filled':''}">${i<existingReview.overall?'star':'star_border'}</span>`
+    ).join('');
+    const catHtml = CATS.map(c => {
+      const val = existingReview.cats?.[c]||0;
+      const strs = Array.from({length:5},(_,i)=>`<span class="mi" style="font-size:13px;color:${i<val?'#f59e0b':'#d1d5db'}">${i<val?'star':'star_border'}</span>`).join('');
+      return `<span style="font-size:11px;color:var(--text-mid);background:var(--bg2);padding:3px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px">${CAT_LABELS[c]} ${strs}</span>`;
+    }).join('');
+
+    document.getElementById('rate-body').innerHTML =
+      `<div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="stars-row">${starsHtml}</div>
+          <span style="font-size:13px;font-weight:600;color:var(--text)">${existingReview.overall}/5</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${catHtml}</div>
+        ${existingReview.comment ? `<div style="font-size:13px;color:var(--text-mid);font-style:italic">"${existingReview.comment}"</div>` : ''}
+        <div style="font-size:11px;color:var(--text-light)">${new Date(existingReview.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+        <button onclick="editMyDeliveryReview()" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-mid);cursor:pointer;font-family:var(--sans)"><span class="mi" style="font-size:14px">edit</span> Edit review</button>
+      </div>`;
     return;
   }
-  wrap.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
-    '<thead><tr style="background:var(--bg2)">' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Order ID</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Items</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Total</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Status</th>' +
-    '<th style="padding:11px 1.25rem;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Date</th>' +
-    '</tr></thead><tbody>' +
-    list.map(o => {
-      const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ');
-      const d = new Date(o.date||''); const date = isNaN(d)?'—':d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-      const st = o.status||'delivered';
-      const SC = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled' };
-      return '<tr style="border-top:1px solid var(--border)">' +
-        '<td style="padding:13px 1.25rem;font-weight:600;color:var(--text);font-size:13px">#'+o.id+'</td>' +
-        '<td style="padding:13px 1.25rem;font-size:13px;color:var(--text-mid);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+items+'</td>' +
-        '<td style="padding:13px 1.25rem;font-weight:600;color:var(--text);font-size:13px">'+fmtMoney(o.total)+'</td>' +
-        '<td style="padding:13px 1.25rem"><span class="badge '+(SC[st]||'')+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>' +
-        '<td style="padding:13px 1.25rem;font-size:13px;color:var(--text-mid)">'+date+'</td>' +
-        '</tr>';
-    }).join('') + '</tbody></table>';
+
+  if (!myOrders.length) {
+    document.getElementById('rate-body').innerHTML =
+      `<div style="text-align:center;padding:2rem;color:var(--text-light);font-size:13px">
+        <span class="mi" style="font-size:36px;display:block;margin-bottom:8px">delivery_dining</span>
+        You don't have any delivered orders yet. Once your first order is delivered you can rate the experience.
+      </div>`;
+    return;
+  }
+
+  buildRatingForm(myOrders[0]);
 }
 
-function pageInit(s) {
-  allMyOrders = getOrders().filter(o=>o.email===s.email||o.customer===s.name).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  renderOrders();
+function editMyDeliveryReview() {
+  const s = getSession();
+  const reviews = getDelReviews().filter(r => r.email !== s.email);
+  saveDelReviews(reviews);
+  overallRating = 0;
+  CATS.forEach(c => catRatings[c]=0);
+  document.getElementById('already-rated-badge').style.display = 'none';
+  const myOrders = getOrders()
+    .filter(o => (o.email===s.email||o.customer===s.name) && o.status==='delivered')
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  buildRatingForm(myOrders[0]);
+  renderAllReviews();
 }
 
+// ── All reviews & summary ─────────────────────
+function renderAllReviews() {
+  const reviews = getDelReviews();
+  const wrap    = document.getElementById('all-reviews-wrap');
+  const summary = document.getElementById('reviews-summary');
 
+  if (!reviews.length) {
+    summary.innerHTML = '';
+    wrap.innerHTML = '<p style="font-size:13px;color:var(--text-light);text-align:center;padding:1.5rem">No delivery reviews yet. Be the first!</p>';
+    return;
+  }
+
+  // Summary stats
+  const avg = (reviews.reduce((s,r)=>s+r.overall,0)/reviews.length).toFixed(1);
+  const counts = [5,4,3,2,1].map(n=>reviews.filter(r=>r.overall===n).length);
+  const maxCount = Math.max(...counts,1);
+  summary.innerHTML =
+    `<div class="summary-score">
+      <div class="summary-num">${avg}</div>
+      <div style="display:flex;gap:2px;justify-content:center;margin:4px 0">
+        ${Array.from({length:5},(_,i)=>`<span class="mi" style="font-size:14px;color:${i<Math.round(avg)?'#f59e0b':'#d1d5db'}">${i<Math.round(avg)?'star':'star_border'}</span>`).join('')}
+      </div>
+      <div class="summary-sub">${reviews.length} review${reviews.length!==1?'s':''}</div>
+    </div>
+    <div class="bar-rows">
+      ${[5,4,3,2,1].map((n,i)=>`
+        <div class="bar-row">
+          <span style="width:14px;font-weight:600;color:var(--text)">${n}</span>
+          <span class="mi" style="font-size:13px;color:#f59e0b">star</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(counts[i]/maxCount*100)}%"></div></div>
+          <span class="bar-count">${counts[i]}</span>
+        </div>`).join('')}
+    </div>`;
+
+  // Individual reviews
+  wrap.innerHTML = [...reviews].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r => {
+    const initials = r.author.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    const starsHtml = Array.from({length:5},(_,i)=>`<span class="mi sm" style="font-size:14px;color:${i<r.overall?'#f59e0b':'#d1d5db'}">${i<r.overall?'star':'star_border'}</span>`).join('');
+    const catHtml = r.cats ? CATS.filter(c=>r.cats[c]>0).map(c =>
+      `<span class="rc-cat"><span class="mi" style="font-size:12px;color:var(--amber)">star</span>${CAT_LABELS[c]}: ${r.cats[c]}/5</span>`
+    ).join('') : '';
+    const d = new Date(r.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return `
+    <div class="review-card">
+      <div class="rc-header">
+        <div class="rc-name">
+          <div class="rc-avatar">${initials}</div>
+          ${r.author}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="stars-row">${starsHtml}</div>
+          <span class="rc-date">${d}</span>
+        </div>
+      </div>
+      ${r.comment ? `<div class="rc-comment">"${r.comment}"</div>` : ''}
+      ${catHtml ? `<div class="rc-cats">${catHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Init ──────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   const s = getSession();
   if (!s) { window.location.href = '/components/auth/login.html'; return; }
   if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+
   await loadSidebar();
-  // Populate sidebar session info
   const av = document.getElementById('sb-avatar');
   const nm = document.getElementById('sb-name');
   const rl = document.getElementById('sb-role');
-  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+  if (av) av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
   if (nm) nm.textContent = s.name;
   if (rl) rl.textContent = s.role || 'customer';
-  if (typeof pageInit === 'function') pageInit(s);
+
+  renderRatingSection(s);
+  renderAllReviews();
 });
 </script>
 </body>

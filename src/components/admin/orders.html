@@ -139,6 +139,7 @@
     <a class="sidebar-link active" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
     <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
     <a class="sidebar-link" href="delivery.html"><span class="mi">delivery_dining</span> Delivery</a>
+    <a class="sidebar-link" href="voucher.html"><span class="mi">local_offer</span> Vouchers</a>
     <div class="sidebar-section">Settings</div>
     <a class="sidebar-link" href="setting.html"><span class="mi">settings</span> Settings</a>
     <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
@@ -335,9 +336,24 @@ function openDrawer(orderId){
     `<button class="shipper-preset" onclick="setShipperPreset('${s}')">${s}</button>`
   ).join('');
 
+  // Customer comment to shipper
+  const commentHtml = o.customerComment ? `
+    <div>
+      <div class="drawer-section">Customer Comment to Shipper</div>
+      <div class="review-box" style="background:#f0f9ff;border-color:#bae6fd;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="mi" style="font-size:18px;color:#0369a1">mark_chat_read</span>
+          <span style="font-size:12px;font-weight:600;color:#0369a1">Sent by ${o.customer}</span>
+          ${o.shipper ? '<span style="margin-left:4px;font-size:11px;padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:99px;font-weight:500">→ '+o.shipper+'</span>' : ''}
+        </div>
+        <div class="review-comment" style="color:var(--text-mid)">"${o.customerComment}"</div>
+        <div class="review-author" style="margin-top:6px">${o.customerCommentDate ? new Date(o.customerCommentDate).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+      </div>
+    </div>` : '';
+
   const reviewHtml = o.shipperRating ? `
     <div>
-      <div class="drawer-section">Customer Review for Shipper</div>
+      <div class="drawer-section">Customer Star Rating</div>
       <div class="review-box">
         <div class="review-stars">${'★'.repeat(o.shipperRating)}${'☆'.repeat(5-o.shipperRating)}</div>
         <div class="review-comment">"${o.shipperComment||'No comment left.'}"</div>
@@ -410,6 +426,7 @@ function openDrawer(orderId){
       </button>
     </div>
 
+    ${commentHtml}
     ${reviewHtml}
   `;
   document.getElementById('drawerOverlay').classList.add('open');

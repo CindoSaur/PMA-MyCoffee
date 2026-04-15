@@ -12,38 +12,74 @@
     .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
     .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
     .dash-content { padding:1.75rem 2rem; flex:1; }
-    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
-    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
-    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
-    .section-body { padding:1.5rem; }
     .page-hd { margin-bottom:1.75rem; }
     .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
     .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
-    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
-    .form-label { font-size:13px; font-weight:500; color:var(--text); }
-    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
-    .form-input:focus { border-color:var(--green); }
-    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
-    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
-    .btn-save:hover { background:var(--green-dark); }
-    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
-    .btn-outline:hover { border-color:var(--text); }
-    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
-    .badge-delivered  { background:#dcfce7; color:#15803d; }
-    .badge-processing { background:#fef9c3; color:#854d0e; }
-    .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
-    .badge-customer { background:var(--green-light); color:var(--green-dark); }
-    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
-    .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
     .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
-
+    .prod-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:box-shadow .2s,transform .2s; display:flex; flex-direction:column; }
+    .prod-card:hover { box-shadow:0 8px 28px rgba(0,0,0,.09); transform:translateY(-2px); }
+    .prod-img { width:100%; height:150px; object-fit:cover; }
+    .prod-body { padding:1rem; flex:1; display:flex; flex-direction:column; gap:5px; }
+    .prod-cat { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--green-dark); font-weight:600; }
+    .prod-name { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+    .prod-desc { font-size:12px; color:var(--text-light); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .prod-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+    .prod-tag { font-size:10px; padding:2px 8px; background:var(--bg2); border-radius:99px; color:var(--text-mid); }
+    .prod-rating-row { display:flex; align-items:center; gap:5px; margin-top:3px; min-height:18px; }
+    .prod-footer { display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; border-top:1px solid var(--border); gap:8px; }
+    .prod-price { font-family:var(--serif); font-size:1.05rem; font-weight:700; color:var(--green-dark); }
+    .btn-review { display:flex; align-items:center; gap:4px; padding:7px 12px; background:var(--bg2); color:var(--text-mid); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:11px; font-weight:500; cursor:pointer; font-family:var(--sans); transition:.15s; white-space:nowrap; }
+    .btn-review:hover { background:var(--green-light); color:var(--green-dark); border-color:var(--green); }
+    .btn-add-cart { display:flex; align-items:center; gap:5px; padding:7px 14px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-size:12px; font-weight:500; cursor:pointer; font-family:var(--sans); transition:.15s; white-space:nowrap; }
+    .btn-add-cart:hover { background:var(--green-dark); }
+    /* Review modal */
+    .rev-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:700; display:none; align-items:center; justify-content:center; padding:1rem; }
+    .rev-overlay.open { display:flex; }
+    .rev-modal { background:#fff; border-radius:var(--radius); width:560px; max-width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); animation:revUp .25s cubic-bezier(.34,1.3,.64,1); }
+    @keyframes revUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .rev-modal-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+    .rev-modal-title { font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--text); }
+    .rev-modal-close { width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .rev-modal-close:hover { background:var(--bg2); }
+    .rev-modal-body { padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem; }
+    .write-rev-box { background:var(--bg2); border-radius:var(--radius-sm); padding:1.25rem; border:1px solid var(--border); }
+    .write-rev-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:1rem; display:flex; align-items:center; gap:6px; }
+    .star-picker { display:flex; gap:4px; margin-bottom:.85rem; }
+    .star-picker span { font-size:28px; color:#d1d5db; cursor:pointer; transition:color .1s; line-height:1; user-select:none; }
+    .rev-textarea { width:100%; min-height:90px; padding:10px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; color:var(--text); background:#fff; outline:none; resize:vertical; transition:border-color .2s; box-sizing:border-box; }
+    .rev-textarea:focus { border-color:var(--green); }
+    .rev-submit { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer; transition:.15s; margin-top:.75rem; }
+    .rev-submit:hover { background:var(--green-dark); }
+    .rev-item { background:var(--bg2); border-radius:var(--radius-sm); padding:1rem; border:1px solid var(--border); }
+    .rev-item-hd { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; gap:8px; }
+    .rev-author-block { display:flex; align-items:center; gap:8px; }
+    .rev-avatar { width:32px; height:32px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700; flex-shrink:0; }
+    .rev-author { font-size:13px; font-weight:600; color:var(--text); }
+    .rev-date { font-size:11px; color:var(--text-light); }
+    .rev-stars { color:#f59e0b; font-size:13px; margin-bottom:4px; }
+    .rev-comment { font-size:13px; color:var(--text-mid); line-height:1.6; }
+    .rev-delete-own { font-size:11px; color:#dc2626; background:none; border:none; cursor:pointer; padding:3px 7px; border-radius:4px; white-space:nowrap; }
+    .rev-delete-own:hover { background:#fee2e2; }
+    .stars-inline { color:#f59e0b; font-size:12px; }
+    .count-inline { font-size:11px; color:var(--text-light); }
+    .no-rev { font-size:11px; color:var(--text-light); }
   </style>
 </head>
 <body>
-
 <div id="toast" class="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+<!-- Review Modal -->
+<div class="rev-overlay" id="rev-overlay" onclick="if(event.target===this)closeRevModal()">
+  <div class="rev-modal">
+    <div class="rev-modal-hd">
+      <div class="rev-modal-title" id="rev-modal-title">Reviews</div>
+      <button class="rev-modal-close" onclick="closeRevModal()"><span class="mi" style="font-size:18px">close</span></button>
+    </div>
+    <div class="rev-modal-body" id="rev-modal-body"></div>
+  </div>
+</div>
 
 <div class="portal-shell">
   <div id="sidebar-slot"></div>
@@ -53,17 +89,15 @@
       <div id="topbar-right"></div>
     </div>
     <div class="dash-content">
-
       <div class="page-hd">
         <h2>Menu</h2>
         <p>Browse our cold-pressed juices, smoothies and herbal teas.</p>
       </div>
-
-      <!-- Search + filter -->
       <div style="display:flex;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center">
         <div style="position:relative;flex:1;min-width:200px">
           <span class="mi" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-light);font-size:18px">search</span>
-          <input type="text" id="prod-search" placeholder="Search drinks…" oninput="renderProducts()" style="width:100%;padding:9px 14px 9px 38px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;color:var(--text);background:#fff;outline:none" />
+          <input type="text" id="prod-search" placeholder="Search drinks…" oninput="renderProducts()"
+            style="width:100%;padding:9px 14px 9px 38px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;color:var(--text);background:#fff;outline:none" />
         </div>
         <div style="display:flex;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;gap:3px" id="cat-tabs">
           <button onclick="setCat('all',this)" style="padding:7px 14px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:500;color:var(--green-dark);cursor:pointer;font-family:var(--sans);box-shadow:0 1px 4px rgba(0,0,0,.09)">All</button>
@@ -73,23 +107,18 @@
           <button onclick="setCat('detox',this)" style="padding:7px 14px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Detox</button>
         </div>
       </div>
-
-      <div id="products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px"></div>
-
+      <div id="products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
     </div>
   </div>
 </div>
 
 <script>
 const FM_SESSION = 'fm_session';
-const FM_USERS   = 'fm_users';
-const FM_ORDERS  = 'fm_orders';
-function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
-function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
-function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
-function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
-function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
-function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
+const FM_REVIEWS = 'fm_reviews';
+
+function getSession()  { return JSON.parse(localStorage.getItem(FM_SESSION)||'null'); }
+function getReviews()  { return JSON.parse(localStorage.getItem(FM_REVIEWS)||'[]'); }
+function saveReviews(r){ localStorage.setItem(FM_REVIEWS, JSON.stringify(r)); }
 
 let toastTmr;
 function showToast(msg){
@@ -99,121 +128,298 @@ function showToast(msg){
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-
-// ── Sidebar loader ──────────────────────────
-async function loadSidebar() {
-  const slot = document.getElementById('sidebar-slot');
-  if (!slot) return;
-  try {
-    const res = await fetch('/components/layout/sidebar-customer.html');
-    if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
-  } catch(e) {}
-  // Fallback inline sidebar
-  slot.innerHTML = buildFallbackSidebar();
+function starsHtml(n,size){
+  const full=Math.round(parseFloat(n));
+  return Array.from({length:5},(_,i)=>
+    '<span style="color:'+(i<full?'#f59e0b':'#d1d5db')+';font-size:'+(size||13)+'px">&#9733;</span>'
+  ).join('');
 }
 
-function buildFallbackSidebar() {
-  const path = window.location.pathname;
-  const links = [
-    { href:'/components/customer/dashboard-customer.html', icon:'dashboard',       label:'Dashboard',  section:'Overview' },
-    { href:'/components/customer/products-customer.html',  icon:'inventory_2',      label:'Menu',       section:'Shop' },
-    { href:'/components/customer/voucher-customer.html',   icon:'local_offer',      label:'Vouchers',   section:null },
-    { href:'/components/customer/orders-customer.html',    icon:'receipt_long',     label:'Orders',     section:null },
-    { href:'/components/customer/delivery-customer.html',  icon:'delivery_dining',  label:'Delivery',   section:null },
-    { href:'/components/customer/user-customer.html',      icon:'manage_accounts',  label:'My Profile', section:'Account' },
-    { href:'/components/customer/setting-customer.html',   icon:'settings',         label:'Settings',   section:null },
+function getRevSummary(productId){
+  const revs=getReviews().filter(r=>r.productId===productId);
+  if(!revs.length) return null;
+  const avg=revs.reduce((s,r)=>s+r.stars,0)/revs.length;
+  return {avg:avg.toFixed(1),count:revs.length};
+}
+
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Sidebar ── */
+async function loadSidebar(){
+  const slot=document.getElementById('sidebar-slot');
+  if(!slot) return;
+  try{
+    const res=await fetch('/components/layout/sidebar-customer.html');
+    if(res.ok){const html=await res.text();if(html.trim()){slot.innerHTML=html;return;}}
+  }catch(e){}
+  slot.innerHTML=buildFallbackSidebar();
+}
+
+function buildFallbackSidebar(){
+  const path=window.location.pathname;
+  const links=[
+    {href:'/components/customer/dashboard-customer.html',icon:'dashboard',label:'Dashboard',section:'Overview'},
+    {href:'/components/customer/products-customer.html',icon:'inventory_2',label:'Menu',section:'Shop'},
+    {href:'/components/customer/voucher-customer.html',icon:'local_offer',label:'Vouchers',section:null},
+    {href:'/components/customer/orders-customer.html',icon:'receipt_long',label:'Orders',section:null},
+    {href:'/components/customer/delivery-customer.html',icon:'delivery_dining',label:'Delivery',section:null},
+    {href:'/components/customer/user-customer.html',icon:'manage_accounts',label:'My Profile',section:'Account'},
+    {href:'/components/customer/setting-customer.html',icon:'settings',label:'Settings',section:null},
   ];
-  let html = '<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
-    + '<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
-    + '<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
-    + '</a>';
-  let lastSection = null;
-  links.forEach(l => {
-    if (l.section && l.section !== lastSection) {
-      html += '<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">' + l.section + '</div>';
-      lastSection = l.section;
+  let html='<aside style="width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden">'
+    +'<a href="/" style="display:flex;align-items:center;gap:10px;padding:1.4rem 1.25rem 1rem;font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);text-decoration:none">'
+    +'<div style="width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="mi" style="font-size:16px;color:#fff">local_drink</span></div>PolyCoffee'
+    +'</a>';
+  let lastSection=null;
+  links.forEach(l=>{
+    if(l.section&&l.section!==lastSection){
+      html+='<div style="padding:.75rem 1rem .25rem;font-size:10px;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase">'+l.section+'</div>';
+      lastSection=l.section;
     }
-    const active = path.includes(l.href.split('/').pop());
-    html += '<a href="' + l.href + '" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:' + (active ? 'var(--green-dark)' : 'var(--text-mid)') + ';text-decoration:none;font-weight:' + (active ? '500' : '400') + ';background:' + (active ? 'var(--green-light)' : 'none') + '"><span class="mi">' + l.icon + '</span> ' + l.label + '</a>';
+    const active=path.includes(l.href.split('/').pop());
+    html+='<a href="'+l.href+'" style="display:flex;align-items:center;gap:9px;padding:9px 1.25rem;font-size:13px;color:'+(active?'var(--green-dark)':'var(--text-mid)')+';text-decoration:none;font-weight:'+(active?'500':'400')+';background:'+(active?'var(--green-light)':'none')+'"><span class="mi">'+l.icon+'</span> '+l.label+'</a>';
   });
-  html += '<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-    + '<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
-    + '<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
-    + '</div>'
-    + '<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
-    + '<span class="mi" style="font-size:15px">logout</span> Sign out'
-    + '</button>'
-    + '</div></aside>';
+  html+='<div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;flex-shrink:0">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    +'<div id="sb-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">&#8212;</div>'
+    +'<div><div id="sb-name" style="font-size:13px;font-weight:600;color:var(--text)">&#8212;</div><div id="sb-role" style="font-size:11px;color:var(--text-light)">customer</div></div>'
+    +'</div>'
+    +'<button onclick="if(confirm(\'Sign out?\')){localStorage.removeItem(\'fm_session\');location.href=\'\/\'}" style="display:flex;align-items:center;gap:6px;width:100%;padding:.55rem .75rem;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-family:var(--sans);cursor:pointer">'
+    +'<span class="mi" style="font-size:15px">logout</span> Sign out'
+    +'</button>'
+    +'</div></aside>';
   return html;
 }
 
+/* ── Products ── */
+let allProducts=[];
+let currentCat='all';
+let currentSession=null;
 
-
-let allProducts = [];
-let currentCat = 'all';
-
-function setCat(c, btn) {
-  currentCat = c;
-  document.querySelectorAll('#cat-tabs button').forEach(b => {
-    b.style.background = 'none'; b.style.color = 'var(--text-mid)'; b.style.boxShadow = 'none';
-  });
-  btn.style.background = '#fff'; btn.style.color = 'var(--green-dark)'; btn.style.boxShadow = '0 1px 4px rgba(0,0,0,.09)';
+function setCat(c,btn){
+  currentCat=c;
+  document.querySelectorAll('#cat-tabs button').forEach(b=>{b.style.background='none';b.style.color='var(--text-mid)';b.style.boxShadow='none';});
+  btn.style.background='#fff';btn.style.color='var(--green-dark)';btn.style.boxShadow='0 1px 4px rgba(0,0,0,.09)';
   renderProducts();
 }
 
-function renderProducts() {
-  const q = document.getElementById('prod-search').value.toLowerCase();
-  let list = allProducts;
-  if (currentCat !== 'all') list = list.filter(p=>p.cat===currentCat);
-  if (q) list = list.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
-  const grid = document.getElementById('products-grid');
-  if (!list.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="mi">search_off</span>No drinks found.</div>';
+function renderProducts(){
+  const q=document.getElementById('prod-search').value.toLowerCase();
+  let list=allProducts;
+  if(currentCat!=='all') list=list.filter(p=>p.cat===currentCat);
+  if(q) list=list.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  const grid=document.getElementById('products-grid');
+  if(!list.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light)"><span class="mi" style="font-size:48px;display:block;margin-bottom:1rem">search_off</span>No drinks found.</div>';
     return;
   }
-  grid.innerHTML = list.map(p => `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:pointer" onmouseover="this.style.boxShadow='0 8px 28px rgba(0,0,0,.09)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'">
-      <img src="${p.img||'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&q=80'}" style="width:100%;height:150px;object-fit:cover" />
-      <div style="padding:1rem">
-        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--green-dark);font-weight:600;margin-bottom:4px">${p.cat||''}</div>
-        <div style="font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--text)">${p.name}</div>
-        <div style="font-size:12px;color:var(--text-light);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.desc||''}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">${(p.tags||[]).map(t=>`<span style="font-size:10px;padding:2px 8px;background:var(--bg2);border-radius:99px;color:var(--text-mid)">${t}</span>`).join('')}</div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-top:1px solid var(--border)">
-        <span style="font-family:var(--serif);font-size:1.05rem;font-weight:700;color:var(--green-dark)">$${p.price}</span>
-        <button onclick="showToast('${p.name} — visit the main store to order!')" style="display:flex;align-items:center;gap:5px;padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans)">
-          <span class="mi" style="font-size:14px;color:#fff">add_shopping_cart</span> Add
-        </button>
-      </div>
-    </div>`).join('');
+  grid.innerHTML=list.map(p=>{
+    const rev=getRevSummary(p.id);
+    const ratingHtml=rev
+      ? '<span class="stars-inline">'+starsHtml(rev.avg,12)+'</span><span class="count-inline">'+rev.avg+' ('+rev.count+')</span>'
+      : '<span class="no-rev">No reviews yet</span>';
+    const outOfStock=p.inStock===false;
+    const safeName=p.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="prod-card">'
+      +'<img class="prod-img" src="'+(p.img||'')+'" alt="'+escHtml(p.name)+'" onerror="this.src=\'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&q=80\'" />'
+      +'<div class="prod-body">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">'
+      +'<span class="prod-cat">'+(p.cat||'')+'</span>'
+      +(p.feat?'<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#fef9c3;color:#854d0e;font-weight:500;display:inline-flex;align-items:center;gap:3px"><span class="mi" style="font-size:11px">star</span> Featured</span>':'')
+      +(outOfStock?'<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:#fee2e2;color:#b91c1c;font-weight:500">Out of stock</span>':'')
+      +'</div>'
+      +'<div class="prod-name">'+escHtml(p.name)+'</div>'
+      +'<div class="prod-rating-row" id="rating-row-'+p.id+'">'+ratingHtml+'</div>'
+      +'<div class="prod-desc">'+escHtml(p.desc||'')+'</div>'
+      +'<div class="prod-tags">'+(p.tags||[]).map(t=>'<span class="prod-tag">'+escHtml(t)+'</span>').join('')+'</div>'
+      +'</div>'
+      +'<div class="prod-footer">'
+      +'<span class="prod-price">$'+Number(p.price).toFixed(2)+'</span>'
+      +'<div style="display:flex;gap:6px;align-items:center">'
+      +'<button class="btn-review" onclick="openRevModal('+p.id+',\''+safeName+'\')">'
+      +'<span class="mi" style="font-size:14px">rate_review</span> Reviews'
+      +'</button>'
+      +'<button class="btn-add-cart" '+(outOfStock?'style="opacity:.5;cursor:not-allowed" ':'')+' onclick="handleAddCart(\''+safeName+'\','+outOfStock+')">'
+      +'<span class="mi" style="font-size:14px;color:#fff">add_shopping_cart</span> Add'
+      +'</button>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 
-function pageInit(s) {
-  // Try fm_products first, fall back to built-in product list from script.js
-  allProducts = JSON.parse(localStorage.getItem('fm_products')||'[]');
-  if (!allProducts.length) {
-    // Seed from script.js products if available
-    if (typeof products !== 'undefined') { allProducts = products; }
+function handleAddCart(name,outOfStock){
+  if(outOfStock){showToast(name+' is currently out of stock');return;}
+  showToast(name+' — visit the main store to order!');
+}
+
+/* ── Review Modal ── */
+let revProductId=null;
+let revProductName='';
+let pickedStars=0;
+
+function openRevModal(productId,productName){
+  revProductId=productId;
+  revProductName=productName;
+  pickedStars=0;
+  document.getElementById('rev-modal-title').textContent=productName;
+  renderRevModal();
+  document.getElementById('rev-overlay').classList.add('open');
+}
+
+function closeRevModal(){
+  document.getElementById('rev-overlay').classList.remove('open');
+}
+
+function renderRevModal(){
+  const s=currentSession;
+  const revs=getReviews().filter(r=>r.productId===revProductId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const myRev=s?revs.find(r=>r.email===s.email):null;
+  const rev=getRevSummary(revProductId);
+
+  let writeBox='';
+  if(!s){
+    writeBox='<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:1.25rem;border:1px solid var(--border);text-align:center;font-size:13px;color:var(--text-mid)">'
+      +'<span class="mi" style="display:block;font-size:36px;margin-bottom:.5rem;color:var(--green)">login</span>'
+      +'<a href="/components/auth/login.html" style="color:var(--green-dark);font-weight:600;text-decoration:none">Sign in</a> to leave a review.'
+      +'</div>';
+  } else if(myRev){
+    writeBox='<div style="background:#f0fdf4;border-radius:var(--radius-sm);padding:1.25rem;border:1px solid #bbf7d0">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--green-dark);margin-bottom:.5rem;display:flex;align-items:center;gap:6px"><span class="mi" style="font-size:16px">check_circle</span> You already reviewed this drink</div>'
+      +'<div style="margin-bottom:6px">'+starsHtml(myRev.stars,15)+'</div>'
+      +'<div style="font-size:13px;color:var(--text-mid);margin-bottom:.75rem">&ldquo;'+escHtml(myRev.comment)+'&rdquo;</div>'
+      +'<button class="rev-delete-own" onclick="deleteMyReview()"><span class="mi" style="font-size:13px;vertical-align:middle">delete</span> Remove my review</button>'
+      +'</div>';
+  } else {
+    writeBox='<div class="write-rev-box">'
+      +'<div class="write-rev-title"><span class="mi" style="font-size:16px;color:var(--green)">edit</span> Write a review</div>'
+      +'<div style="font-size:12px;font-weight:500;color:var(--text-mid);margin-bottom:6px">Your rating *</div>'
+      +'<div class="star-picker" id="star-picker">'
+      +[1,2,3,4,5].map(i=>'<span onclick="pickStar('+i+')" onmouseover="hoverStar('+i+')" onmouseout="unhoverStar()">&#9733;</span>').join('')
+      +'</div>'
+      +'<textarea class="rev-textarea" id="rev-text" placeholder="Share your thoughts about this drink\u2026" maxlength="500"></textarea>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">'
+      +'<span style="font-size:11px;color:var(--text-light)">Max 500 characters</span>'
+      +'<button class="rev-submit" onclick="submitReview()"><span class="mi" style="font-size:15px">send</span> Submit</button>'
+      +'</div></div>';
   }
+
+  let summaryBar='';
+  if(rev){
+    summaryBar='<div style="display:flex;align-items:center;gap:14px;padding:.85rem 1rem;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid var(--border)">'
+      +'<div style="text-align:center"><div style="font-family:var(--serif);font-size:1.9rem;font-weight:700;color:var(--text);line-height:1">'+rev.avg+'</div>'
+      +'<div style="font-size:11px;color:var(--text-light)">'+rev.count+' review'+(rev.count!==1?'s':'')+'</div></div>'
+      +'<div>'+starsHtml(rev.avg,20)+'<div style="font-size:11px;color:var(--text-light);margin-top:3px">Average rating</div></div>'
+      +'</div>';
+  }
+
+  let listHtml='';
+  if(!revs.length){
+    listHtml='<div style="text-align:center;padding:2rem;color:var(--text-light);font-size:13px"><span class="mi" style="font-size:36px;display:block;margin-bottom:.5rem">rate_review</span>No reviews yet. Be the first!</div>';
+  } else {
+    listHtml=revs.map(r=>{
+      const d=new Date(r.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const init=r.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+      const isMe=s&&r.email===s.email;
+      return '<div class="rev-item">'
+        +'<div class="rev-item-hd">'
+        +'<div class="rev-author-block">'
+        +'<div class="rev-avatar">'+init+'</div>'
+        +'<div><div class="rev-author">'+escHtml(r.name)+(isMe?' <span style="font-size:10px;background:var(--green-light);color:var(--green-dark);padding:1px 6px;border-radius:99px;font-weight:500">You</span>':'')+'</div>'
+        +'<div class="rev-date">'+d+'</div></div>'
+        +'</div>'
+        +(isMe?'<button class="rev-delete-own" onclick="deleteMyReview()"><span class="mi" style="font-size:13px;vertical-align:middle">delete</span> Delete</button>':'')
+        +'</div>'
+        +'<div class="rev-stars">'+starsHtml(r.stars,14)+'</div>'
+        +'<div class="rev-comment">'+escHtml(r.comment)+'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  document.getElementById('rev-modal-body').innerHTML=
+    writeBox+summaryBar
+    +'<div>'
+    +'<div style="font-size:12px;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem">All reviews'+(revs.length?' ('+revs.length+')':'')+'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px">'+listHtml+'</div>'
+    +'</div>';
+
+  if(!myRev&&s) renderStarPicker(pickedStars);
+}
+
+/* ── Star picker ── */
+function renderStarPicker(filled){
+  const picker=document.getElementById('star-picker');
+  if(!picker) return;
+  picker.querySelectorAll('span').forEach((el,i)=>{el.style.color=i<filled?'#f59e0b':'#d1d5db';});
+}
+function pickStar(n){pickedStars=n;renderStarPicker(n);}
+function hoverStar(n){
+  const picker=document.getElementById('star-picker');
+  if(!picker) return;
+  picker.querySelectorAll('span').forEach((el,i)=>{el.style.color=i<n?'#f59e0b':'#d1d5db';});
+}
+function unhoverStar(){renderStarPicker(pickedStars);}
+
+/* ── Submit review ── */
+function submitReview(){
+  const s=currentSession;
+  if(!s){showToast('Please sign in to review');return;}
+  if(pickedStars<1){showToast('Please pick a star rating');return;}
+  const comment=(document.getElementById('rev-text')?.value||'').trim();
+  if(!comment){showToast('Please write something about this drink');return;}
+  const revs=getReviews();
+  if(revs.find(r=>r.productId===revProductId&&r.email===s.email)){showToast('You already reviewed this drink');return;}
+  revs.push({productId:revProductId,name:s.name,email:s.email,stars:pickedStars,comment,date:new Date().toISOString()});
+  saveReviews(revs);
+  pickedStars=0;
+  showToast('Thanks for your review! \u2b50');
+  renderRevModal();
+  refreshRatingRow(revProductId);
+}
+
+/* ── Delete own review ── */
+function deleteMyReview(){
+  const s=currentSession;
+  if(!s) return;
+  if(!confirm('Remove your review?')) return;
+  saveReviews(getReviews().filter(r=>!(r.productId===revProductId&&r.email===s.email)));
+  showToast('Your review was removed');
+  renderRevModal();
+  refreshRatingRow(revProductId);
+}
+
+/* ── Refresh star badge on card ── */
+function refreshRatingRow(productId){
+  const el=document.getElementById('rating-row-'+productId);
+  if(!el) return;
+  const rev=getRevSummary(productId);
+  el.innerHTML=rev
+    ?'<span class="stars-inline">'+starsHtml(rev.avg,12)+'</span><span class="count-inline">'+rev.avg+' ('+rev.count+')</span>'
+    :'<span class="no-rev">No reviews yet</span>';
+}
+
+/* ── Init ── */
+function pageInit(s){
+  currentSession=s;
+  allProducts=JSON.parse(localStorage.getItem('fm_products')||'[]');
+  if(!allProducts.length&&typeof products!=='undefined'){allProducts=products;}
   renderProducts();
 }
 
-
-window.addEventListener('DOMContentLoaded', async () => {
-  const s = getSession();
-  if (!s) { window.location.href = '/components/auth/login.html'; return; }
-  if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+window.addEventListener('DOMContentLoaded',async()=>{
+  const s=getSession();
+  if(!s){window.location.href='/components/auth/login.html';return;}
+  if(s.role==='admin'||s.role==='staff'){window.location.href='/components/admin/dashboard.html';return;}
   await loadSidebar();
-  // Populate sidebar session info
-  const av = document.getElementById('sb-avatar');
-  const nm = document.getElementById('sb-name');
-  const rl = document.getElementById('sb-role');
-  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
-  if (nm) nm.textContent = s.name;
-  if (rl) rl.textContent = s.role || 'customer';
-  if (typeof pageInit === 'function') pageInit(s);
+  const av=document.getElementById('sb-avatar');
+  const nm=document.getElementById('sb-name');
+  const rl=document.getElementById('sb-role');
+  if(av) av.textContent=s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+  if(nm) nm.textContent=s.name;
+  if(rl) rl.textContent=s.role||'customer';
+  pageInit(s);
 });
 </script>
 </body>

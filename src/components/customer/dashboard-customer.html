@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — PolyCoffee</title>
   <link rel="stylesheet" href="/style/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     body { background:var(--bg); }
     .portal-shell { display:flex; min-height:100vh; }
@@ -12,33 +13,36 @@
     .dash-topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
     .dash-title { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--text); }
     .dash-content { padding:1.75rem 2rem; flex:1; }
-    .section-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem; }
-    .section-hd { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
-    .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
-    .section-body { padding:1.5rem; }
-    .page-hd { margin-bottom:1.75rem; }
-    .page-hd h2 { font-family:var(--serif); font-size:1.5rem; font-weight:600; color:var(--text); }
-    .page-hd p { font-size:13px; color:var(--text-mid); margin-top:4px; }
-    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:1rem; }
-    .form-label { font-size:13px; font-weight:500; color:var(--text); }
-    .form-input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; color:var(--text); background:#fff; outline:none; transition:border-color .2s; width:100%; }
-    .form-input:focus { border-color:var(--green); }
-    .form-input:disabled { background:var(--bg2); color:var(--text-light); cursor:not-allowed; }
-    .btn-save { display:inline-flex; align-items:center; gap:7px; padding:10px 22px; background:var(--green); color:#fff; border:none; border-radius:var(--radius-sm); font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer; transition:.2s; }
-    .btn-save:hover { background:var(--green-dark); }
-    .btn-outline { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#fff; color:var(--text); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--sans); font-size:13px; cursor:pointer; transition:.2s; }
-    .btn-outline:hover { border-color:var(--text); }
-    .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
+
+    .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:1.75rem; }
+    .kpi-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; display:flex; flex-direction:column; gap:6px; }
+    .kpi-label { font-size:12px; color:var(--text-light); display:flex; align-items:center; gap:6px; }
+    .kpi-value { font-family:var(--serif); font-size:1.9rem; font-weight:600; color:var(--text); line-height:1.1; }
+    .kpi-sub { font-size:12px; color:var(--text-light); }
+
+    .charts-row { display:grid; grid-template-columns:1fr 300px; gap:16px; margin-bottom:16px; }
+    .chart-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; display:flex; flex-direction:column; }
+    .chart-card-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+    .chart-card-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); }
+
+    .table-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:16px; }
+    .table-card-hd { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:11px 1.5rem; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-light); background:var(--bg2); font-weight:500; text-align:left; border-bottom:1px solid var(--border); }
+    tbody tr { transition:background .12s; }
+    tbody tr:hover { background:var(--bg2); }
+    tbody td { padding:13px 1.5rem; font-size:13px; color:var(--text-mid); border-bottom:1px solid rgba(0,0,0,.04); }
+    .order-id { font-weight:600; color:var(--text); font-family:var(--serif); }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:500; }
     .badge-delivered  { background:#dcfce7; color:#15803d; }
     .badge-processing { background:#fef9c3; color:#854d0e; }
     .badge-cancelled  { background:#fee2e2; color:#b91c1c; }
-    .badge-customer { background:var(--green-light); color:var(--green-dark); }
-    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
-    .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
+    .badge-shipping   { background:#dbeafe; color:#1e40af; }
+
     .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px); background:#1a1a18; color:#fff; padding:14px 22px; border-radius:var(--radius); font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition:all .35s cubic-bezier(.34,1.56,.64,1); z-index:9999; display:flex; align-items:center; gap:10px; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
-
+    .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
   </style>
 </head>
 <body>
@@ -49,53 +53,10 @@
   <div id="sidebar-slot"></div>
   <div class="dash-main">
     <div class="dash-topbar">
-      <div class="dash-title">Dashboard</div>
-      <div id="topbar-right"></div>
+      <div class="dash-title" id="dash-title">Dashboard</div>
+      <span style="font-size:12px;color:var(--text-light)" id="dash-date"></span>
     </div>
-    <div class="dash-content">
-
-      <!-- Overview cards -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem" id="ov-grid">
-        <div class="section-card" style="margin:0">
-          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
-            <div style="width:44px;height:44px;border-radius:12px;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">receipt_long</span></div>
-            <div><div id="ov-orders" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">0</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Total orders</div></div>
-          </div>
-        </div>
-        <div class="section-card" style="margin:0">
-          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
-            <div style="width:44px;height:44px;border-radius:12px;background:#fff8ec;color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">payments</span></div>
-            <div><div id="ov-spent" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">₫0</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Total spent</div></div>
-          </div>
-        </div>
-        <div class="section-card" style="margin:0">
-          <div class="section-body" style="display:flex;align-items:center;gap:1rem">
-            <div style="width:44px;height:44px;border-radius:12px;background:#eaf1ff;color:#3a7bd5;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0"><span class="mi">favorite</span></div>
-            <div><div id="ov-fav" style="font-size:1.4rem;font-weight:700;color:var(--text);line-height:1">—</div><div style="font-size:12px;color:var(--text-mid);margin-top:3px">Favourite drink</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent orders -->
-      <div class="section-card">
-        <div class="section-hd">
-          <div class="section-title">Recent Orders</div>
-          <a href="/components/customer/orders-customer.html" class="btn-outline" style="font-size:12px;padding:6px 14px">View all</a>
-        </div>
-        <div class="section-body" id="recent-orders"></div>
-      </div>
-
-      <!-- Quick links -->
-      <div class="section-card">
-        <div class="section-hd"><div class="section-title">Quick Actions</div></div>
-        <div class="section-body" style="display:flex;gap:12px;flex-wrap:wrap">
-          <a href="/" class="btn-save"><span class="mi" style="font-size:15px;color:#fff">storefront</span> Browse Menu</a>
-          <a href="/components/customer/voucher-customer.html" class="btn-outline"><span class="mi" style="font-size:15px">local_offer</span> My Vouchers</a>
-          <a href="/components/customer/delivery-customer.html" class="btn-outline"><span class="mi" style="font-size:15px">delivery_dining</span> Delivery Info</a>
-        </div>
-      </div>
-
-    </div>
+    <div class="dash-content" id="dash-content"></div>
   </div>
 </div>
 
@@ -107,8 +68,14 @@ function getSession(){ return JSON.parse(localStorage.getItem(FM_SESSION)||'null
 function getUsers()  { return JSON.parse(localStorage.getItem(FM_USERS)||'[]'); }
 function saveUsers(u){ localStorage.setItem(FM_USERS,JSON.stringify(u)); }
 function getOrders() { return JSON.parse(localStorage.getItem(FM_ORDERS)||'[]'); }
-function fmtMoney(v) { if(!v) return '₫0'; if(v>=1000) return '₫'+(v/1000).toFixed(0)+'K'; return '₫'+v.toFixed(0); }
 function logout()    { localStorage.removeItem(FM_SESSION); window.location.href='/'; }
+
+function fmtMoney(v) {
+  if(!v) return '\u20ab0';
+  if(v>=1000000) return '\u20ab'+(v/1000000).toFixed(1)+'M';
+  if(v>=1000)    return '\u20ab'+(v/1000).toFixed(0)+'K';
+  return '\u20ab'+v.toFixed(0);
+}
 
 let toastTmr;
 function showToast(msg){
@@ -118,8 +85,7 @@ function showToast(msg){
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-
-// ── Sidebar loader ──────────────────────────
+// ── Sidebar ───────────────────────────────────
 async function loadSidebar() {
   const slot = document.getElementById('sidebar-slot');
   if (!slot) return;
@@ -127,7 +93,6 @@ async function loadSidebar() {
     const res = await fetch('/components/layout/sidebar-customer.html');
     if (res.ok) { const html = await res.text(); if (html.trim()) { slot.innerHTML = html; return; } }
   } catch(e) {}
-  // Fallback inline sidebar
   slot.innerHTML = buildFallbackSidebar();
 }
 
@@ -167,55 +132,171 @@ function buildFallbackSidebar() {
   return html;
 }
 
+// ── Charts ────────────────────────────────────
+let drinkChartInst = null;
+let payChartInst   = null;
 
+function renderDrinkChart(orders) {
+  const ctx = document.getElementById('drinkChart');
+  if (!ctx) return;
+  const map = {};
+  orders.forEach(o => (o.items||[]).forEach(i => {
+    map[i.name] = (map[i.name]||0) + (i.qty||1);
+  }));
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const labels = sorted.map(e=>e[0]);
+  const values = sorted.map(e=>e[1]);
 
-function pageInit(s) {
-  document.querySelector('.dash-title').textContent = 'Welcome back, ' + s.name.split(' ')[0] + '!';
-  const orders = getOrders().filter(o => o.email === s.email || o.customer === s.name);
-  document.getElementById('ov-orders').textContent = orders.length;
-  const spent = orders.reduce((t,o)=>t+(o.total||0),0);
-  document.getElementById('ov-spent').textContent = fmtMoney(spent);
-  const drinkMap = {};
-  orders.forEach(o=>(o.items||[]).forEach(i=>{ drinkMap[i.name]=(drinkMap[i.name]||0)+i.qty; }));
-  const fav = Object.entries(drinkMap).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('ov-fav').textContent = fav ? fav[0].split(' ')[0] : '—';
-  const recent = [...orders].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
-  const tbody = document.getElementById('recent-orders');
-  if (!recent.length) { tbody.innerHTML = '<div class="empty-state"><span class="mi">receipt_long</span>No orders yet. <a href="/" style="color:var(--green)">Start shopping →</a></div>'; return; }
-  tbody.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
-    '<thead><tr style="background:var(--bg2)">' +
-    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Order</th>' +
-    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Items</th>' +
-    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Total</th>' +
-    '<th style="padding:10px 12px;text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);font-weight:500">Status</th>' +
-    '</tr></thead><tbody>' +
-    recent.map(o => {
-      const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ');
-      const STATUS_COLORS = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled' };
-      const st = o.status||'delivered';
-      return '<tr style="border-top:1px solid var(--border)">' +
-        '<td style="padding:12px;font-weight:600;color:var(--text);font-size:13px">#'+o.id+'</td>' +
-        '<td style="padding:12px;font-size:13px;color:var(--text-mid);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+items+'</td>' +
-        '<td style="padding:12px;font-size:13px;font-weight:600;color:var(--text)">'+fmtMoney(o.total)+'</td>' +
-        '<td style="padding:12px"><span class="badge '+(STATUS_COLORS[st]||'')+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>' +
-        '</tr>';
-    }).join('') + '</tbody></table>';
+  if (drinkChartInst) drinkChartInst.destroy();
+  if (!labels.length) {
+    ctx.parentElement.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-light);font-size:13px">No drink data yet</div>';
+    return;
+  }
+  drinkChartInst = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Qty ordered',
+        data: values,
+        backgroundColor: 'rgba(29,158,117,.18)',
+        borderColor: '#1d9e75',
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid:{display:false}, ticks:{ font:{family:'DM Sans',size:11}, maxRotation:30 } },
+        y: { grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:'DM Sans',size:11}, stepSize:1}, beginAtZero:true }
+      }
+    }
+  });
 }
 
+function renderPayChart(orders) {
+  const ctx = document.getElementById('payChart');
+  if (!ctx) return;
+  const map = {};
+  orders.forEach(o => {
+    const p = (o.payment||'cash');
+    map[p] = (map[p]||0) + 1;
+  });
+  const rawLabels = Object.keys(map);
+  const labels = rawLabels.map(k=>k.charAt(0).toUpperCase()+k.slice(1));
+  const values = rawLabels.map(k=>map[k]);
+  const total  = values.reduce((a,b)=>a+b,0)||1;
+  const COLORS = ['#3b82f6','#8b5cf6','#f59e0b','#1d9e75','#ec4899'];
+  const colors = labels.map((_,i)=>COLORS[i%COLORS.length]);
+
+  if (payChartInst) payChartInst.destroy();
+  if (!labels.length) {
+    ctx.parentElement.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-light);font-size:13px">No payment data yet</div>';
+    return;
+  }
+  payChartInst = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets:[{ data:values, backgroundColor:colors, borderWidth:3, borderColor:'#fff', hoverOffset:10 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      cutout:'64%',
+      plugins:{ legend:{display:false} }
+    }
+  });
+
+  const leg = document.getElementById('payLegend');
+  if (leg) leg.innerHTML = labels.map((lbl,i) =>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0">'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<div style="width:10px;height:10px;border-radius:50%;background:' + colors[i] + ';flex-shrink:0"></div>'
+    + '<span style="font-size:12px;color:var(--text-mid)">' + lbl + '</span>'
+    + '</div>'
+    + '<span style="font-size:12px;font-weight:600;color:var(--text)">' + Math.round(values[i]/total*100) + '%</span>'
+    + '</div>'
+  ).join('');
+}
+
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById('orders-tbody');
+  if (!tbody) return;
+  const recent = [...orders].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  if (!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">No orders yet. <a href="/" style="color:var(--green)">Start shopping \u2192</a></div></td></tr>';
+    return;
+  }
+  const SC = { delivered:'badge-delivered', processing:'badge-processing', cancelled:'badge-cancelled', shipping:'badge-shipping' };
+  tbody.innerHTML = recent.map(o => {
+    const items = (o.items||[]).map(i=>i.name+(i.qty>1?' x'+i.qty:'')).join(', ');
+    const d = new Date(o.date);
+    const date = isNaN(d) ? '\u2014' : d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const st  = o.status||'delivered';
+    const pay = o.payment ? o.payment.charAt(0).toUpperCase()+o.payment.slice(1) : '\u2014';
+    return '<tr>'
+      + '<td class="order-id">#'+o.id+'</td>'
+      + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+items+'</td>'
+      + '<td style="font-weight:500;color:var(--text)">'+fmtMoney(o.total)+'</td>'
+      + '<td><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-mid)"><span class="mi" style="font-size:14px">payments</span>'+pay+'</span></td>'
+      + '<td><span class="badge '+(SC[st]||'')+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</span></td>'
+      + '<td>'+date+'</td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ── Main ──────────────────────────────────────
+function buildDashboard(s) {
+  const orders = getOrders().filter(o => o.email === s.email || o.customer === s.name);
+  const spent  = orders.reduce((t,o)=>t+(o.total||0),0);
+  const drinkMap = {};
+  orders.forEach(o=>(o.items||[]).forEach(i=>{ drinkMap[i.name]=(drinkMap[i.name]||0)+(i.qty||1); }));
+  const fav = Object.entries(drinkMap).sort((a,b)=>b[1]-a[1])[0];
+  const totalDrinks = Object.values(drinkMap).reduce((a,b)=>a+b,0);
+
+  document.getElementById('dash-content').innerHTML =
+    '<div class="kpi-grid">'
+    + '<div class="kpi-card"><div class="kpi-label"><span class="mi" style="color:var(--green)">payments</span> Total Spent</div><div class="kpi-value">'+fmtMoney(spent)+'</div><div class="kpi-sub">Across '+orders.length+' order'+(orders.length!==1?'s':'')+'</div></div>'
+    + '<div class="kpi-card"><div class="kpi-label"><span class="mi" style="color:#f59e0b">local_drink</span> Drinks Ordered</div><div class="kpi-value">'+totalDrinks+'</div><div class="kpi-sub">'+(fav ? 'Fav: '+fav[0] : 'No drinks yet')+'</div></div>'
+    + '<div class="kpi-card"><div class="kpi-label"><span class="mi" style="color:#3b82f6">receipt_long</span> Total Orders</div><div class="kpi-value">'+orders.length+'</div><div class="kpi-sub">Avg. '+fmtMoney(orders.length ? spent/orders.length : 0)+' per order</div></div>'
+    + '</div>'
+
+    + '<div class="charts-row">'
+    + '<div class="chart-card"><div class="chart-card-hd"><div class="chart-card-title">Drinks You\'ve Ordered</div></div><div style="position:relative;height:240px"><canvas id="drinkChart"></canvas></div></div>'
+    + '<div class="chart-card" style="justify-content:space-between"><div class="chart-card-hd" style="margin-bottom:.5rem"><div class="chart-card-title">Payment Methods</div></div><div style="display:flex;align-items:center;justify-content:center;padding:.25rem 0"><canvas id="payChart" style="max-height:170px;max-width:170px"></canvas></div><div id="payLegend" style="margin-top:.75rem;display:flex;flex-direction:column;gap:5px"></div></div>'
+    + '</div>'
+
+    + '<div class="table-card">'
+    + '<div class="table-card-hd"><div class="chart-card-title">Recent Orders <span style="font-size:12px;color:var(--text-light)">('+orders.length+' total)</span></div><a href="/components/customer/orders-customer.html" style="font-size:12px;color:var(--green);text-decoration:none;display:flex;align-items:center;gap:4px"><span class="mi" style="font-size:14px">open_in_new</span> View all</a></div>'
+    + '<table><thead><tr><th>Order ID</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr></thead><tbody id="orders-tbody"></tbody></table>'
+    + '</div>';
+
+  setTimeout(() => {
+    renderDrinkChart(orders);
+    renderPayChart(orders);
+    renderOrdersTable(orders);
+  }, 80);
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
   const s = getSession();
   if (!s) { window.location.href = '/components/auth/login.html'; return; }
   if (s.role === 'admin' || s.role === 'staff') { window.location.href = '/components/admin/dashboard.html'; return; }
+
+  document.getElementById('dash-title').textContent = 'Welcome back, ' + s.name.split(' ')[0] + '!';
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
   await loadSidebar();
-  // Populate sidebar session info
   const av = document.getElementById('sb-avatar');
   const nm = document.getElementById('sb-name');
   const rl = document.getElementById('sb-role');
-  if (av) { av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+  if (av) av.textContent = s.name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
   if (nm) nm.textContent = s.name;
   if (rl) rl.textContent = s.role || 'customer';
-  if (typeof pageInit === 'function') pageInit(s);
+
+  buildDashboard(s);
 });
 </script>
 </body>

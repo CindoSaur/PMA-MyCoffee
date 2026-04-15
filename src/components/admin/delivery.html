@@ -111,6 +111,19 @@
     .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green-mid); flex-shrink:0; }
 
     .section-title { font-family:var(--serif); font-size:1rem; font-weight:600; color:var(--text); margin-bottom:1rem; }
+
+    /* ── Comment feed ── */
+    .comment-feed { display:flex; flex-direction:column; gap:10px; }
+    .comment-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; }
+    .comment-card-hd { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .comment-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+    .comment-customer { font-size:13px; font-weight:600; color:var(--text); }
+    .comment-order-id { font-size:11px; color:var(--text-light); }
+    .comment-text { font-size:13px; color:var(--text-mid); line-height:1.6; font-style:italic; }
+    .comment-date { font-size:11px; color:var(--text-light); margin-top:6px; }
+    .comment-shipper-tag { display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:2px 8px; border-radius:99px; background:#f0f9ff; color:#0369a1; font-weight:500; margin-left:8px; }
+    .comment-status-done { display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:2px 8px; border-radius:99px; background:#dcfce7; color:#15803d; font-weight:500; }
+    .no-comments { text-align:center; padding:2rem; color:var(--text-light); font-size:13px; }
     .empty-state { text-align:center; padding:3rem; color:var(--text-light); }
     .empty-state .mi { font-size:48px; display:block; margin-bottom:1rem; }
   </style>
@@ -128,8 +141,12 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-idx" value="-1" />
+      <div class="form-group" id="f-email-group">
+        <label class="form-label">Email (linked to user account)</label>
+        <input class="form-input" id="f-email" type="email" placeholder="staff@polycoffee.vn" />
+      </div>
       <div class="form-group">
-        <label class="form-label">Full Name *</label>
+        <label class="form-label">Full Name</label>
         <input class="form-input" id="f-name" placeholder="Nguyen Van A" />
       </div>
       <div class="form-group">
@@ -184,6 +201,7 @@
     <a class="sidebar-link" href="orders.html"><span class="mi">receipt_long</span> Orders</a>
     <a class="sidebar-link" href="products.html"><span class="mi">inventory_2</span> Products</a>
     <a class="sidebar-link active" href="delivery.html"><span class="mi">delivery_dining</span> Delivery</a>
+    <a class="sidebar-link" href="voucher.html"><span class="mi">local_offer</span> Vouchers</a>
     <div class="sidebar-section">Settings</div>
     <a class="sidebar-link" href="setting.html"><span class="mi">settings</span> Settings</a>
     <a class="sidebar-link" href="/"><span class="mi" style="color:var(--green)">storefront</span> Back to Store</a>
@@ -202,7 +220,7 @@
   <div class="dash-main">
     <div class="dash-topbar">
       <div class="dash-title">Delivery Management</div>
-      <button class="btn-add" onclick="openAddModal()">
+      <button class="btn-add" id="add-shipper-btn" onclick="openAddModal()">
         <span class="mi" style="font-size:17px">add</span> Add Shipper
       </button>
     </div>
@@ -264,6 +282,21 @@
         </div>
       </div>
 
+      <!-- ── CUSTOMER COMMENTS TO SHIPPERS ── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:2rem 0 1rem">
+        <div class="section-title" style="margin:0">
+          <span class="mi" style="font-size:18px;vertical-align:middle;color:#0369a1">mark_chat_read</span>
+          Customer Comments to Shippers
+        </div>
+        <div style="display:flex;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;gap:3px" id="comment-filter-tabs">
+          <button onclick="setCommentFilter('all',this)" style="padding:6px 14px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:500;color:var(--green-dark);cursor:pointer;font-family:var(--sans);box-shadow:0 1px 4px rgba(0,0,0,.09)">All</button>
+          <button onclick="setCommentFilter('mine',this)" id="btn-mine-comments" style="padding:6px 14px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-mid);cursor:pointer;font-family:var(--sans)">Mine only</button>
+        </div>
+      </div>
+      <div class="table-card" style="padding:1.25rem">
+        <div id="comment-feed" class="comment-feed"></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -272,8 +305,10 @@
 const FM_SHIPPERS_KEY  = 'fm_shippers';
 const FM_ORDERS_KEY    = 'fm_orders';
 const AUTH_SESSION_KEY = 'fm_session';
+const AUTH_USERS_KEY   = 'fm_users';
 
 function getSession()  { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)||'null'); }
+function getUsers()    { return JSON.parse(localStorage.getItem(AUTH_USERS_KEY)||'[]'); }
 function getShippers() { return JSON.parse(localStorage.getItem(FM_SHIPPERS_KEY)||'[]'); }
 function saveShippers(s){ localStorage.setItem(FM_SHIPPERS_KEY, JSON.stringify(s)); }
 function getOrders()   { return JSON.parse(localStorage.getItem(FM_ORDERS_KEY)||'[]'); }
@@ -287,15 +322,39 @@ const ZONES = [
   { name:'Nhà Bè',      info:'Launching Q4 2026',    active:false },
 ];
 
-const SEED_SHIPPERS = [
-  { name:'Nguyen Van A', phone:'+84 901 111 111', vehicle:'motorbike', zone:'District 1',  status:'active',  deliveries:142 },
-  { name:'Tran Thi B',   phone:'+84 902 222 222', vehicle:'motorbike', zone:'District 3',  status:'busy',    deliveries:98  },
-  { name:'Le Van C',     phone:'+84 903 333 333', vehicle:'bicycle',   zone:'Bình Thạnh',  status:'active',  deliveries:67  },
-  { name:'Pham Van D',   phone:'+84 904 444 444', vehicle:'motorbike', zone:'Thủ Đức',     status:'offline', deliveries:210 },
-];
+// ── Build shipper list from real staff users in fm_users ──────────────────
+// Each staff user gets a shipper record auto-created if not already saved.
+// Admin can then edit zone/vehicle/status per shipper.
+function syncShippersFromUsers() {
+  const staffUsers = getUsers().filter(u => u.role === 'staff');
+  let shippers = getShippers();
+  let changed = false;
 
-function seedShippers() {
-  if (!getShippers().length) { saveShippers(SEED_SHIPPERS); }
+  // Add any new staff users not yet in shippers list
+  staffUsers.forEach(u => {
+    const exists = shippers.find(s => s.email === u.email);
+    if (!exists) {
+      shippers.push({
+        name:       u.name,
+        email:      u.email,
+        phone:      u.phone || '—',
+        vehicle:    'motorbike',
+        zone:       'District 1',
+        status:     'active',
+        deliveries: 0,
+      });
+      changed = true;
+    }
+  });
+
+  // Remove shipper records whose user was deleted or role changed from staff
+  const staffEmails = staffUsers.map(u => u.email);
+  const before = shippers.length;
+  shippers = shippers.filter(s => !s.email || staffEmails.includes(s.email));
+  if (shippers.length !== before) changed = true;
+
+  if (changed) saveShippers(shippers);
+  return shippers;
 }
 
 const COLORS = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316'];
@@ -303,6 +362,8 @@ function avatarColor(name) { let h=0; for(const c of name) h=(h*31+c.charCodeAt(
 function initials(name)    { return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
 let currentFilter = 'all';
+let currentRole   = null; // set from session on init
+
 function setFilter(f, btn) {
   currentFilter = f;
   document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
@@ -338,19 +399,45 @@ function renderTable() {
   const q = document.getElementById('search-input').value.toLowerCase();
   let list = getShippers();
   if (currentFilter !== 'all') list = list.filter(s=>s.status===currentFilter);
-  if (q) list = list.filter(s=>s.name.toLowerCase().includes(q)||s.phone.includes(q));
+  if (q) list = list.filter(s=>s.name.toLowerCase().includes(q)||(s.phone||'').includes(q));
 
-  const all = getShippers();
-  const tbody = document.getElementById('shippers-tbody');
+  const all    = getShippers();
+  const tbody  = document.getElementById('shippers-tbody');
+  const isAdmin = currentRole === 'admin';
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="mi">delivery_dining</span>No shippers found</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="mi">delivery_dining</span>${
+      getUsers().filter(u=>u.role==='staff').length === 0
+        ? 'No staff users found. Add staff accounts in <a href="user.html" style="color:var(--green)">Users</a> first.'
+        : 'No shippers match your search.'
+    }</div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = list.map((s,i) => {
-    const realIdx = all.findIndex(a=>a.name===s.name&&a.phone===s.phone);
+    const realIdx    = all.findIndex(a=>a.email===s.email);
     const vehicleIcon = { motorbike:'two_wheeler', bicycle:'directions_bike', car:'directions_car' }[s.vehicle] || 'two_wheeler';
+
+    // Staff can only update their OWN status; admin can edit/manage anyone
+    const session = getSession();
+    const isSelf  = session && session.email === s.email;
+    const canEdit = isAdmin || isSelf;
+
+    const actionBtns = isAdmin
+      ? `<div style="display:flex;gap:6px">
+           <button class="act-btn" title="Edit" onclick="openEditModal(${realIdx})">
+             <span class="mi" style="font-size:16px;color:var(--text-mid)">edit</span>
+           </button>
+           <button class="act-btn" title="Delete" onclick="deleteShipper(${realIdx})">
+             <span class="mi" style="font-size:16px;color:#e05252">delete</span>
+           </button>
+         </div>`
+      : isSelf
+        ? `<button class="act-btn" title="Update my status" onclick="openStatusModal(${realIdx})">
+             <span class="mi" style="font-size:16px;color:var(--green)">edit_note</span>
+           </button>`
+        : `<span style="font-size:12px;color:var(--text-light)">—</span>`;
+
     return `<tr>
       <td style="color:var(--text-light);font-size:12px">${i+1}</td>
       <td>
@@ -358,7 +445,7 @@ function renderTable() {
           <div class="shipper-avatar" style="background:${avatarColor(s.name)}">${initials(s.name)}</div>
           <div>
             <div class="shipper-name">${s.name}</div>
-            <div class="shipper-phone">${s.phone}</div>
+            <div class="shipper-phone">${s.email||''} ${s.phone && s.phone!=='—' ? '· '+s.phone : ''}</div>
           </div>
         </div>
       </td>
@@ -366,60 +453,87 @@ function renderTable() {
       <td><span class="zone-chip"><span class="mi" style="font-size:12px">location_on</span>${s.zone}</span></td>
       <td style="font-weight:500;color:var(--text)">${s.deliveries || 0}</td>
       <td><span class="badge badge-${s.status}">${s.status.charAt(0).toUpperCase()+s.status.slice(1)}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="act-btn" title="Edit" onclick="openEditModal(${realIdx})">
-            <span class="mi" style="font-size:16px;color:var(--text-mid)">edit</span>
-          </button>
-          <button class="act-btn" title="Delete" onclick="deleteShipper(${realIdx})" style="hover:background:#fee2e2">
-            <span class="mi" style="font-size:16px;color:#e05252">delete</span>
-          </button>
-        </div>
-      </td>
+      <td>${actionBtns}</td>
     </tr>`;
   }).join('');
 }
 
+// ── Admin: full edit modal ────────────────────────────────────────────────
 function openAddModal() {
+  if (currentRole !== 'admin') { showToast('Only admins can add shippers'); return; }
   document.getElementById('modal-title').textContent = 'Add Shipper';
   document.getElementById('edit-idx').value = '-1';
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-phone').value = '';
+  document.getElementById('f-name').value   = '';
+  document.getElementById('f-phone').value  = '';
   document.getElementById('f-vehicle').value = 'motorbike';
-  document.getElementById('f-zone').value = 'District 1';
-  document.getElementById('f-status').value = 'active';
+  document.getElementById('f-zone').value    = 'District 1';
+  document.getElementById('f-status').value  = 'active';
+  document.getElementById('f-email-group').style.display = 'flex';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-email').disabled = false;
   document.getElementById('shipperModal').classList.add('open');
 }
 
 function openEditModal(idx) {
   const s = getShippers()[idx];
   document.getElementById('modal-title').textContent = 'Edit Shipper';
-  document.getElementById('edit-idx').value = idx;
+  document.getElementById('edit-idx').value  = idx;
   document.getElementById('f-name').value    = s.name;
-  document.getElementById('f-phone').value   = s.phone;
+  document.getElementById('f-phone').value   = s.phone !== '—' ? s.phone : '';
   document.getElementById('f-vehicle').value = s.vehicle;
   document.getElementById('f-zone').value    = s.zone;
   document.getElementById('f-status').value  = s.status;
+  document.getElementById('f-email-group').style.display = 'flex';
+  document.getElementById('f-email').value    = s.email || '';
+  document.getElementById('f-email').disabled = true; // email is the key, cannot change
   document.getElementById('shipperModal').classList.add('open');
 }
 
-function closeModal() { document.getElementById('shipperModal').classList.remove('open'); }
-document.getElementById('shipperModal').addEventListener('click', e => { if(e.target===document.getElementById('shipperModal')) closeModal(); });
+// ── Staff: status-only modal ──────────────────────────────────────────────
+function openStatusModal(idx) {
+  const s = getShippers()[idx];
+  document.getElementById('modal-title').textContent = 'Update My Status';
+  document.getElementById('edit-idx').value  = idx;
+  document.getElementById('f-name').value    = s.name;
+  document.getElementById('f-phone').value   = s.phone !== '—' ? s.phone : '';
+  document.getElementById('f-vehicle').value = s.vehicle;
+  document.getElementById('f-zone').value    = s.zone;
+  document.getElementById('f-status').value  = s.status;
+  document.getElementById('f-email-group').style.display = 'none';
+  // Disable all fields except status and phone for staff
+  ['f-name','f-vehicle','f-zone'].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById('f-phone').disabled  = false;
+  document.getElementById('f-status').disabled = false;
+  document.getElementById('shipperModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('shipperModal').classList.remove('open');
+  // Re-enable all fields for next open
+  ['f-name','f-phone','f-vehicle','f-zone','f-status','f-email'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.disabled = false;
+  });
+}
+document.getElementById('shipperModal').addEventListener('click', e => {
+  if(e.target===document.getElementById('shipperModal')) closeModal();
+});
 
 function saveShipper() {
-  const idx   = parseInt(document.getElementById('edit-idx').value);
-  const name  = document.getElementById('f-name').value.trim();
-  const phone = document.getElementById('f-phone').value.trim();
+  const idx     = parseInt(document.getElementById('edit-idx').value);
+  const name    = document.getElementById('f-name').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim() || '—';
   const vehicle = document.getElementById('f-vehicle').value;
   const zone    = document.getElementById('f-zone').value;
   const status  = document.getElementById('f-status').value;
+  const email   = document.getElementById('f-email').value.trim().toLowerCase();
 
-  if (!name)  { showToast('Please enter a name');  return; }
-  if (!phone) { showToast('Please enter a phone'); return; }
+  if (!name) { showToast('Please enter a name'); return; }
 
   const shippers = getShippers();
+
   if (idx === -1) {
-    shippers.push({ name, phone, vehicle, zone, status, deliveries: 0 });
+    // Admin adding a manual shipper (not tied to a user account)
+    shippers.push({ name, email, phone, vehicle, zone, status, deliveries: 0 });
     showToast(`${name} added`);
   } else {
     shippers[idx] = { ...shippers[idx], name, phone, vehicle, zone, status };
@@ -431,12 +545,13 @@ function saveShipper() {
 }
 
 function deleteShipper(idx) {
+  if (currentRole !== 'admin') { showToast('Only admins can delete shippers'); return; }
   const s = getShippers()[idx];
-  if (!confirm(`Delete shipper "${s.name}"?`)) return;
+  if (!confirm(`Remove "${s.name}" from shippers?`)) return;
   const list = getShippers();
   list.splice(idx, 1);
   saveShippers(list);
-  showToast('Shipper deleted');
+  showToast('Shipper removed');
   renderStats(); renderZones(); renderTable();
 }
 
@@ -448,13 +563,100 @@ function showToast(msg) {
   toastTmr=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
+// ── Comment feed ────────────────────────────────
+let commentFilterMode = 'all';
+let currentUserEmail  = '';
+
+function setCommentFilter(mode, btn) {
+  commentFilterMode = mode;
+  document.querySelectorAll('#comment-filter-tabs button').forEach(b => {
+    b.style.background = 'none'; b.style.color = 'var(--text-mid)'; b.style.boxShadow = 'none';
+  });
+  btn.style.background = '#fff'; btn.style.color = 'var(--green-dark)'; btn.style.boxShadow = '0 1px 4px rgba(0,0,0,.09)';
+  renderComments();
+}
+
+const CAVA_COLORS = ['#1d9e75','#ef9f27','#3b82f6','#8b5cf6','#ec4899','#f97316'];
+function cAvatarColor(name) { let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))%CAVA_COLORS.length; return CAVA_COLORS[h]; }
+function cInitials(name)    { return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+function renderComments() {
+  const orders = getOrders();
+  // Only orders that have a customer comment
+  let commented = orders.filter(o => o.customerComment);
+
+  // Staff sees only comments addressed to their shipper record
+  if (commentFilterMode === 'mine' || currentRole === 'staff') {
+    // Find shippers linked to this user
+    const shippers = getShippers();
+    const myShipper = shippers.find(s => s.email === currentUserEmail);
+    const myName    = myShipper ? myShipper.name : '';
+    if (currentRole === 'staff') {
+      // Staff only see their own comments always
+      commented = commented.filter(o => o.shipper === myName);
+    } else if (commentFilterMode === 'mine') {
+      const s = getSession();
+      const myShippers = shippers.filter(sh => sh.email === s.email).map(sh=>sh.name);
+      commented = commented.filter(o => myShippers.includes(o.shipper));
+    }
+  }
+
+  commented = commented.sort((a,b) => new Date(b.customerCommentDate||b.date) - new Date(a.customerCommentDate||a.date));
+
+  const feed = document.getElementById('comment-feed');
+  if (!commented.length) {
+    feed.innerHTML = '<div class="no-comments"><span class="mi" style="font-size:40px;display:block;margin-bottom:8px;color:var(--border)">mark_chat_read</span>No customer comments yet.</div>';
+    return;
+  }
+
+  feed.innerHTML = commented.map(o => {
+    const date = o.customerCommentDate
+      ? new Date(o.customerCommentDate).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    return `<div class="comment-card">
+      <div class="comment-card-hd">
+        <div class="comment-avatar" style="background:${cAvatarColor(o.customer)}">${cInitials(o.customer)}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="comment-customer">${o.customer}</span>
+            <span class="comment-order-id">#${o.id}</span>
+            ${o.shipper ? '<span class="comment-shipper-tag"><span class="mi" style="font-size:12px">delivery_dining</span>'+o.shipper+'</span>' : ''}
+            <span class="comment-status-done"><span class="mi" style="font-size:12px">check_circle</span>Delivered</span>
+          </div>
+        </div>
+      </div>
+      <div class="comment-text">"${o.customerComment}"</div>
+      <div class="comment-date">${date}</div>
+    </div>`;
+  }).join('');
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const s = getSession();
-  if (!s || (s.role!=='admin' && s.role!=='staff')) { alert('Access denied.'); window.location.href='/'; return; }
+  if (!s || (s.role!=='admin' && s.role!=='staff')) {
+    alert('Access denied. Admin and staff only.');
+    window.location.href='/'; return;
+  }
+
+  currentRole      = s.role;
+  currentUserEmail = s.email;
   document.getElementById('sb-name').textContent = s.name;
-  document.getElementById('sb-role').textContent = s.role;
-  seedShippers();
+  document.getElementById('sb-role').textContent  = s.role;
+
+  // Admin sees "Add Shipper" button; staff does not
+  const addBtn = document.getElementById('add-shipper-btn');
+  if (addBtn) addBtn.style.display = s.role === 'admin' ? 'flex' : 'none';
+
+  // Staff: hide "Mine only" tab (they always see only theirs)
+  if (s.role === 'staff') {
+    const mineBtn = document.getElementById('btn-mine-comments');
+    if (mineBtn) mineBtn.style.display = 'none';
+  }
+
+  // Sync staff users → shippers
+  syncShippersFromUsers();
   renderStats(); renderZones(); renderTable();
+  renderComments();
 });
 </script>
 </body>
